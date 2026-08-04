@@ -404,6 +404,79 @@ rejected, and a Hypothesis property confirming all-finite input is never
 false-positively rejected (the fault-injection guard must not reject
 ordinary data).
 
+### Milestone 5B — property-based invariant tests
+
+**Functoriality composability** (`tests/test_functor_properties.py`,
+RFC-CLE005 §2.1's spirit, adapted): `CanonicalInclusionFunctorConstructor`
+has no explicit `compose` operation to test `F(g∘f) = F(g)∘F(f)` against
+directly, so the tested property is the categorical fact this
+implementation's inclusion functors must satisfy instead — transitivity:
+for `A.concept_ids` / `B.concept_ids` / `C.concept_ids` built as growing
+prefixes of one shared universe list (so `A ⊆ B ⊆ C` holds by construction,
+not by luck), `construct(A, C)` succeeds whenever both `construct(A, B)`
+and `construct(B, C)` do (subset inclusion is transitive), `construct` is
+deterministic, and — the strongest of the three —
+`test_construct_succeeds_iff_source_is_a_subset_of_target` checks the full
+iff: over independently-generated (not nested) random id sets, `construct`
+succeeds exactly when the subset relation holds and raises
+`FunctorialityViolation` exactly when it doesn't, never one when the other
+was expected.
+
+**Homotopy invariance under random isometries**
+(`tests/test_homotopy_invariants.py`): generalizes Phase 2's hand-picked
+rotation/translation/reflection/reordering cases to Hypothesis-generated
+random point clouds and random angles/offsets. Boundary-flakiness is
+avoided by `assume()`-filtering out any generated point cloud whose
+pairwise distances land within a small margin of the fixed `eps` used — a
+real constraint on what can be tested this way, not a workaround for a
+bug: right at the eps boundary, floating-point rotation/translation
+arithmetic really can move a distance from one side of `<=` to the other,
+and that would be testing float rounding, not Betti-number invariance.
+
+12 new tests, all passing on first implementation; 100% coverage
+maintained without any coverage-driven additions — both files test
+properties of already-implemented, already-covered code paths, adding
+confidence rather than new lines to cover.
+
+### Milestone 5C — end-to-end deterministic replay
+
+`tests/test_deterministic_replay.py`: the first test in this repository
+that wires all four implemented phases together in one call chain —
+`FunctorialConceptLift` -> `IdentityInclusionMorphismLift` (Phase 1) ->
+`EpsilonGraphBettiAnalyzer` (Phase 2, run alongside the chain though its
+output still has no ABI-carried path downstream — the same documented gap
+from the Phase 2/3 reviews) -> `ProvenanceCanonicalizingCrystallizer` ->
+`ArtifactKnowledgeDeltaGenerator` -> `ObservationalCommitCandidateBuilder`
+(Phase 3) -> `GeometricEvolutionTracker.detect_evolution` / `apply_events`
+(Phase 4) — run twice against the same trajectory with fixed injected
+clocks (`clock_ns`, `clock_utc`), asserting equality both of the full
+result bundle and, separately, field-by-field, so a future regression
+names the exact stage that broke determinism rather than just failing a
+single opaque equality check. No prior test exercised this full chain;
+every phase before this was tested in isolation from the others. This is
+"end-to-end pipeline validation" and "deterministic replay validation"
+read literally, not a new capability — assembling one that already
+existed, phase by phase, into a single reproducibility proof.
+
+5 new tests: full-chain determinism (bundle and per-field), a sanity check
+that a genuinely novel trajectory produces exactly one BIRTH event and a
+one-node snapshot, and basic well-formedness checks on confidence bounds
+and Betti-number shape.
+
+### Phase 5 status
+
+177 tests total (up from 157 at the start of Phase 5), 100% line + branch
+coverage, ruff clean, mypy `--strict` clean. RFC-CLE005's own checklist
+(§6): `tests/test_functor_properties.py` ✓, `tests/test_homotopy_invariants.py`
+✓, `tests/test_fuzz_quarantine.py` ✓ (adapted to this repository's
+exception-based quarantine model, not a literal `quarantine_stage` fuzz
+harness — no such field exists on this ABI). `tests/test_abi_layout.py`
+(C-struct/Arrow packing validation) is **not implemented**: this
+repository's ABI has no C-FFI or Arrow boundary yet (RFC-CLE002 §4 is
+aspirational future work, not something any phase has built), so there is
+nothing yet for a layout test to validate — recorded here as a known,
+honest gap rather than a fabricated placeholder test.
+
 ## Assumptions carried from real, existing RFCs
 
 Unlike the RFC-CLE series itself, these dependencies are real, published

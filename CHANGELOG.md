@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### Added — Phase 5 Milestones 5B/5C: property tests + end-to-end replay
+
+- `tests/test_functor_properties.py`: Hypothesis property tests for
+  `CanonicalInclusionFunctorConstructor` — transitivity of composed
+  inclusion functors, determinism, and the full iff (succeeds exactly when
+  source is a subset of target, raises `FunctorialityViolation` exactly
+  when it isn't).
+- `tests/test_homotopy_invariants.py`: generalizes Phase 2's hand-picked
+  isometry-invariance tests to Hypothesis-generated random point clouds
+  and random rotation/translation/reflection/reordering, with a
+  boundary-flakiness guard around the `eps` threshold.
+- `tests/test_deterministic_replay.py`: first end-to-end test wiring all
+  four implemented phases together (object/morphism lifting -> topology ->
+  crystallization/delta/commit-candidate -> evolution detection/replay),
+  run twice with fixed injected clocks, asserting full-chain and
+  per-field determinism.
+- RFC-CLE005's checklist reconciled in `docs/RFC_ALIGNMENT.md`:
+  `test_abi_layout.py` explicitly not implemented (this ABI has no C-FFI/
+  Arrow boundary yet — nothing to validate), recorded as a known gap.
+- 17 new tests, 100% line coverage, 100% branch coverage, ruff clean,
+  mypy `--strict` clean maintained (177 tests total, up from 165).
+
 ### Fixed — Phase 5 Milestone 5A: NaN/Inf fault injection (RFC-CLE005 §4.1)
 
 Real gap found by building the validation tests RFC-CLE005 asks for:
