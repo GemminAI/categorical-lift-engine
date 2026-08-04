@@ -34,9 +34,15 @@ from cle.abi.outputs import (
 )
 from cle.categorical_lift.engine import CategoricalLiftEngine
 from cle.category import CategoryConstructor
-from cle.commit_candidate import CommitCandidateBuilder
+from cle.commit_candidate import (
+    CommitCandidateBuilder,
+    ObservationalCommitCandidateBuilder,
+)
 from cle.concept import ConceptDiscoveryStrategy, FunctorialConceptLift
-from cle.crystallization import KnowledgeCrystallizer
+from cle.crystallization import (
+    KnowledgeCrystallizer,
+    ProvenanceCanonicalizingCrystallizer,
+)
 from cle.errors import (
     CLEError,
     DimensionMismatch,
@@ -51,7 +57,7 @@ from cle.homotopy import (
     HomotopyAnalyzer,
     HomotopyPathAnalyzer,
 )
-from cle.knowledge_delta import KnowledgeDeltaGenerator
+from cle.knowledge_delta import ArtifactKnowledgeDeltaGenerator, KnowledgeDeltaGenerator
 from cle.morphism import IdentityInclusionMorphismLift, MorphismLiftStrategy
 from cle.natural_transformation import NaturalTransformationAnalyzer
 from cle.ports.commit import CommitSink
@@ -59,6 +65,7 @@ from cle.quotient import QuotientConstructor
 from cle.version import __version__
 
 __all__ = [
+    "ArtifactKnowledgeDeltaGenerator",
     "CLEError",
     "CanonicalInclusionFunctorConstructor",
     "CategoricalLiftEngine",
@@ -94,6 +101,8 @@ __all__ = [
     "NaturalTransformationAnalyzer",
     "NoStrategyConfigured",
     "NotStabilized",
+    "ObservationalCommitCandidateBuilder",
+    "ProvenanceCanonicalizingCrystallizer",
     "QuotientConstructor",
     "StabilizedTrajectoryLike",
     "__version__",

@@ -151,6 +151,62 @@ is likewise deliberately deferred, to whenever a `TopologicalInvariant`-
 shaped ABI addition is actually needed by Phase 3+'s
 `Concept -> Knowledge` flow, not before.
 
+## Phase 3 — Knowledge Crystallization Pipeline (RFC-CLE003)
+
+Directive for this phase: implement the three existing, still-unimplemented
+Protocols (`KnowledgeCrystallizer`, `KnowledgeDeltaGenerator`,
+`CommitCandidateBuilder`) exactly as they already stand — no new ABI type,
+no new Protocol, no new `KnowledgeDeltaKind` member. Unlike Phases 1–2, this
+phase needed **zero** additive ABI surface: the mission's own four-step
+breakdown (ConceptCandidate generation / confidence / KnowledgeDelta
+generation / CommitCandidate generation) already maps onto the three
+existing Protocols without modification, once RFC-CLE003 §3's Stage 3
+(Symmetry Reduction) and Stage 4 (Multi-Context Pullback) — which need
+multiple HEKB contexts to compare against, Enterprise-tier per RFC-CLE001
+§2 — are scoped out, matching how the mission itself already scoped the
+four steps down from RFC-CLE003's full five-stage pipeline.
+
+| Mission step | Resolution |
+|---|---|
+| Step 1 (ConceptCandidate generation) | `cle.crystallization.ProvenanceCanonicalizingCrystallizer` implements the pre-existing `KnowledgeCrystallizer.crystallize(artifact) -> Artifact` unchanged. The "candidate" *is* the finalized `Artifact` — no new `ConceptCandidate` type was introduced. Scoped to the one meaningful, single-artifact finalization action: deduplicating `provenance` (first-occurrence order, not sorted — sorting would discard whatever sequencing the upstream stage encoded). |
+| Step 2 (confidence estimation) | No separate Protocol — folded entirely into `CommitCandidateBuilder`, since `KnowledgeDelta` has no confidence field and `HEKBCommitCandidate.confidence` is the only place it can go. |
+| Step 3 (KnowledgeDelta generation: NEW/UPDATE/MERGE/REINFORCE) | `cle.knowledge_delta.ArtifactKnowledgeDeltaGenerator` implements the pre-existing `KnowledgeDeltaGenerator.generate(artifact) -> KnowledgeDelta` unchanged, mapped onto the ABI's existing four `KnowledgeDeltaKind` members. NEW -> `CONCEPT_CREATED`, UPDATE -> `CONCEPT_UPDATED`. REINFORCE is **not** a separate kind — it is a `CONCEPT_UPDATED` delta whose `ConceptDelta.reinforcement_count` is the already-observable reinforcement signal, per direction. MERGE has **no representation**: `CATEGORY_RELATED` is a morphism between two categories, not a fusion of them, and RFC-CLE004 (Phase 4, Category Evolution Tracking) is where MERGE actually belongs (its own BIRTH/DEATH/MERGE/SPLIT/DRIFT taxonomy) — deferred there, not fabricated here. |
+| Step 4 (CommitCandidate generation) | `cle.commit_candidate.ObservationalCommitCandidateBuilder` implements the pre-existing `CommitCandidateBuilder.build(delta, *, source_trajectory_id) -> HEKBCommitCandidate` unchanged. Confidence is a deterministic, monotonic, saturating function (`evidence / (evidence + half_life)`) of observable evidence already on the delta's payload — `dwell_steps` (Concept), `reinforcement_count` (ConceptDelta), `len(concept_ids)` (Category) — never a topological signal (Betti numbers still have no ABI home, still deliberately deferred). `CategoryRelation` gets a fixed confidence of `1.0`: it only exists because a `FunctorConstructor` already *proved* the mapping holds, so its existence is a validated fact, not a volume-of-evidence estimate. |
+| `HEKBCommitCandidate.created_at_ns` vs. "no timestamps" | Resolved via an injectable `clock_ns: Callable[[], int]` constructor field (default `time.time_ns`). The determinism guarantee actually tested is scoped to `id`/`delta`/`confidence`/`provenance` — not `created_at_ns`, which records *when*, not *what*, and cannot be deterministic without lying about it. |
+
+No ABI file changed: `git diff` against `src/cle/abi/` for this phase is
+empty.
+
+### Phase 3 addendum — architectural review finding, fixed
+
+An architecture-only review (additive Protocol growth, ABI consistency,
+mathematical correctness claims, determinism, unnecessary abstraction)
+found one real, empirically-reproduced issue in
+`ObservationalCommitCandidateBuilder`, fixed as an experimental validation
+improvement — not an architectural change, no ABI/Protocol/behavior surface
+touched beyond the one new check:
+
+**Unvalidated `confidence_half_life` precondition.** The confidence
+formula's monotonicity claim ("strictly increasing for `evidence >= 0`,
+`half_life > 0`") is correct, but `half_life > 0` was never enforced.
+Reproduced three concrete failure modes: `confidence_half_life=0.0` with
+positive evidence silently returns `confidence=1.0` for *any* evidence
+value (stops depending on evidence at all); `confidence_half_life=0.0`
+with zero evidence raises `ZeroDivisionError`; `confidence_half_life<0`
+pushes the result outside `[0, 1]`, which then surfaces several calls
+later as `HEKBCommitCandidate.__post_init__`'s existing bounds-check
+`ValueError` — a confusing, indirect failure that never names the actual
+misconfiguration.
+
+Fixed with a `__post_init__` on `ObservationalCommitCandidateBuilder`
+(the same validate-at-construction convention `Category`/`KnowledgeDelta`/
+`HEKBCommitCandidate` already use elsewhere in this ABI) raising
+`ValueError("confidence_half_life must be greater than zero")` immediately
+at construction. No change to the confidence formula, deterministic id
+generation, the injected clock, or any ABI/Protocol — purely an added
+precondition check. 3 new regression tests (0.0 and negative rejected at
+construction; a valid positive value's existing behavior unchanged).
+
 ## Assumptions carried from real, existing RFCs
 
 Unlike the RFC-CLE series itself, these dependencies are real, published

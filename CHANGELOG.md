@@ -2,6 +2,56 @@
 
 ## Unreleased
 
+### Added — Phase 3: Knowledge Crystallization Pipeline (RFC-CLE003)
+
+Zero ABI changes this phase — the mission's four steps (ConceptCandidate
+generation / confidence / KnowledgeDelta generation / CommitCandidate
+generation) already mapped onto the three existing, still-unimplemented
+Protocols without modification. Full rationale in `docs/RFC_ALIGNMENT.md`.
+
+- `cle.crystallization.ProvenanceCanonicalizingCrystallizer`: implements
+  `KnowledgeCrystallizer.crystallize` — deduplicates an artifact's
+  `provenance` (first-occurrence order), the one meaningful finalization
+  action available from a single artifact.
+- `cle.knowledge_delta.ArtifactKnowledgeDeltaGenerator`: implements
+  `KnowledgeDeltaGenerator.generate` — maps `Concept`/`ConceptDelta`/
+  `Category`/`CategoryRelation` onto the existing four `KnowledgeDeltaKind`
+  values. REINFORCE is a `CONCEPT_UPDATED` delta distinguished by
+  `reinforcement_count`, not a new kind. MERGE is out of scope, deferred to
+  Phase 4 (RFC-CLE004 Category Evolution Tracking), where it actually
+  belongs.
+- `cle.commit_candidate.ObservationalCommitCandidateBuilder`: implements
+  `CommitCandidateBuilder.build`. Confidence is a deterministic, strictly
+  monotonic, saturating function of observable evidence already on the
+  artifact (`dwell_steps`, `reinforcement_count`, `len(concept_ids)`);
+  `CategoryRelation` gets a fixed `1.0` (its existence is already a proven
+  fact, not a volume-of-evidence estimate). `created_at_ns` comes from an
+  injectable `clock_ns` callable, keeping `id`/`delta`/`confidence`/
+  `provenance` testable for "same input -> same output" independent of
+  wall-clock time.
+- 24 new tests, including explicit confidence-monotonicity and
+  candidate/delta-reproducibility property tests. 100% line + branch
+  coverage, ruff clean, mypy `--strict` clean maintained (107 tests total,
+  up from 82).
+
+### Fixed — Phase 3 architectural review
+
+An architecture-only review found one real, reproduced issue in
+`ObservationalCommitCandidateBuilder`'s confidence formula, fixed as an
+experimental validation improvement (no architectural, ABI, or Protocol
+change) — see `docs/RFC_ALIGNMENT.md`'s Phase 3 addendum.
+
+- `confidence_half_life` is now validated at construction
+  (`__post_init__` raises `ValueError("confidence_half_life must be
+  greater than zero")` for `<= 0`). Previously, `0.0` silently made
+  confidence stop depending on evidence (always `1.0` for any positive
+  evidence) or raised `ZeroDivisionError` at zero evidence; negative
+  values could push confidence outside `[0, 1]`, surfacing several calls
+  later as an unrelated-looking `ValueError` from `HEKBCommitCandidate`'s
+  own bounds check.
+- 3 new regression tests (110 total): zero and negative rejected at
+  construction; valid positive values behave exactly as before.
+
 ### Added — Phase 2: Homotopy Path Analyzer (RFC-CLE001 §3.3)
 
 Correctness-first, minimum-mathematics implementation — no persistent
