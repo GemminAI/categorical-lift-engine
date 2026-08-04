@@ -41,6 +41,7 @@ from cle.errors import (
     CLEError,
     DimensionMismatch,
     FunctorialityViolation,
+    InvalidTrajectory,
     NoStrategyConfigured,
     NotStabilized,
 )
@@ -76,6 +77,7 @@ __all__ = [
     "HEKBContextLike",
     "HomotopyAnalyzer",
     "IdentityInclusionMorphismLift",
+    "InvalidTrajectory",
     "KnowledgeCrystallizer",
     "KnowledgeDelta",
     "KnowledgeDeltaGenerator",

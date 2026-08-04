@@ -42,6 +42,20 @@ class NoStrategyConfigured(CLEError):
     """
 
 
+class InvalidTrajectory(CLEError):
+    """A trajectory's own fields disagree in a way no strategy can resolve.
+
+    Added post-Phase-1 architectural review: `StabilizedTrajectoryLike.is_novel`
+    and `.basin_id` are independent properties on the real Protocol — nothing
+    guarantees `basin_id is not None` whenever `is_novel` is `False`, that
+    relationship only held in the test fixture. Rather than hashing `None`
+    into a fabricated concept id when a reinforcing trajectory has no
+    `basin_id` and no `hekb_context` match to fall back on,
+    `FunctorialConceptLift` raises this instead — the same "fail loudly, not
+    fabricate" convention as `NotStabilized`/`NoStrategyConfigured`.
+    """
+
+
 class FunctorialityViolation(CLEError):
     """No structure-preserving mapping exists between two categorical structures.
 
@@ -61,6 +75,7 @@ __all__ = [
     "CLEError",
     "DimensionMismatch",
     "FunctorialityViolation",
+    "InvalidTrajectory",
     "NoStrategyConfigured",
     "NotStabilized",
 ]

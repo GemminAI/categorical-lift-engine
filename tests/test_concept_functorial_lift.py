@@ -6,8 +6,13 @@ import pytest
 
 from cle.abi.outputs import Concept, ConceptDelta
 from cle.concept import ConceptDiscoveryStrategy, FunctorialConceptLift
-from cle.errors import DimensionMismatch
-from conftest import FakeHEKBConcept, FakeHEKBContext, FakeStabilizedTrajectory
+from cle.errors import DimensionMismatch, InvalidTrajectory
+from conftest import (
+    FakeHEKBConcept,
+    FakeHEKBContext,
+    FakeInconsistentTrajectory,
+    FakeStabilizedTrajectory,
+)
 
 
 def test_functorial_concept_lift_satisfies_the_protocol() -> None:
@@ -112,6 +117,36 @@ def test_reinforcing_trajectory_with_no_nearby_candidates_falls_back(
 
     assert isinstance(delta, ConceptDelta)
     assert delta.centroid_shift is None
+
+
+def test_tied_candidates_break_ties_deterministically_by_id(
+    reinforcing_trajectory: FakeStabilizedTrajectory,
+) -> None:
+    tied_a = FakeHEKBConcept(id="z-concept", centroid=(1.1, 2.1))
+    tied_b = FakeHEKBConcept(id="a-concept", centroid=(1.1, 2.1))
+    engine = FunctorialConceptLift()
+
+    # Same trajectory, same candidates, only the host's return order differs
+    # — the match must not depend on that order (RFC-CLE005 §3.2).
+    first = engine.discover(
+        reinforcing_trajectory, hekb_context=FakeHEKBContext(near=(tied_a, tied_b))
+    )
+    second = engine.discover(
+        reinforcing_trajectory, hekb_context=FakeHEKBContext(near=(tied_b, tied_a))
+    )
+
+    assert isinstance(first, ConceptDelta)
+    assert isinstance(second, ConceptDelta)
+    assert first.concept_id == second.concept_id == "a-concept"
+
+
+def test_reinforcing_trajectory_without_basin_id_or_match_is_rejected(
+    reinforcing_trajectory_without_basin_id: FakeInconsistentTrajectory,
+) -> None:
+    engine = FunctorialConceptLift()
+
+    with pytest.raises(InvalidTrajectory):
+        engine.discover(reinforcing_trajectory_without_basin_id, hekb_context=None)
 
 
 def test_dimension_mismatch_between_centroid_and_covariance_is_rejected(

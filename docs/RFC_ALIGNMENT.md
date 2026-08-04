@@ -57,6 +57,36 @@ contains only additions to `cle.abi.outputs.__all__`/`cle.errors.__all__`
 plus two brand-new modules (`cle.identity`, `cle.morphism`) and concrete
 implementation classes added *beside* each Protocol they satisfy.
 
+### Phase 1 addendum — architectural review findings, fixed
+
+An architecture-only review of Phase 1 (Protocol/ABI leakage, OSS/Pro
+boundary, determinism, unnecessary abstraction) surfaced two implementation-
+quality issues in `cle.concept.FunctorialConceptLift`, both fixed in the
+same phase rather than deferred:
+
+1. **Tie-break determinism.** `_closest_known_concept`'s `min(known, key=...)`
+   selected the nearest HEKB candidate by distance alone. Two candidates
+   exactly tied on distance would resolve by whatever order
+   `hekb_context.concepts_near()` happened to return them in — order that
+   is host-implemented and outside CLE's control, so "same trajectory lifted
+   twice" could pick a different match across calls even though nothing
+   about the trajectory changed. Fixed by adding `.id` as a stable secondary
+   sort key (`key=lambda c: (distance, c.id)`); RFC-CLE005 §3.2's
+   determinism now holds regardless of host return order. Not an RFC or ABI
+   change — an implementation-quality fix.
+2. **`basin_id`/`is_novel` assumed coupled.** The fallback path (no
+   `hekb_context` match) computed `deterministic_id("concept", frame_id,
+   trajectory.basin_id)` without checking `basin_id is not None`.
+   `StabilizedTrajectoryLike` defines `is_novel` and `basin_id` as
+   independent properties — nothing in the real Protocol guarantees
+   `basin_id is not None` whenever `is_novel` is `False`; that relationship
+   only held in the test fixture. Fixed by raising the new
+   `cle.errors.InvalidTrajectory(CLEError)` when a reinforcing trajectory
+   has neither a `hekb_context` match nor a `basin_id` to fall back on,
+   instead of silently hashing `None` into a fabricated (and
+   over-collapsing — every such trajectory from a frame would hash to the
+   same id) concept id.
+
 ## Assumptions carried from real, existing RFCs
 
 Unlike the RFC-CLE series itself, these dependencies are real, published

@@ -32,6 +32,23 @@ out below and logged in detail in `docs/RFC_ALIGNMENT.md`.
 - 20 new tests; 100% line + branch coverage, ruff clean, mypy `--strict`
   clean maintained (63 tests total, up from 43).
 
+### Fixed — Phase 1 architectural review
+
+An architecture-only review (Protocol/ABI leakage, OSS/Pro boundary,
+determinism, unnecessary abstraction) of the above found two
+implementation-quality issues in `FunctorialConceptLift`, both fixed —
+see `docs/RFC_ALIGNMENT.md`'s Phase 1 addendum for the full rationale.
+
+- HEKB-candidate tie-break: `_closest_known_concept` now breaks exact
+  distance ties by `.id`, so a match no longer depends on
+  `hekb_context.concepts_near()`'s (host-controlled) return order.
+- `cle.errors.InvalidTrajectory` (new): raised instead of hashing `None`
+  into a concept id when a reinforcing trajectory has neither a
+  `hekb_context` match nor a `basin_id` — `is_novel`/`basin_id` are
+  independent properties on `StabilizedTrajectoryLike`, never assumed
+  coupled.
+- 2 new tests (65 total).
+
 ## 0.1.0 — 2026-08-04
 
 ### Added — initial skeleton

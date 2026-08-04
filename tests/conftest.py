@@ -114,3 +114,41 @@ def reinforcing_trajectory() -> FakeStabilizedTrajectory:
         dwell_seconds=0.1,
         provenance=("obs-9",),
     )
+
+
+@dataclass(frozen=True, slots=True)
+class FakeInconsistentTrajectory:
+    """A `StabilizedTrajectoryLike` where `is_novel` and `basin_id` disagree.
+
+    `is_novel` and `basin_id` are independent properties on the real
+    Protocol — `FakeStabilizedTrajectory` above only ties them together as a
+    test convenience. This fixture exists to exercise the defensive path for
+    when a host reports `is_novel=False` with no `basin_id` to fall back on.
+    """
+
+    trajectory_id: str
+    frame_id: str
+    basin_id: str | None
+    states: tuple[FakeMeaningState, ...]
+    centroid: Vector
+    covariance: Matrix
+    dwell_steps: int
+    dwell_seconds: float
+    is_novel: bool
+    provenance: tuple[str, ...] = field(default_factory=tuple)
+
+
+@pytest.fixture
+def reinforcing_trajectory_without_basin_id() -> FakeInconsistentTrajectory:
+    return FakeInconsistentTrajectory(
+        trajectory_id="traj-inconsistent",
+        frame_id="F",
+        basin_id=None,
+        states=(make_state(0, basin_id=None),),
+        centroid=(1.1, 2.1),
+        covariance=((0.1, 0.0), (0.0, 0.1)),
+        dwell_steps=1,
+        dwell_seconds=0.1,
+        is_novel=False,
+        provenance=("obs-9",),
+    )

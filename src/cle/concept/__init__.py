@@ -13,7 +13,7 @@ from typing import Protocol, runtime_checkable
 
 from cle.abi.inputs import HEKBConceptLike, HEKBContextLike, StabilizedTrajectoryLike
 from cle.abi.outputs import Concept, ConceptDelta
-from cle.errors import DimensionMismatch
+from cle.errors import DimensionMismatch, InvalidTrajectory
 from cle.identity import deterministic_id
 
 
@@ -80,12 +80,18 @@ def _closest_known_concept(
     known = [c for c in candidates if c.centroid is not None]
     if not known:
         return candidates[0]
+    # Tie-break on `.id`: `hekb_context.concepts_near` is host-implemented and
+    # its return order is not part of CLE's determinism contract, so two
+    # exactly-equidistant candidates must not let that order decide the
+    # match — RFC-CLE005 §3.2's "same input -> same output" would otherwise
+    # depend on the host, not on the trajectory.
     return min(
         known,
         key=lambda c: (
             _euclidean_distance(trajectory.centroid, c.centroid)
             if c.centroid is not None
-            else math.inf
+            else math.inf,
+            c.id,
         ),
     )
 
@@ -103,9 +109,13 @@ class FunctorialConceptLift:
       derived from `(frame_id, centroid)` (RFC-CLE005 §3.2 lift-determinism).
     - `is_novel` is `False` -> a `ConceptDelta` against the concept
       `hekb_context` resolves the trajectory's centroid to (nearest known
-      concept within a radius derived from the trajectory's own covariance),
-      falling back to a deterministic id derived from `basin_id` when no
-      `hekb_context` is supplied or nothing is found near enough.
+      concept within a radius derived from the trajectory's own covariance,
+      ties on distance broken by `.id` so the match never depends on the
+      host's return order), falling back to a deterministic id derived from
+      `basin_id` when no `hekb_context` is supplied or nothing is found near
+      enough. Raises `InvalidTrajectory` if even `basin_id` is `None` in that
+      case — `is_novel`/`basin_id` are independent properties on
+      `StabilizedTrajectoryLike`, so this is never assumed away.
     """
 
     def discover(
@@ -134,11 +144,18 @@ class FunctorialConceptLift:
                     if matched.centroid is not None
                     else None
                 )
-            else:
+            elif trajectory.basin_id is not None:
                 concept_id = deterministic_id(
                     "concept", trajectory.frame_id, trajectory.basin_id
                 )
                 shift = None
+            else:
+                raise InvalidTrajectory(
+                    f"trajectory {trajectory.trajectory_id!r} is not novel "
+                    "(is_novel=False) but has no basin_id and no hekb_context "
+                    "match — cannot resolve which concept it reinforces "
+                    "without fabricating an id from None"
+                )
             return ConceptDelta(
                 concept_id=concept_id,
                 frame_id=trajectory.frame_id,
