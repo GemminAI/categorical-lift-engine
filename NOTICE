@@ -1,0 +1,23 @@
+Categorical Lift Engine (CLE)
+Copyright 2026 Gemmina Intelligence LLC.
+
+This product includes software developed at Gemmina Intelligence LLC.
+
+Categorical Lift Engine (CLE) is an optional knowledge-generation extension
+of SensOS. It sits downstream of Meaning Space Runtime
+(https://github.com/GemminAI/meaning-space-runtime) and upstream of HEKB,
+and imports no code from either — it is structurally independent, wired
+through Protocol-typed ports and frozen ABI values, the same convention
+MSR and Meaning Mapper already establish.
+
+The SensOS OSS stack (semantic-annotator-core, Meaning Mapper, Meaning
+Space Runtime — all Apache-2.0) is complete and fully functional without
+this repository: observation, measurement, meaning-state tracking, runtime
+dynamics, and LLM-rendering integration all work with no dependency on
+CLE. Installing CLE extends that stack by turning stabilized semantic
+trajectories into reusable knowledge; it does not complete it.
+
+This repository's inclusion outside the current OSS distribution is a
+product-strategy decision, not a technical limitation. See LICENSE —
+license status is intentionally reserved, and commercial licensing terms
+will be determined separately.

@@ -1,0 +1,22 @@
+Categorical Lift Engine (CLE)
+Copyright 2026 Gemmina Intelligence LLC.
+All rights reserved.
+
+LICENSE STATUS: INTENTIONALLY RESERVED
+=======================================
+
+This repository sits outside SensOS's current OSS distribution by product
+strategy, not by technical limitation. The OSS stack (semantic-annotator-core,
+Meaning Mapper, Meaning Space Runtime — all Apache-2.0) is complete and fully
+functional on its own; this repository is a separate, optional extension of
+it, and its licensing is decided independently of the OSS stack's.
+
+Commercial licensing terms for this repository will be determined
+separately, as a business decision, and are not yet finalized. This file is
+a neutral placeholder, not a considered legal instrument, and does not
+speculate about what form those terms will take.
+
+No license to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of this software is granted by this placeholder. Until
+this file is replaced with finalized terms, all rights are reserved and no
+use beyond internal evaluation is authorized.
