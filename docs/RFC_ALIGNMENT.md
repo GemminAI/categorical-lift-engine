@@ -389,13 +389,31 @@ additive calls to a new, independently-tested helper; neither changes any
 existing Protocol signature, ABI field, or previously-tested behavior
 (all 157 pre-existing tests still pass unmodified).
 
-**Not yet extended to `cle.evolution`/`cle.commit_candidate`.**
-`NodeState.centroid` and confidence-evidence floats have the same class of
-gap (nothing stops a NaN `NodeState.centroid` from being constructed), left
-as a documented, deferred finding rather than patched everywhere in one
-pass — consistent with this repository's established practice of fixing
-the highest-value entry points now and recording the rest for a
-follow-up rather than a same-day sweep of every module.
+**Not yet extended to `cle.evolution`/`cle.commit_candidate`, and the exact
+shape of the remaining gap was checked, not just assumed.** A NaN
+`NodeState.centroid` behaves *differently* depending on which event type
+it flows into, verified directly:
+
+- **DRIFT** gets *accidental* protection: its `confidence_score` is
+  computed from the NaN-poisoned distance, and `EvolutionEvent.__post_init__`'s
+  pre-existing `0.0 <= confidence_score <= 1.0` bounds check already raises
+  `ValueError` on it (`0.0 <= float('nan')` is `False` in Python, so the
+  bounds check fails) — confirmed by direct test. This is a side effect of
+  an unrelated check, not a designed guarantee.
+- **BIRTH/DEATH have zero protection**, confirmed the same way: their
+  `confidence_score` is a hardcoded `1.0` that never touches the centroid,
+  so a NaN-centroid'd BIRTH event is accepted completely silently — the
+  node is registered as "born" with a permanently corrupt position, and
+  every later `detect_evolution` call comparing against it computes NaN
+  distances that never satisfy `<=` (always `False`), so that node can
+  never again be detected as drifting, merging, or matching.
+
+Left as a documented, deferred finding (not patched now) — consistent with
+this repository's established practice of fixing the highest-value entry
+points and recording the rest for a follow-up rather than a same-day sweep
+of every module — but the imprecise version of this note ("same class of
+gap") has been replaced with what was actually verified, since "deferred"
+should name the exact exposure, not gesture at it.
 
 8 new tests in `tests/test_fuzz_quarantine.py`: hand-picked NaN/Inf cases
 for both fixed entry points, a Hypothesis property confirming *any*
