@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+### Added — Phase 4 Milestone 4B: MERGE/SPLIT, trace_lineage, ancestry evidence
+
+Direction: stop pausing at phase/milestone boundaries; keep building;
+git history is the rollback mechanism. Full rationale in `docs/RFC_ALIGNMENT.md`.
+
+- `GeometricEvolutionTracker` now detects `MERGE`/`SPLIT` via an explicit,
+  disclosed nearest-centroid proximity heuristic (not a verified pushout/
+  pullback — `NodeState` has no trajectory data to verify one), disabled
+  by default (`merge_split_tolerance=0.0`, opt-in).
+- `AncestryLink`s are now populated: MERGE links carry `weight = 1/N`
+  (parents jointly explain one child), SPLIT links carry `weight = 1.0`
+  (one parent fully explains each child) — reusing Phase 1's
+  `MorphismType` (`PUSHOUT_CANONICAL`/`PULLBACK_CANONICAL`).
+- `CategoryEvolutionTracker.trace_lineage(node_id, event_log, *, depth=10)`
+  added to the Protocol and implemented: breadth-first ancestry-graph walk
+  indexed from BIRTH/MERGE/SPLIT events, cycle-safe, depth-bounded.
+  Deliberately takes an explicit `event_log` parameter (a pure function,
+  no internal tracker state), a disclosed deviation from RFC-CLE004 §5's
+  literal signature.
+- `apply_events`' BIRTH/DEATH-only branching was generalized to
+  unconditional set arithmetic for every event type — as a direct
+  consequence, this also fixes the Milestone 4A review's Priority B
+  finding (MERGE/SPLIT previously would have silently no-op'd).
+- 23 new tests (47 total in `tests/test_evolution.py`), 100% line + branch
+  coverage, ruff clean, mypy `--strict` clean maintained (157 tests total,
+  up from 134).
+
 ### Added — Phase 4: Category Evolution Tracking (RFC-CLE004) — experimental
 
 Explicit change of directive for this phase: optimize for discovering the

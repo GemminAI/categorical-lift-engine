@@ -241,8 +241,8 @@ all one-directional; nothing outside `cle.evolution` imports from it).
 | `LineageSnapshot` | Added verbatim (ids + parent pointer only, no geometry) — RFC-CLE004's own design is already minimal here, and there was no reason to enrich it: `NodeState` is where geometry lives. |
 | **New, not in RFC-CLE004**: `NodeState` (`node_id`, `centroid`) | RFC-CLE004 §5's `detect_evolution(previous_snapshot, current_lift_objects: Sequence[Any], current_lift_morphisms: Sequence[Any])` leaves "lift objects" unspecified. Using `Concept \| ConceptDelta` directly doesn't work: a `ConceptDelta` only carries a *shift*, not an absolute position, so the previous absolute centroid isn't reconstructable from a `ConceptDelta` alone, and `LineageSnapshot.active_node_ids` carries no geometry at all. `NodeState` is the smallest representation that makes BIRTH/DEATH/DRIFT detection well-defined and testable — introduced exactly because "optimize for discovery" invites it, not smuggled in as a minimal necessity. |
 | `CategoryEvolutionTrackingProtocol.detect_evolution` / `apply_events` | Added as `CategoryEvolutionTracker.detect_evolution(previous_nodes, current_nodes) -> tuple[EvolutionEvent, ...]` / `apply_events(previous_snapshot, events) -> LineageSnapshot`, implemented by `GeometricEvolutionTracker`. Signature adapted from RFC-CLE004's literal one: `detect_evolution` takes `tuple[NodeState, ...]` pairs instead of a `LineageSnapshot` (id-only, insufficient for DRIFT's geometry) plus untyped object/morphism sequences. |
-| `CategoryEvolutionTrackingProtocol.trace_lineage` | **Not added yet.** With only BIRTH/DEATH/DRIFT producible, every node has at most one trivial parent — a lineage trace has nothing genuine to demonstrate before `MERGE`/`SPLIT` exist to create real multi-parent ancestry. Declaring it now would ship an untested, unmotivated method. Deferred to the same follow-up milestone as `MERGE`/`SPLIT`, added additively (this Protocol is brand new this phase, so there is no "existing shipped signature" being redesigned by extending it later). |
-| `MERGE` / `SPLIT` | Not implemented. RFC-CLE004 §2.1–2.2 defines them via pullback/pushout diagrams over multiple concepts — a real mechanism, not a naming exercise, and building one honestly is its own milestone rather than a same-day addition. |
+| `CategoryEvolutionTrackingProtocol.trace_lineage` | **Now implemented** (Milestone 4B, below) — added additively to `CategoryEvolutionTracker` once `MERGE`/`SPLIT` gave it a genuine multi-parent case to walk. |
+| `MERGE` / `SPLIT` | **Now implemented** (Milestone 4B, below) as an explicit heuristic, not a verified pushout/pullback — see below for exactly what evidence it does and doesn't check. |
 | Determinism (`timestamp_utc`) | Same resolution as Phase 3's `created_at_ns`: an injectable `clock_utc: Callable[[], str]` constructor field on `GeometricEvolutionTracker` (default: real UTC time). `EvolutionEvent.event_id` and `LineageSnapshot.snapshot_id` are both derived only from semantic content (`cle.identity.deterministic_id` over node ids / prior event ids), never from `timestamp_utc` — verified directly: two trackers with different injected clocks produce identical `event_id`s and different `timestamp_utc`s for the same detection. |
 | Event ordering | `detect_evolution`'s returned tuple is sorted by `(event_type, source_node_ids, target_node_ids)`, not left in whatever order the input `NodeState` tuples or Python's set-difference iteration happened to produce — the same host/iteration-order independence lesson the Phase 2 review's tie-break fix established for `FunctorialConceptLift`, applied proactively here instead of found by a later review. |
 | Configuration validation | `GeometricEvolutionTracker.drift_tolerance` is validated at construction (`__post_init__`, `>= 0.0`) — applying the Phase 3 review's lesson (`confidence_half_life`'s unvalidated precondition) proactively rather than waiting for it to be found again. Note the bound differs deliberately: `drift_tolerance = 0.0` is valid (means "any movement at all is drift"), where Phase 3's `confidence_half_life` required strictly `> 0` (it is a divisor that must never be zero); `drift_tolerance` is only ever a comparison threshold, not a divisor, so zero is safe and meaningful. |
@@ -259,6 +259,95 @@ and the two new configuration-validation guards. 100% line + branch
 coverage achieved without a second pass — no coverage-driven test
 gymnastics were needed, a mild signal that the module's branching is
 already about as simple as the problem allows.
+
+### Milestone 4B — MERGE, SPLIT, trace_lineage, ancestry evidence
+
+Direction changed explicitly for this milestone: stop pausing at phase
+boundaries, keep building, treat git history as the rollback mechanism
+rather than a reason to hold back on an experimental abstraction.
+
+**MERGE/SPLIT are an explicit proximity heuristic, stated as such, not a
+verified pushout/pullback.** RFC-CLE004 §2.1–2.2 defines MERGE/SPLIT via
+categorical limit/colimit diagrams over the concepts involved; `NodeState`
+carries only an id and a centroid, never the trajectory such a diagram
+would need to verify. What `GeometricEvolutionTracker` actually does:
+for every died node, find its nearest born node by Euclidean distance; if
+two or more died nodes share the same nearest born node within
+`merge_split_tolerance`, that is reported as a MERGE. SPLIT is the mirror
+(group born nodes by nearest died node). Disabled by default
+(`merge_split_tolerance=0.0`) — merge/split inference is opt-in, unlike
+`drift_tolerance` which defaults to a meaningful `0.0` ("any movement
+counts"). Every died/born id is claimed by at most one MERGE or SPLIT
+(MERGE resolved first); whatever remains becomes plain DEATH/BIRTH.
+
+**Confidence has two different shapes on purpose, not one formula reused
+twice.** `_saturating_confidence` (DRIFT: more distance past the tolerance
+is *more* evidence of real drift) is monotonically *increasing*.
+`_proximity_confidence` (MERGE/SPLIT: closer centroids are *more* evidence
+the heuristic's grouping hypothesis is right) is monotonically
+*decreasing*, `1.0 - average_distance / tolerance`, exactly `0.0` at the
+tolerance boundary and `1.0` at zero distance. Both are property-tested
+for their respective (opposite) monotonicity direction.
+
+**Ancestry weight semantics are asymmetric, and that asymmetry is
+deliberate, not an oversight.** A MERGE's `AncestryLink`s each carry
+`weight = 1 / len(sources)`: several parents jointly explain one child, so
+credit is split. A SPLIT's `AncestryLink`s each carry `weight = 1.0`: one
+parent alone fully explains each child, so nothing is diluted. Both reuse
+`MorphismType` from Phase 1 (`PUSHOUT_CANONICAL` for MERGE,
+`PULLBACK_CANONICAL` for SPLIT) rather than a new vocabulary.
+
+**`apply_events`'s BIRTH/DEATH branching was generalized to unconditional
+set arithmetic** (`active -= sources; active |= targets`, for every event
+regardless of type) instead of the previous explicit `if BIRTH / elif
+DEATH`. This is not purely a MERGE/SPLIT feature addition: it also
+directly resolves the Priority B finding from the Milestone-4A
+architecture review (`apply_events` would have silently no-op'd on a
+hand-built MERGE/SPLIT event, since neither `if` branch matched it) — the
+generalization needed for MERGE/SPLIT correctness fixes that gap as a
+natural consequence, verified by test
+(`test_apply_events_consolidates_merge_sources_into_target`,
+`test_apply_events_distributes_split_source_into_targets`).
+
+**`trace_lineage(node_id, event_log, *, depth=10)`** indexes only
+BIRTH/MERGE/SPLIT events by `target_node_id` (DEATH removes identity,
+DRIFT preserves it without creating ancestry — neither is indexed), then
+walks breadth-first from `node_id` through `ancestry_links`, bounded to
+`depth` hops, with a visited-set guard against re-queuing an
+already-reached ancestor (RFC-CLE004 §6's DAG assumption is trusted, not
+verified — a real cycle would still terminate via the guard, just without
+detecting that a cycle existed). The guard prevents infinite traversal; it
+does **not** deduplicate the returned `AncestryLink`s themselves — if the
+same ancestor is reachable via two different paths, both links are
+returned (verified directly by a synthetic multi-path test) — collapsing
+those into one entry was judged a premature design decision (which
+"real" path should win, and does it matter?) for a first experimental
+pass, deferred rather than guessed at.
+
+**Signature deviation from RFC-CLE004 §5, disclosed:** `trace_lineage`
+takes an explicit `event_log: tuple[EvolutionEvent, ...]` parameter that
+RFC-CLE004's literal signature (`trace_lineage(self, node_id, depth=10)`)
+does not have. The RFC's version implies the tracker itself holds
+accumulated history as internal state; `GeometricEvolutionTracker`
+deliberately holds none (it is a `frozen` dataclass with no mutable log) —
+every method is a pure function of its explicit arguments, matching this
+repository's established preference for explicit state over hidden
+instance state, and keeping `trace_lineage` trivially unit-testable
+without needing to first replay a whole history into the tracker.
+
+47 tests total in `tests/test_evolution.py` (up from 24): MERGE/SPLIT
+detection and ancestry-weight assertions, the "single candidate is not a
+merge" boundary, tolerance-disabled and no-candidates-in-range paths,
+`apply_events` consolidation/distribution, and `trace_lineage` correctness
+(single-parent, multi-generation chains, depth limiting, determinism,
+DEATH/DRIFT exclusion, and the shared-ancestor revisit-guard). 100% line +
+branch coverage on `cle.evolution` reached in two passes: the first
+implementation left 5 branches uncovered (documented, not hidden, in the
+commit history) — the early-return paths in `_detect_merges`/
+`_detect_splits` when one side is empty, the "no candidate within
+tolerance" paths, and `trace_lineage`'s DEATH/DRIFT-exclusion and
+revisit-guard branches — each closed by one additional, purposefully
+targeted test rather than a blanket fuzz pass.
 
 ## Assumptions carried from real, existing RFCs
 

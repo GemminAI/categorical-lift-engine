@@ -1,8 +1,8 @@
 """`GeometricEvolutionTracker` — Category Evolution Tracking (RFC-CLE004, Phase 4).
 
 Experimental module (see `cle.evolution`'s own docstring and
-`docs/RFC_ALIGNMENT.md`): this milestone covers BIRTH/DEATH/DRIFT detection
-and snapshot replay only. MERGE/SPLIT/trace_lineage are deferred.
+`docs/RFC_ALIGNMENT.md`): all five `EvolutionEventType`s, `apply_events`,
+and `trace_lineage` are covered.
 """
 
 from __future__ import annotations
@@ -23,9 +23,13 @@ from cle.evolution import (
 _FIXED_TIME = "2026-01-01T00:00:00+00:00"
 
 
-def _tracker(drift_tolerance: float = 0.0) -> GeometricEvolutionTracker:
+def _tracker(
+    drift_tolerance: float = 0.0, merge_split_tolerance: float = 0.0
+) -> GeometricEvolutionTracker:
     return GeometricEvolutionTracker(
-        drift_tolerance=drift_tolerance, clock_utc=lambda: _FIXED_TIME
+        drift_tolerance=drift_tolerance,
+        merge_split_tolerance=merge_split_tolerance,
+        clock_utc=lambda: _FIXED_TIME,
     )
 
 
@@ -340,3 +344,402 @@ def test_default_clock_is_a_real_utc_timestamp() -> None:
 
     parsed = datetime_module.datetime.fromisoformat(event.timestamp_utc)
     assert parsed >= before
+
+
+def test_negative_merge_split_tolerance_is_rejected_at_construction() -> None:
+    with pytest.raises(
+        ValueError, match="merge_split_tolerance must be greater than or equal to zero"
+    ):
+        GeometricEvolutionTracker(merge_split_tolerance=-1.0)
+
+
+# --- detect_evolution: MERGE -------------------------------------------------
+
+
+def test_two_dying_nodes_near_one_born_node_are_a_merge() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+    previous = (
+        NodeState(node_id="a", centroid=(0.0, 0.0)),
+        NodeState(node_id="b", centroid=(1.0, 0.0)),
+    )
+    current = (NodeState(node_id="c", centroid=(0.5, 0.0)),)
+
+    events = tracker.detect_evolution(previous, current)
+
+    assert len(events) == 1
+    (event,) = events
+    assert event.event_type is EvolutionEventType.MERGE
+    assert event.source_node_ids == ("a", "b")
+    assert event.target_node_ids == ("c",)
+
+
+def test_merge_ancestry_links_split_weight_equally_among_parents() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+    previous = (
+        NodeState(node_id="a", centroid=(0.0, 0.0)),
+        NodeState(node_id="b", centroid=(1.0, 0.0)),
+    )
+    current = (NodeState(node_id="c", centroid=(0.5, 0.0)),)
+
+    (event,) = tracker.detect_evolution(previous, current)
+
+    assert len(event.ancestry_links) == 2
+    assert {link.parent_node_id for link in event.ancestry_links} == {"a", "b"}
+    assert all(link.weight == 0.5 for link in event.ancestry_links)
+    assert all(
+        link.morphism_type is MorphismType.PUSHOUT_CANONICAL
+        for link in event.ancestry_links
+    )
+
+
+def test_merge_confidence_decreases_with_average_distance() -> None:
+    def confidence_for(offset: float) -> float:
+        tracker = _tracker(merge_split_tolerance=2.0)
+        previous = (
+            NodeState(node_id="a", centroid=(-offset, 0.0)),
+            NodeState(node_id="b", centroid=(offset, 0.0)),
+        )
+        current = (NodeState(node_id="c", centroid=(0.0, 0.0)),)
+        (event,) = tracker.detect_evolution(previous, current)
+        return event.confidence_score
+
+    confidences = [confidence_for(offset) for offset in (0.1, 0.5, 1.0, 1.9)]
+
+    # Larger offset -> larger average distance -> lower confidence.
+    assert confidences == sorted(confidences, reverse=True)
+    assert len(set(confidences)) == len(confidences)
+    assert all(0.0 <= c <= 1.0 for c in confidences)
+
+
+def test_single_dying_node_near_a_born_node_is_not_a_merge() -> None:
+    # Only one parent candidate: this is a coincidental DEATH + BIRTH, not
+    # a merge (a merge requires >= 2 sources by definition).
+    tracker = _tracker(merge_split_tolerance=1.0)
+    previous = (NodeState(node_id="a", centroid=(0.0, 0.0)),)
+    current = (NodeState(node_id="c", centroid=(0.1, 0.0)),)
+
+    events = tracker.detect_evolution(previous, current)
+
+    event_types = {event.event_type for event in events}
+    assert EvolutionEventType.MERGE not in event_types
+    assert event_types == {EvolutionEventType.DEATH, EvolutionEventType.BIRTH}
+
+
+def test_merge_split_tolerance_zero_disables_merge_detection() -> None:
+    tracker = _tracker(merge_split_tolerance=0.0)
+    previous = (
+        NodeState(node_id="a", centroid=(0.0, 0.0)),
+        NodeState(node_id="b", centroid=(0.01, 0.0)),
+    )
+    current = (NodeState(node_id="c", centroid=(0.005, 0.0)),)
+
+    events = tracker.detect_evolution(previous, current)
+
+    event_types = {event.event_type for event in events}
+    assert EvolutionEventType.MERGE not in event_types
+    assert event_types == {EvolutionEventType.DEATH, EvolutionEventType.BIRTH}
+
+
+# --- detect_evolution: SPLIT -------------------------------------------------
+
+
+def test_one_dying_node_near_two_born_nodes_is_a_split() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+    previous = (NodeState(node_id="a", centroid=(0.5, 0.0)),)
+    current = (
+        NodeState(node_id="b", centroid=(0.0, 0.0)),
+        NodeState(node_id="c", centroid=(1.0, 0.0)),
+    )
+
+    events = tracker.detect_evolution(previous, current)
+
+    assert len(events) == 1
+    (event,) = events
+    assert event.event_type is EvolutionEventType.SPLIT
+    assert event.source_node_ids == ("a",)
+    assert event.target_node_ids == ("b", "c")
+
+
+def test_split_ancestry_links_each_carry_full_weight() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+    previous = (NodeState(node_id="a", centroid=(0.5, 0.0)),)
+    current = (
+        NodeState(node_id="b", centroid=(0.0, 0.0)),
+        NodeState(node_id="c", centroid=(1.0, 0.0)),
+    )
+
+    (event,) = tracker.detect_evolution(previous, current)
+
+    assert len(event.ancestry_links) == 2
+    assert all(link.parent_node_id == "a" for link in event.ancestry_links)
+    assert all(link.weight == 1.0 for link in event.ancestry_links)
+    assert all(
+        link.morphism_type is MorphismType.PULLBACK_CANONICAL
+        for link in event.ancestry_links
+    )
+
+
+def test_merge_is_resolved_before_split_so_ids_are_not_double_claimed() -> None:
+    # a merges into c; d splits into e/f. Distinct groups, no id shared.
+    tracker = _tracker(merge_split_tolerance=1.0)
+    previous = (
+        NodeState(node_id="a1", centroid=(0.0, 0.0)),
+        NodeState(node_id="a2", centroid=(1.0, 0.0)),
+        NodeState(node_id="d", centroid=(10.5, 0.0)),
+    )
+    current = (
+        NodeState(node_id="c", centroid=(0.5, 0.0)),
+        NodeState(node_id="e", centroid=(10.0, 0.0)),
+        NodeState(node_id="f", centroid=(11.0, 0.0)),
+    )
+
+    events = tracker.detect_evolution(previous, current)
+
+    event_types = [event.event_type for event in events]
+    assert event_types.count(EvolutionEventType.MERGE) == 1
+    assert event_types.count(EvolutionEventType.SPLIT) == 1
+    merge_event = next(e for e in events if e.event_type is EvolutionEventType.MERGE)
+    split_event = next(e for e in events if e.event_type is EvolutionEventType.SPLIT)
+    assert merge_event.source_node_ids == ("a1", "a2")
+    assert split_event.target_node_ids == ("e", "f")
+
+
+# --- apply_events with MERGE / SPLIT -----------------------------------------
+
+
+def test_apply_events_consolidates_merge_sources_into_target() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+    previous_snapshot = LineageSnapshot(
+        snapshot_id="s0", timestamp_utc=_FIXED_TIME, active_node_ids=("a", "b")
+    )
+    previous_nodes = (
+        NodeState(node_id="a", centroid=(0.0, 0.0)),
+        NodeState(node_id="b", centroid=(1.0, 0.0)),
+    )
+    current_nodes = (NodeState(node_id="c", centroid=(0.5, 0.0)),)
+    events = tracker.detect_evolution(previous_nodes, current_nodes)
+
+    new_snapshot = tracker.apply_events(previous_snapshot, events)
+
+    assert new_snapshot.active_node_ids == ("c",)
+
+
+def test_apply_events_distributes_split_source_into_targets() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+    previous_snapshot = LineageSnapshot(
+        snapshot_id="s0", timestamp_utc=_FIXED_TIME, active_node_ids=("a",)
+    )
+    previous_nodes = (NodeState(node_id="a", centroid=(0.5, 0.0)),)
+    current_nodes = (
+        NodeState(node_id="b", centroid=(0.0, 0.0)),
+        NodeState(node_id="c", centroid=(1.0, 0.0)),
+    )
+    events = tracker.detect_evolution(previous_nodes, current_nodes)
+
+    new_snapshot = tracker.apply_events(previous_snapshot, events)
+
+    assert set(new_snapshot.active_node_ids) == {"b", "c"}
+
+
+# --- trace_lineage ------------------------------------------------------------
+
+
+def test_trace_lineage_of_a_birth_is_empty() -> None:
+    tracker = _tracker()
+    birth = tracker._birth("root", _FIXED_TIME)
+
+    links = tracker.trace_lineage("root", (birth,))
+
+    assert links == ()
+
+
+def test_trace_lineage_follows_a_merge_to_its_parents() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+    birth_a = tracker._birth("a", _FIXED_TIME)
+    birth_b = tracker._birth("b", _FIXED_TIME)
+    merge = tracker._merge(
+        ["a", "b"],
+        "c",
+        {"a": NodeState("a", (0.0, 0.0)), "b": NodeState("b", (1.0, 0.0))},
+        {"c": NodeState("c", (0.5, 0.0))},
+        _FIXED_TIME,
+    )
+
+    links = tracker.trace_lineage("c", (birth_a, birth_b, merge))
+
+    assert {link.parent_node_id for link in links} == {"a", "b"}
+
+
+def test_trace_lineage_follows_multi_generation_chain() -> None:
+    # a --split--> b, c ; b --merge(with d)--> e
+    tracker = _tracker(merge_split_tolerance=1.0)
+    split = tracker._split(
+        "a",
+        ["b", "c"],
+        {"a": NodeState("a", (0.0, 0.0))},
+        {"b": NodeState("b", (-1.0, 0.0)), "c": NodeState("c", (1.0, 0.0))},
+        _FIXED_TIME,
+    )
+    birth_d = tracker._birth("d", _FIXED_TIME)
+    merge = tracker._merge(
+        ["b", "d"],
+        "e",
+        {"b": NodeState("b", (-1.0, 0.0)), "d": NodeState("d", (5.0, 0.0))},
+        {"e": NodeState("e", (2.0, 0.0))},
+        _FIXED_TIME,
+    )
+
+    links = tracker.trace_lineage("e", (split, birth_d, merge), depth=10)
+
+    assert {link.parent_node_id for link in links} == {"a", "b", "d"}
+
+
+def test_trace_lineage_respects_depth_limit() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+    split = tracker._split(
+        "a",
+        ["b", "c"],
+        {"a": NodeState("a", (0.0, 0.0))},
+        {"b": NodeState("b", (-1.0, 0.0)), "c": NodeState("c", (1.0, 0.0))},
+        _FIXED_TIME,
+    )
+    birth_d = tracker._birth("d", _FIXED_TIME)
+    merge = tracker._merge(
+        ["b", "d"],
+        "e",
+        {"b": NodeState("b", (-1.0, 0.0)), "d": NodeState("d", (5.0, 0.0))},
+        {"e": NodeState("e", (2.0, 0.0))},
+        _FIXED_TIME,
+    )
+
+    shallow = tracker.trace_lineage("e", (split, birth_d, merge), depth=1)
+    deep = tracker.trace_lineage("e", (split, birth_d, merge), depth=10)
+
+    assert {link.parent_node_id for link in shallow} == {"b", "d"}
+    assert {link.parent_node_id for link in deep} == {"a", "b", "d"}
+
+
+def test_trace_lineage_is_deterministic() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+    birth_a = tracker._birth("a", _FIXED_TIME)
+    birth_b = tracker._birth("b", _FIXED_TIME)
+    merge = tracker._merge(
+        ["a", "b"],
+        "c",
+        {"a": NodeState("a", (0.0, 0.0)), "b": NodeState("b", (1.0, 0.0))},
+        {"c": NodeState("c", (0.5, 0.0))},
+        _FIXED_TIME,
+    )
+
+    first = tracker.trace_lineage("c", (birth_a, birth_b, merge))
+    second = tracker.trace_lineage("c", (birth_a, birth_b, merge))
+
+    assert first == second
+
+
+def test_trace_lineage_of_unknown_node_is_empty() -> None:
+    tracker = _tracker()
+
+    assert tracker.trace_lineage("nonexistent", ()) == ()
+
+
+def test_trace_lineage_ignores_death_and_drift_events() -> None:
+    # DEATH/DRIFT never assign a new identity, so they must not be indexed
+    # as ancestry-producing events.
+    tracker = _tracker()
+    birth = tracker._birth("a", _FIXED_TIME)
+    death = tracker._death("z", _FIXED_TIME)
+    drift = tracker._drift(
+        "a", NodeState("a", (0.0, 0.0)), NodeState("a", (5.0, 0.0)), _FIXED_TIME
+    )
+    assert drift is not None
+
+    links = tracker.trace_lineage("a", (birth, death, drift))
+
+    assert links == ()
+
+
+def test_trace_lineage_does_not_requeue_an_already_visited_ancestor() -> None:
+    # Synthetic log (not a physically realistic single evolution history) —
+    # built purely to exercise the revisit guard: "a" is reachable directly
+    # from "c" (depth 1) and again from "b" (depth 2). The guard must skip
+    # re-queuing "a" the second time without breaking traversal past it: "y"
+    # (reachable only via "b") must still be found.
+    tracker = _tracker(merge_split_tolerance=1.0)
+
+    def node(node_id: str, x: float) -> NodeState:
+        return NodeState(node_id, (x, 0.0))
+
+    birth_a = tracker._birth("a", _FIXED_TIME)
+    birth_y = tracker._birth("y", _FIXED_TIME)
+    merge_b = tracker._merge(
+        ["a", "y"],
+        "b",
+        {"a": node("a", 0.0), "y": node("y", 2.0)},
+        {"b": node("b", 1.0)},
+        _FIXED_TIME,
+    )
+    merge_c = tracker._merge(
+        ["a", "b"],
+        "c",
+        {"a": node("a", 0.0), "b": node("b", 1.0)},
+        {"c": node("c", 0.5)},
+        _FIXED_TIME,
+    )
+
+    links = tracker.trace_lineage("c", (birth_a, birth_y, merge_b, merge_c), depth=10)
+
+    assert {link.parent_node_id for link in links} == {"a", "b", "y"}
+
+
+# --- coverage: merge/split boundary branches ---------------------------------
+
+
+def test_merge_and_split_detection_is_skipped_with_only_births() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+
+    current = (NodeState(node_id="a", centroid=(0.0, 0.0)),)
+    events = tracker.detect_evolution((), current)
+
+    assert len(events) == 1
+    assert events[0].event_type is EvolutionEventType.BIRTH
+
+
+def test_merge_and_split_detection_is_skipped_with_only_deaths() -> None:
+    tracker = _tracker(merge_split_tolerance=1.0)
+
+    previous = (NodeState(node_id="a", centroid=(0.0, 0.0)),)
+    events = tracker.detect_evolution(previous, ())
+
+    assert len(events) == 1
+    assert events[0].event_type is EvolutionEventType.DEATH
+
+
+def test_merge_finds_no_group_when_all_candidates_are_out_of_tolerance() -> None:
+    tracker = _tracker(merge_split_tolerance=0.5)
+    previous = (
+        NodeState(node_id="a", centroid=(0.0, 0.0)),
+        NodeState(node_id="b", centroid=(1.0, 0.0)),
+    )
+    current = (NodeState(node_id="c", centroid=(100.0, 100.0)),)
+
+    events = tracker.detect_evolution(previous, current)
+
+    event_types = {event.event_type for event in events}
+    assert EvolutionEventType.MERGE not in event_types
+    assert event_types == {EvolutionEventType.DEATH, EvolutionEventType.BIRTH}
+
+
+def test_split_finds_no_group_when_all_candidates_are_out_of_tolerance() -> None:
+    tracker = _tracker(merge_split_tolerance=0.5)
+    previous = (NodeState(node_id="a", centroid=(0.0, 0.0)),)
+    current = (
+        NodeState(node_id="b", centroid=(100.0, 0.0)),
+        NodeState(node_id="c", centroid=(200.0, 0.0)),
+    )
+
+    events = tracker.detect_evolution(previous, current)
+
+    event_types = {event.event_type for event in events}
+    assert EvolutionEventType.SPLIT not in event_types
+    assert event_types == {EvolutionEventType.DEATH, EvolutionEventType.BIRTH}
