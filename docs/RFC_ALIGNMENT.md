@@ -1,32 +1,61 @@
 # RFC Alignment
 
-**No `RFC-CLE` document exists anywhere in the GemminAI vault as of this
-repository's creation (2026-08-04).** The only trace of the series is a
-forward reference in `meaning-mapper/docs/RFC_COMPLIANCE.md`: *"Categorical
-Lift itself — and any future RFC-CLE series — belongs to the independent
-Categorical Lift Engine, not this repository."* This document records the
-assumptions this repository's structure makes about that not-yet-written
-series, so they can be checked against the real RFCs once they exist,
-rather than silently treated as authoritative.
+**`RFC-CLE001`–`RFC-CLE005` (v1.0.0, 2026-08-04) are now published.** This
+repository predates them (also created 2026-08-04, Implementation-first —
+see below); this document originally recorded *assumptions* about a
+not-yet-written series and now records the real, checked comparison,
+following this workspace's convention of recording — not silently
+resolving — a spec/implementation mismatch (`RFCv3_draft/rfc/MSR/RFC_MSR_SERIES_INDEX.md`
+§9).
 
 This repository was implemented under this workspace's own governance rule
 (`CLAUDE.md` / `REPOSITORY_CANONICAL.md`, from the sibling `RFCv3_draft`
-workspace): *"Never implement directly from a Draft RFC."* Here there is
-not even a Draft — so this is Implementation-first, matching the precedent
-`meaning-space-runtime`'s own README sets ("Implementation → Experiment →
-Verification → RFC. This repository contains the implementation... it does
-not design it") for exactly this situation, except one step earlier: no RFC
-exists yet to document.
+workspace): *"Never implement directly from a Draft RFC."* At the time
+there was not even a Draft, so the repository was built Implementation-first,
+matching the precedent `meaning-space-runtime`'s own README sets. The
+RFC-CLE series is explicitly **Experimental**: its purpose is to drive
+implementation experiments and validate the mathematical architecture, not
+to freeze a specification the code must match verbatim. Per direction, this
+repository's frozen ABI is not treated as immutable either — it evolves
+additively, one documented step at a time, as each phase's implementation
+reveals what the RFC's math actually requires.
 
-## Expected series (assumed, not confirmed)
+## Structural mismatch found against the published RFCs
 
-| RFC | Assumed scope | What this repository assumes in its place |
-|---|---|---|
-| `RFC-CLE001` Architecture | System boundary, module placement, position relative to MSR/HEKB | `docs/ARCHITECTURE.md`, `docs/BOUNDARIES.md` — the OSS-complete-without-CLE position, the nine-stage pipeline shape |
-| `RFC-CLE002` ABI | Frozen input/output types, binary or structural boundary contract | `cle.abi.inputs` (structural `Protocol`s mirroring `msr.abi.StabilizedTrajectory`/`MeaningState`) and `cle.abi.outputs` (six frozen dataclasses) |
-| `RFC-CLE003` Categorical Lift | The categorical-theory construction itself (functor, natural transformation, pullback, pushout, commutative diagram) | Interfaces only (`cle.homotopy`, `cle.quotient`, `cle.functor`, `cle.natural_transformation`) — **no algorithm is assumed or implemented** |
-| `RFC-CLE004` Knowledge Crystallization | How a stabilized trajectory becomes committable knowledge | `cle.crystallization`, `cle.knowledge_delta`, `cle.commit_candidate` interfaces, and `CategoricalLiftEngine.lift()`'s fixed orchestration order |
-| `RFC-CLE005` Validation | Test/benchmark protocols, analogous to `RFC-MSR06` | `tests/` scaffolding only — conformance-by-shape tests for every `Protocol`, and orchestration tests for `CategoricalLiftEngine`; no quantitative Pass Criteria are assumed, since none exist to align to |
+RFC-CLE002's literal data model (`ObjectNode`, `MorphismEdge`,
+`CategoricalLiftResult`, `CLEQuarantineStage`, `EvolutionEvent`,
+`LineageSnapshot`, `HEKBCommitTransaction`, …) and literal Protocol
+signatures (`FunctorialLiftEngineProtocol.lift(trajectory, frame) ->
+CategoricalLiftResult`, `HomotopyPathAnalyzerProtocol.compute_betti_numbers`,
+`CategoryEvolutionTrackingProtocol.detect_evolution/apply_events/trace_lineage`,
+`CrystallizationEvaluatorProtocol.evaluate_candidate/build_hekb_transaction`)
+do not match this repository's pre-existing ABI/Protocols at all — different
+names, different shapes, different error-handling philosophy (RFC-CLE002 §5
+mandates a `quarantine_stage` field and forbids raising; this repository's
+`cle.errors.CLEError` hierarchy raises). None of RFC-CLE002's named types
+existed in `cle.abi` before Phase 1.
+
+Resolution, per direction: implement the RFC's *mathematics* against this
+repository's *existing* Protocols and dataclasses wherever the existing
+shape can carry it, extend the ABI additively (new fields/types/modules,
+never renaming or removing anything shipped) only where it genuinely
+cannot, and log every such addition here, phase by phase, as it happens.
+
+## Phase 1 — Functorial Lift Engine (RFC-CLE001 §3.1, §5 subsystem "LFE")
+
+| RFC-CLE001/002 concept | Resolution in this repository |
+|---|---|
+| Object lifting ($\mathcal{M}_{\text{proj}} \to \mathcal{C}_{\text{concept}}$ on objects) | Implemented as `cle.concept.FunctorialConceptLift`, satisfying the pre-existing `ConceptDiscoveryStrategy` Protocol unchanged. Novelty follows `trajectory.is_novel` exactly as that Protocol's docstring already specified. |
+| Deterministic object/morphism ids (RFC-CLE005 §3.2 lift-determinism) | New pure-function module `cle.identity.deterministic_id` (content hash, no randomness/wall-clock) — additive, no existing symbol touched. |
+| Morphism lifting (RFC-CLE001 §3.1: morphisms of $\mathcal{M}_{\text{proj}}$ must be preserved into $\mathcal{C}_{\text{concept}}$) | **Genuine ABI gap**: nothing in the pre-existing output ABI represented a morphism between two concepts (`CategoryRelation` is scoped to morphisms *between two `Category` values*, not concepts — see its own docstring). Added additively: `cle.abi.outputs.ConceptMorphism` (new frozen dataclass) and `cle.abi.outputs.MorphismType` (new `StrEnum`, values copied 1:1 from RFC-CLE002 §2.1 for future serialization compatibility), plus a new module `cle.morphism` (`MorphismLiftStrategy` Protocol + `IdentityInclusionMorphismLift` implementation). Phase 1 only ever constructs `IDENTITY` (every lifted object's trivial self-morphism, a category axiom) and `INCLUSION` (evidence flowing from a matched prior HEKB concept). `HOMOTOPIC_EQUIVALENCE`, `PULLBACK_CANONICAL`, `PUSHOUT_CANONICAL` are declared but intentionally unconstructed — they need trajectory-level topology (Phase 2 HPIA) or multi-category structure (Phase 4 CET), not Phase 1's concern. |
+| Functor construction | Implemented as `cle.functor.CanonicalInclusionFunctorConstructor`, satisfying the pre-existing `FunctorConstructor` Protocol unchanged. Given only two frozen `Category` values (a `concept_ids` set each — no explicit object-to-object mapping is part of the ABI), the only functor derivable without fabricating evidence is the canonical inclusion functor (`source.concept_ids ⊆ target.concept_ids`); functoriality then holds automatically. |
+| RFC-CLE002 §5 quarantine-on-functoriality-violation | **Not adopted verbatim.** No `quarantine_stage` field was added to the ABI (that would touch `HEKBCommitCandidate`/`Category`/etc., a much larger additive surface than Phase 1 needs). Instead, added `cle.errors.FunctorialityViolation(CLEError)` — same failure condition, this repository's existing raise-based convention. Revisit if/when a later phase's quarantine needs force a real `quarantine_stage` field. |
+
+None of the above renamed, removed, or changed the signature of anything
+that shipped before Phase 1; `git diff` against the pre-Phase-1 commit
+contains only additions to `cle.abi.outputs.__all__`/`cle.errors.__all__`
+plus two brand-new modules (`cle.identity`, `cle.morphism`) and concrete
+implementation classes added *beside* each Protocol they satisfy.
 
 ## Assumptions carried from real, existing RFCs
 
@@ -49,11 +78,14 @@ documents this repository's design does align to:
   round-tripped, become a field-prior well for MSR again — without either
   repository importing the other.
 
-## What happens when RFC-CLE001–005 are published
+## Ongoing convention for Phases 2–5
 
-This document is expected to be replaced or substantially rewritten once
-real RFCs exist: any assumption above that the published text contradicts
-should be corrected in the code and flagged here, following this
-workspace's established convention (see `RFCv3_draft/rfc/MSR/RFC_MSR_SERIES_INDEX.md`
-§9 for the house style of recording — not silently resolving — a
-spec/implementation mismatch) rather than silently reconciled.
+Each remaining phase (HPIA, KCP, CET, Validation) gets its own dated section
+above, appended in the same shape as Phase 1's: which RFC concept it
+targets, how it was resolved against the existing ABI, exactly what was
+added (if anything), and what was deliberately left out and why. The
+experiment is expected to keep surfacing mismatches like Phase 1's; they are
+recorded here as they're found, not resolved by silently reconciling the
+code to the RFC text or vice versa — per direction, implementation precedes
+standardization, and the RFCs are expected to be refined based on these
+empirical results, not the other way around.

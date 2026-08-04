@@ -81,3 +81,36 @@ def unstabilized_trajectory() -> FakeStabilizedTrajectory:
         dwell_steps=0,
         dwell_seconds=0.0,
     )
+
+
+@dataclass(frozen=True, slots=True)
+class FakeHEKBConcept:
+    id: str
+    centroid: Vector | None
+
+
+@dataclass(frozen=True, slots=True)
+class FakeHEKBContext:
+    """A structural `HEKBContextLike`: returns whatever `near` was seeded with."""
+
+    near: tuple[FakeHEKBConcept, ...] = field(default_factory=tuple)
+
+    def concepts_near(
+        self, centroid: Vector, *, radius: float
+    ) -> tuple[FakeHEKBConcept, ...]:
+        return self.near
+
+
+@pytest.fixture
+def reinforcing_trajectory() -> FakeStabilizedTrajectory:
+    return FakeStabilizedTrajectory(
+        trajectory_id="traj-2",
+        frame_id="F",
+        basin_id="basin-1",  # not novel: MSR already recognizes this basin
+        states=(make_state(0, basin_id="basin-1"),),
+        centroid=(1.1, 2.1),
+        covariance=((0.1, 0.0), (0.0, 0.1)),
+        dwell_steps=1,
+        dwell_seconds=0.1,
+        provenance=("obs-9",),
+    )

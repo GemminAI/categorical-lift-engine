@@ -42,9 +42,25 @@ class NoStrategyConfigured(CLEError):
     """
 
 
+class FunctorialityViolation(CLEError):
+    """No structure-preserving mapping exists between two categorical structures.
+
+    Added for RFC-CLE001 Phase 1 (Functorial Lift Engine): RFC-CLE002 §5
+    names this failure mode `QuarantineReason.FUNCTORIALITY_VIOLATION` and
+    routes it through a `quarantine_stage` field this repository's frozen
+    ABI does not have (see `docs/RFC_ALIGNMENT.md`). Rather than adding that
+    field pre-emptively, this repository keeps its existing exception-based
+    failure convention (`NotStabilized`, `NoStrategyConfigured`): a
+    `FunctorConstructor` implementation that cannot derive a functor between
+    the two categories it was given fails loudly here instead of fabricating
+    one.
+    """
+
+
 __all__ = [
     "CLEError",
     "DimensionMismatch",
+    "FunctorialityViolation",
     "NoStrategyConfigured",
     "NotStabilized",
 ]

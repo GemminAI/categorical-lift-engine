@@ -93,6 +93,44 @@ class Category:
             raise ValueError("Category must reference at least one concept_id")
 
 
+class MorphismType(StrEnum):
+    """The categorical-theory construction a `ConceptMorphism` witnesses.
+
+    Added for RFC-CLE001 Phase 1 (Functorial Lift Engine): mirrors
+    `RFC-CLE002` §2.1's `MorphismType` enum value-for-value, so a future
+    C-FFI/Arrow boundary (RFC-CLE002 §4) can serialize this field without
+    translation. Phase 1 (`cle.morphism`) only ever produces `IDENTITY` and
+    `INCLUSION`; the remaining three members are reserved for later phases
+    (`HOMOTOPIC_EQUIVALENCE` — Phase 2 HPIA, `PULLBACK_CANONICAL` /
+    `PUSHOUT_CANONICAL` — Phase 4 CET) and are not yet constructed anywhere.
+    See `docs/RFC_ALIGNMENT.md`.
+    """
+
+    IDENTITY = "identity"
+    INCLUSION = "inclusion"
+    HOMOTOPIC_EQUIVALENCE = "homotopic_equivalence"
+    PULLBACK_CANONICAL = "pullback_canonical"
+    PUSHOUT_CANONICAL = "pushout_canonical"
+
+
+@dataclass(frozen=True, slots=True)
+class ConceptMorphism:
+    """A morphism between two concepts, discovered during a single Functorial Lift.
+
+    Added for RFC-CLE001 Phase 1: the existing output ABI had no type for a
+    morphism *within* one lift's object structure — `CategoryRelation` is
+    scoped to morphisms *between* two `Category` values instead (see its
+    docstring). `ConceptMorphism` fills that gap additively; it does not
+    replace or narrow `CategoryRelation`. See `docs/RFC_ALIGNMENT.md`.
+    """
+
+    morphism_id: str
+    source_id: str
+    target_id: str
+    morphism_type: MorphismType
+    provenance: tuple[str, ...] = ()
+
+
 @dataclass(frozen=True, slots=True)
 class CategoryRelation:
     """A morphism between two categories: functor, natural transformation, or inclusion.
@@ -203,9 +241,11 @@ __all__ = [
     "CategoryRelation",
     "Concept",
     "ConceptDelta",
+    "ConceptMorphism",
     "HEKBCommitCandidate",
     "KnowledgeDelta",
     "KnowledgeDeltaKind",
     "Matrix",
+    "MorphismType",
     "Vector",
 ]

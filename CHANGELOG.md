@@ -1,5 +1,37 @@
 # Changelog
 
+## Unreleased
+
+### Added — Phase 1: Functorial Lift Engine (RFC-CLE001 §3.1)
+
+First concrete categorical-theory implementations, against RFC-CLE001–005
+(published 2026-08-04, after this repository's initial skeleton). Every
+pre-existing Protocol/dataclass/module is unchanged; additions are called
+out below and logged in detail in `docs/RFC_ALIGNMENT.md`.
+
+- `cle.concept.FunctorialConceptLift`: object lifting — implements the
+  existing `ConceptDiscoveryStrategy` Protocol. Novel trajectories lift to
+  a new `Concept`; reinforcing trajectories resolve to a `ConceptDelta`
+  against the nearest known HEKB concept (radius derived from the
+  trajectory's own covariance), falling back to a `basin_id`-derived id
+  when no host context is supplied.
+- `cle.morphism` (new module): `MorphismLiftStrategy` Protocol +
+  `IdentityInclusionMorphismLift` — morphism lifting. Every lifted concept
+  carries its identity morphism; a matched prior concept additionally
+  yields an inclusion morphism.
+- `cle.functor.CanonicalInclusionFunctorConstructor`: functor construction —
+  implements the existing `FunctorConstructor` Protocol as the canonical
+  inclusion functor between two categories whose concept-id sets are
+  subset-related.
+- `cle.identity.deterministic_id` (new module): content-addressed id
+  generation shared by all three implementations above, satisfying
+  RFC-CLE005 §3.2's lift-determinism requirement.
+- ABI additions (additive only, nothing renamed/removed):
+  `cle.abi.outputs.ConceptMorphism`, `cle.abi.outputs.MorphismType`,
+  `cle.errors.FunctorialityViolation`.
+- 20 new tests; 100% line + branch coverage, ruff clean, mypy `--strict`
+  clean maintained (63 tests total, up from 43).
+
 ## 0.1.0 — 2026-08-04
 
 ### Added — initial skeleton

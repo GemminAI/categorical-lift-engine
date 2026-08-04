@@ -131,15 +131,17 @@ never imports `msr`.
 | Module | Role |
 |---|---|
 | `cle.abi.inputs` | Structural, read-only shapes CLE reads (never imports the source) |
-| `cle.abi.outputs` | The six frozen knowledge artifacts CLE produces |
+| `cle.abi.outputs` | The knowledge artifacts CLE produces, incl. `ConceptMorphism`/`MorphismType` |
 | `cle.errors` | `CLEError` and its subclasses |
+| `cle.identity` | `deterministic_id` — content-addressed id generation |
 | `cle.ports.commit` | `CommitSink` — CLE's one outbound port, toward HEKB |
 | `cle.categorical_lift` | `CategoricalLiftEngine` — the orchestrator |
-| `cle.concept` | `ConceptDiscoveryStrategy` interface |
+| `cle.concept` | `ConceptDiscoveryStrategy` interface + `FunctorialConceptLift` implementation |
+| `cle.morphism` | `MorphismLiftStrategy` interface + `IdentityInclusionMorphismLift` implementation |
 | `cle.category` | `CategoryConstructor` interface |
 | `cle.homotopy` | `HomotopyAnalyzer` interface |
 | `cle.quotient` | `QuotientConstructor` interface |
-| `cle.functor` | `FunctorConstructor` interface |
+| `cle.functor` | `FunctorConstructor` interface + `CanonicalInclusionFunctorConstructor` implementation |
 | `cle.natural_transformation` | `NaturalTransformationAnalyzer` interface |
 | `cle.crystallization` | `KnowledgeCrystallizer` interface |
 | `cle.knowledge_delta` | `KnowledgeDeltaGenerator` interface |

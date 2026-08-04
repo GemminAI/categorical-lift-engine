@@ -26,19 +26,28 @@ from cle.abi.outputs import (
     CategoryRelation,
     Concept,
     ConceptDelta,
+    ConceptMorphism,
     HEKBCommitCandidate,
     KnowledgeDelta,
     KnowledgeDeltaKind,
+    MorphismType,
 )
 from cle.categorical_lift.engine import CategoricalLiftEngine
 from cle.category import CategoryConstructor
 from cle.commit_candidate import CommitCandidateBuilder
-from cle.concept import ConceptDiscoveryStrategy
+from cle.concept import ConceptDiscoveryStrategy, FunctorialConceptLift
 from cle.crystallization import KnowledgeCrystallizer
-from cle.errors import CLEError, DimensionMismatch, NoStrategyConfigured, NotStabilized
-from cle.functor import FunctorConstructor
+from cle.errors import (
+    CLEError,
+    DimensionMismatch,
+    FunctorialityViolation,
+    NoStrategyConfigured,
+    NotStabilized,
+)
+from cle.functor import CanonicalInclusionFunctorConstructor, FunctorConstructor
 from cle.homotopy import HomotopyAnalyzer
 from cle.knowledge_delta import KnowledgeDeltaGenerator
+from cle.morphism import IdentityInclusionMorphismLift, MorphismLiftStrategy
 from cle.natural_transformation import NaturalTransformationAnalyzer
 from cle.ports.commit import CommitSink
 from cle.quotient import QuotientConstructor
@@ -46,6 +55,7 @@ from cle.version import __version__
 
 __all__ = [
     "CLEError",
+    "CanonicalInclusionFunctorConstructor",
     "CategoricalLiftEngine",
     "Category",
     "CategoryConstructor",
@@ -55,18 +65,24 @@ __all__ = [
     "Concept",
     "ConceptDelta",
     "ConceptDiscoveryStrategy",
+    "ConceptMorphism",
     "DimensionMismatch",
     "FieldPriorLike",
     "FunctorConstructor",
+    "FunctorialConceptLift",
+    "FunctorialityViolation",
     "HEKBCommitCandidate",
     "HEKBConceptLike",
     "HEKBContextLike",
     "HomotopyAnalyzer",
+    "IdentityInclusionMorphismLift",
     "KnowledgeCrystallizer",
     "KnowledgeDelta",
     "KnowledgeDeltaGenerator",
     "KnowledgeDeltaKind",
     "MeaningStateLike",
+    "MorphismLiftStrategy",
+    "MorphismType",
     "NaturalTransformationAnalyzer",
     "NoStrategyConfigured",
     "NotStabilized",

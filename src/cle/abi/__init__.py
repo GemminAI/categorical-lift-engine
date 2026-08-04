@@ -21,9 +21,11 @@ from cle.abi.outputs import (
     CategoryRelation,
     Concept,
     ConceptDelta,
+    ConceptMorphism,
     HEKBCommitCandidate,
     KnowledgeDelta,
     KnowledgeDeltaKind,
+    MorphismType,
 )
 
 __all__ = [
@@ -31,6 +33,7 @@ __all__ = [
     "CategoryRelation",
     "Concept",
     "ConceptDelta",
+    "ConceptMorphism",
     "FieldPriorLike",
     "HEKBCommitCandidate",
     "HEKBConceptLike",
@@ -39,6 +42,7 @@ __all__ = [
     "KnowledgeDeltaKind",
     "Matrix",
     "MeaningStateLike",
+    "MorphismType",
     "StabilizedTrajectoryLike",
     "Vector",
 ]

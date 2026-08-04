@@ -1,10 +1,13 @@
 # CLE Architecture (as built)
 
 This document describes the implementation in `src/cle` as it exists in
-this repository — a skeleton (frozen ABI, interfaces, orchestration), not a
-categorical-theory implementation. See
-[`RFC_ALIGNMENT.md`](RFC_ALIGNMENT.md) for what is deliberately left
-unimplemented and why.
+this repository. It started as a pure skeleton (frozen ABI, interfaces,
+orchestration) and is now, per RFC-CLE001–005, in an experimental
+implementation phase: concrete categorical-theory algorithms are being
+added phase by phase (see the Implementation Order in the mission brief),
+each validated by tests before the next phase starts. See
+[`RFC_ALIGNMENT.md`](RFC_ALIGNMENT.md) for exactly what is implemented,
+what remains interface-only, and every ABI addition made along the way.
 
 ## Position in the loop
 
@@ -43,15 +46,17 @@ or a `typing.Protocol` port (`cle.ports`), read by shape.
 | Module | Responsibility |
 |---|---|
 | `cle.abi.inputs` | `MeaningStateLike`, `StabilizedTrajectoryLike`, `FieldPriorLike`, `HEKBConceptLike`, `HEKBContextLike` — structural, read-only shapes |
-| `cle.abi.outputs` | `Concept`, `ConceptDelta`, `Category`, `CategoryRelation`, `KnowledgeDelta`, `KnowledgeDeltaKind`, `HEKBCommitCandidate` — frozen, owned |
-| `cle.errors` | `CLEError` and its three subclasses (`NotStabilized`, `DimensionMismatch`, `NoStrategyConfigured`) |
+| `cle.abi.outputs` | `Concept`, `ConceptDelta`, `Category`, `CategoryRelation`, `ConceptMorphism`, `MorphismType`, `KnowledgeDelta`, `KnowledgeDeltaKind`, `HEKBCommitCandidate` — frozen, owned (`ConceptMorphism`/`MorphismType` added Phase 1, see `RFC_ALIGNMENT.md`) |
+| `cle.errors` | `CLEError` and its four subclasses (`NotStabilized`, `DimensionMismatch`, `NoStrategyConfigured`, `FunctorialityViolation` — added Phase 1) |
+| `cle.identity` | `deterministic_id` — content-addressed id generation, added Phase 1 |
 | `cle.ports.commit` | `CommitSink` — the one outbound port, toward HEKB |
 | `cle.categorical_lift.engine` | `CategoricalLiftEngine` — the orchestrator; CLE's only entry point |
-| `cle.concept` | `ConceptDiscoveryStrategy` — trajectory -> `Concept`/`ConceptDelta` |
+| `cle.concept` | `ConceptDiscoveryStrategy` (interface) + `FunctorialConceptLift` (Phase 1: object lifting) — trajectory -> `Concept`/`ConceptDelta` |
+| `cle.morphism` | `MorphismLiftStrategy` (interface, added Phase 1) + `IdentityInclusionMorphismLift` (Phase 1: morphism lifting) — a lifted concept -> its `ConceptMorphism`s |
 | `cle.category` | `CategoryConstructor` — artifact -> `Category`, optionally |
 | `cle.homotopy` | `HomotopyAnalyzer` — are two concepts the same knowledge, differently reached |
 | `cle.quotient` | `QuotientConstructor` — collapse an equivalence class into one `Category` |
-| `cle.functor` | `FunctorConstructor` — a structure-preserving `Category` -> `Category` mapping |
+| `cle.functor` | `FunctorConstructor` (interface) + `CanonicalInclusionFunctorConstructor` (Phase 1: functor construction) — a structure-preserving `Category` -> `Category` mapping |
 | `cle.natural_transformation` | `NaturalTransformationAnalyzer` — a mapping between two functors |
 | `cle.crystallization` | `KnowledgeCrystallizer` — finalize an artifact into committable form |
 | `cle.knowledge_delta` | `KnowledgeDeltaGenerator` — artifact -> `KnowledgeDelta` |
@@ -95,10 +100,13 @@ the concept-level artifact, one for the category.
   before CLE ever sees anything.
 - **Evolve runtime meaning-space state** — that is MSR's; CLE reads only
   what MSR already decided was stabilized.
-- **Decide categorical-theory algorithms** — every stage in the module map
-  above is an interface. This repository composes them; it does not
-  implement homotopy equivalence, quotient collapse, functor construction,
-  or natural-transformation analysis. See `RFC_ALIGNMENT.md`.
+- **Decide categorical-theory algorithms it hasn't implemented yet** — as of
+  Phase 1, object lifting, morphism lifting, and functor construction have
+  concrete implementations (`FunctorialConceptLift`,
+  `IdentityInclusionMorphismLift`, `CanonicalInclusionFunctorConstructor`);
+  homotopy equivalence, quotient collapse, and natural-transformation
+  analysis remain interface-only, pending later phases. See
+  `RFC_ALIGNMENT.md` for the phase-by-phase status.
 - **Write to HEKB** — `HEKBCommitCandidate` is a proposal. Acceptance is
   HEKB's decision alone.
 - **Import neighbour code** — every neighbour is a structural `Protocol`
