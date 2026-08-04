@@ -349,6 +349,61 @@ tolerance" paths, and `trace_lineage`'s DEATH/DRIFT-exclusion and
 revisit-guard branches — each closed by one additional, purposefully
 targeted test rather than a blanket fuzz pass.
 
+## Phase 5 — Validation (RFC-CLE005)
+
+Direction: complete the experimental implementation through RFC-CLE005, not
+stopping at phase boundaries. `hypothesis>=6.100.0` added as a dev
+dependency — RFC-CLE005 §3 names Hypothesis explicitly, and this repository
+had no property-based testing infrastructure before this phase.
+
+### Milestone 5A — NaN/Inf fault injection (RFC-CLE005 §4.1)
+
+**A real, previously-undetected gap, found by building the validation
+tests RFC-CLE005 asks for, not assumed in advance.** Before this
+milestone, I confirmed empirically (not by inspection) that a NaN centroid
+passed completely silently through `FunctorialConceptLift.discover()` and
+`EpsilonGraphBettiAnalyzer.compute_betti_numbers()` — no exception, no
+`quarantine_stage` (this ABI has none, see the Phase 1 addendum above), no
+detectably-wrong output. This is a worse failure mode than a wrong answer:
+`float('nan') <= eps` and `float('nan') == float('nan')` are both `False`
+in Python, so a NaN coordinate doesn't corrupt a proximity/equality
+check — it makes that check silently behave as "infinitely far, never
+equal" without ever raising.
+
+Fixed by adding one new error (`cle.errors.NonFiniteValue`) and one new
+shared primitive (`cle.geometry.assert_finite`), called at the two points
+raw coordinates first enter a computation:
+
+- `FunctorialConceptLift.discover()` — on `trajectory.centroid`, before
+  constructing a `Concept`/`ConceptDelta`.
+- `EpsilonGraphBettiAnalyzer`'s internal `_graph_betti_numbers` — on every
+  coordinate, before building the eps-neighborhood graph.
+
+This touches Phase 1 (`cle.concept`) and Phase 2 (`cle.homotopy`) code
+that earlier phases' own reviews said should stay untouched between
+phases — a deliberate exception here, because RFC-CLE005's whole purpose
+is auditing every earlier phase, and leaving a confirmed, silent
+correctness gap undocumented-and-unfixed while calling validation
+"complete" would have been dishonest. Both changes are single-line
+additive calls to a new, independently-tested helper; neither changes any
+existing Protocol signature, ABI field, or previously-tested behavior
+(all 157 pre-existing tests still pass unmodified).
+
+**Not yet extended to `cle.evolution`/`cle.commit_candidate`.**
+`NodeState.centroid` and confidence-evidence floats have the same class of
+gap (nothing stops a NaN `NodeState.centroid` from being constructed), left
+as a documented, deferred finding rather than patched everywhere in one
+pass — consistent with this repository's established practice of fixing
+the highest-value entry points now and recording the rest for a
+follow-up rather than a same-day sweep of every module.
+
+8 new tests in `tests/test_fuzz_quarantine.py`: hand-picked NaN/Inf cases
+for both fixed entry points, a Hypothesis property confirming *any*
+single non-finite component in a vector of any tested dimension is
+rejected, and a Hypothesis property confirming all-finite input is never
+false-positively rejected (the fault-injection guard must not reject
+ordinary data).
+
 ## Assumptions carried from real, existing RFCs
 
 Unlike the RFC-CLE series itself, these dependencies are real, published

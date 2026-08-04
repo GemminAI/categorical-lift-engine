@@ -71,11 +71,28 @@ class FunctorialityViolation(CLEError):
     """
 
 
+class NonFiniteValue(CLEError):
+    """A coordinate or scalar was NaN or infinite where a finite value is required.
+
+    Added for RFC-CLE005 §4.1 (Phase 5, Validation): NaN/Inf coordinate
+    injection is named there as its own explicit fault-injection category.
+    Discovered empirically, not assumed: before this was added, a NaN
+    centroid passed through `FunctorialConceptLift`/`EpsilonGraphBettiAnalyzer`
+    completely silently — no exception, no wrong-but-detectable answer.
+    Silent propagation is actively worse than a wrong answer here, since
+    `float('nan') <= eps` and `float('nan') == float('nan')` are both
+    `False` in Python: a NaN coordinate doesn't just corrupt a result, it
+    makes every subsequent proximity/equality check against it silently
+    behave as "infinitely far" without ever raising.
+    """
+
+
 __all__ = [
     "CLEError",
     "DimensionMismatch",
     "FunctorialityViolation",
     "InvalidTrajectory",
     "NoStrategyConfigured",
+    "NonFiniteValue",
     "NotStabilized",
 ]

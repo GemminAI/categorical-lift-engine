@@ -14,6 +14,7 @@ from typing import Protocol, runtime_checkable
 from cle.abi.inputs import HEKBConceptLike, HEKBContextLike, StabilizedTrajectoryLike
 from cle.abi.outputs import Concept, ConceptDelta
 from cle.errors import DimensionMismatch, InvalidTrajectory
+from cle.geometry import assert_finite
 from cle.identity import deterministic_id
 
 
@@ -116,6 +117,11 @@ class FunctorialConceptLift:
       enough. Raises `InvalidTrajectory` if even `basin_id` is `None` in that
       case — `is_novel`/`basin_id` are independent properties on
       `StabilizedTrajectoryLike`, so this is never assumed away.
+
+    Raises `NonFiniteValue` (RFC-CLE005 §4.1, added during Phase 5
+    validation) if `trajectory.centroid` contains NaN or infinity —
+    discovered empirically that a NaN centroid otherwise passed through
+    silently, with no exception anywhere downstream.
     """
 
     def discover(
@@ -125,6 +131,7 @@ class FunctorialConceptLift:
         hekb_context: HEKBContextLike | None,
     ) -> Concept | ConceptDelta:
         dim = _validate_covariance_shape(trajectory)
+        assert_finite(trajectory.centroid)
 
         if not trajectory.is_novel:
             matched = (

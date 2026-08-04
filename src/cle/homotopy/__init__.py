@@ -22,7 +22,7 @@ from typing import Protocol, runtime_checkable
 
 from cle.abi.inputs import HEKBConceptLike, StabilizedTrajectoryLike, Vector
 from cle.errors import DimensionMismatch
-from cle.geometry import euclidean_distance
+from cle.geometry import assert_finite, euclidean_distance
 
 
 @runtime_checkable
@@ -97,6 +97,8 @@ def _graph_betti_numbers(
         raise DimensionMismatch(
             "all coordinates must share the same dimension to form a graph"
         )
+    for point in coordinates:
+        assert_finite(point)
     union_find = _UnionFind(count)
     edge_count = 0
     for i in range(count):
@@ -143,6 +145,12 @@ class EpsilonGraphBettiAnalyzer:
     Betti numbers). That is the necessary-condition proxy RFC-CLE005 §2.2's
     determinism test needs — not a full homotopy-equivalence decision
     procedure.
+
+    Raises `NonFiniteValue` (RFC-CLE005 §4.1, added during Phase 5
+    validation) if any coordinate is NaN or infinite — discovered
+    empirically that a NaN coordinate otherwise silently produced a
+    plausible-looking `(component_count, ...)` result with no exception at
+    all, since NaN distance comparisons are always `False` in Python.
     """
 
     def compute_betti_numbers(

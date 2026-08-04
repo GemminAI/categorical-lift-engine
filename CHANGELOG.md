@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+### Fixed — Phase 5 Milestone 5A: NaN/Inf fault injection (RFC-CLE005 §4.1)
+
+Real gap found by building the validation tests RFC-CLE005 asks for:
+confirmed empirically that a NaN centroid passed silently through
+`FunctorialConceptLift`/`EpsilonGraphBettiAnalyzer` with no exception at
+all (NaN comparisons are always `False` in Python, so it silently behaved
+as "infinitely far" rather than raising). Fixed at both entry points.
+
+- `cle.errors.NonFiniteValue` (new error) + `cle.geometry.assert_finite`
+  (new shared primitive), called on `trajectory.centroid` in
+  `FunctorialConceptLift.discover()` and on every coordinate in
+  `EpsilonGraphBettiAnalyzer`'s internal Betti computation.
+- Touches Phase 1/2 code deliberately — RFC-CLE005 audits every earlier
+  phase; a confirmed silent correctness gap was fixed rather than left
+  undocumented. All 157 pre-existing tests still pass unmodified.
+- Not yet extended to `cle.evolution`/`cle.commit_candidate`, which have
+  the same class of gap — documented as deferred, not patched everywhere
+  in one pass.
+- `hypothesis>=6.100.0` added as a dev dependency.
+- 8 new tests in `tests/test_fuzz_quarantine.py` (hand-picked cases +
+  Hypothesis properties for both rejection and non-false-positive
+  behavior). 100% line + branch coverage, ruff clean, mypy `--strict`
+  clean maintained (165 tests total, up from 157).
+
 ### Added — Phase 4 Milestone 4B: MERGE/SPLIT, trace_lineage, ancestry evidence
 
 Direction: stop pausing at phase/milestone boundaries; keep building;
