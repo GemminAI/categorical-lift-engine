@@ -87,6 +87,70 @@ same phase rather than deferred:
    over-collapsing — every such trajectory from a frame would hash to the
    same id) concept id.
 
+## Phase 2 — Homotopy Path Analyzer (RFC-CLE001 §3.3, §5 subsystem "HPIA")
+
+Directive for this phase: correctness over feature completeness, small
+deterministic implementations validated by property tests, no topology
+library, and only the minimum mathematics RFC-CLE002 actually requires. The
+resolution below is scoped tightly to that.
+
+| RFC-CLE002 concept | Resolution in this repository |
+|---|---|
+| `HomotopyPathAnalyzerProtocol.compute_betti_numbers(coordinates, eps) -> Tuple[int, ...]` | **New Protocol** `cle.homotopy.HomotopyPathAnalyzer`, additive alongside the pre-existing `HomotopyAnalyzer` (untouched) — see "genuine ABI/Protocol gap" below for why a new Protocol was needed rather than extending the old one. Concrete implementation: `EpsilonGraphBettiAnalyzer.compute_betti_numbers`. Parameter type is `tuple[Vector, ...]` (this ABI's existing plain-tuple convention) rather than RFC-CLE002's `npt.NDArray[np.float64]` — this repository has never taken a numpy-typed ABI value anywhere (`cle.abi`'s own docstring: "serialized without touching numpy"), so the RFC's ndarray parameter was not adopted verbatim. |
+| Persistent homology / Betti number derivation | **Not implemented as such — deliberately.** Real persistent homology needs a filtration across multiple scales and a simplicial-complex boundary-matrix computation; that is the "topology library" this phase was told not to build. What is implemented instead: a *single-scale* graph (one vertex per point, an edge between any two points within `eps`) via union-find, then `b_0` = connected-component count (exact — provably equal to the full simplicial complex's `b_0` at that scale, since connectivity never depends on higher simplices) and `b_1` = `edges - vertices + components` (the graph's circuit rank — an exact graph-theoretic fact, not an approximation of a graph invariant, though see the next row for how it relates to the *simplicial* invariant of the same name). |
+| RFC-CLE005 §2.2 "same Betti numbers ⇒ same `homotopy_hash`" / counter-example invalidation | `b_1` as computed here is a **documented upper bound** on the true Vietoris-Rips simplicial complex's `b_1`, not identical to it: three mutually-close points are counted as one cycle (no 2-simplex is ever filled in to cap it off), where a real simplicial-homology computation would report `b_1 = 0` there. `tests/test_homotopy_path_analyzer.py::test_three_mutually_close_points_report_a_spurious_cycle_by_design` demonstrates this discrepancy directly rather than leaving it as an unverified claim — the goal per direction was mathematical honesty about scope, not silently overclaiming a full topological invariant. |
+| `HomotopyPathAnalyzerProtocol.is_homotopic(traj_a, traj_b, tolerance) -> bool` | Implemented as `HomotopyPathAnalyzer.paths_are_homotopic` (named differently from RFC-CLE002's literal `is_homotopic` — see the Phase 2 addendum below) — Betti-tuple equality at the shared `tolerance` used as `eps` for both trajectories. This is a **necessary-condition proxy**, stated as such: Betti numbers are homotopy invariants, so *unequal* Betti numbers is a proof of non-homotopy-equivalence; *equal* Betti numbers is evidence, not proof (distinct spaces can share Betti numbers). RFC-CLE001 §3.3's literal "continuously deformable" test is not decided in general (that is undecidable/intractable for arbitrary point clouds) — this proxy is the minimum mathematics that satisfies what RFC-CLE005 §2.2 actually checks. |
+| Genuine ABI/Protocol gap (flagged in the original gap analysis, now resolved) | The pre-existing `HomotopyAnalyzer.is_homotopic(a: HEKBConceptLike, b: HEKBConceptLike)` cannot carry this phase's math — `HEKBConceptLike` exposes only `.id`/`.centroid`, never a coordinate path, and no amount of implementation cleverness recovers topology from two points. Rather than widening that Protocol's signature (which would be a breaking change to something already shipped and reviewed), a new, separately-scoped Protocol was added. `HomotopyAnalyzer` stays exactly what it always was: a coarser, cheaper "same crystallized HEKB concept?" check with no coordinate data available, useful at a different point in the pipeline (post-crystallization) than `HomotopyPathAnalyzer` (pre-crystallization, still has the raw trajectory). |
+| Shared geometry helper | New module `cle.geometry` (`euclidean_distance`), used only by `cle.homotopy`. Phase 1's `cle.concept` keeps its own private, near-identical helper rather than being refactored to share this one — each phase's already-reviewed code stays untouched; a few duplicated lines were judged cheaper than reopening a committed file for a cross-phase deduplication. |
+
+None of the above changed the signature or behavior of anything that
+shipped in Phase 1: `HomotopyAnalyzer` is byte-for-byte what it was, and
+`cle.concept`/`cle.functor`/`cle.morphism` are untouched by this phase.
+
+### Phase 2 addendum — architectural review finding, fixed
+
+An architecture-only review of Phase 2 (additive Protocol growth, ABI
+consistency, mathematical correctness claims, determinism, unnecessary
+abstraction — explicitly checking whether `HomotopyPathAnalyzer` overlaps
+`HomotopyAnalyzer`'s responsibilities) surfaced a real, empirically-confirmed
+issue, fixed in the same phase:
+
+**`is_homotopic` name collision causing a `runtime_checkable` false
+positive.** `HomotopyPathAnalyzer.is_homotopic(traj_a, traj_b, tolerance)`
+(RFC-CLE002's literal name) shared a method name with the pre-existing,
+differently-shaped `HomotopyAnalyzer.is_homotopic(a, b)`. `@runtime_checkable`
+`Protocol.__instancecheck__` only verifies that a method of the given
+*name* exists on an object — it does not check parameter count or types.
+Confirmed directly: `isinstance(EpsilonGraphBettiAnalyzer(), HomotopyAnalyzer)`
+returned `True`, even though calling it as a `HomotopyAnalyzer` immediately
+raises `TypeError: missing 1 required positional argument: 'tolerance'`.
+This is a real hazard specifically because this codebase's own convention
+(every file under `tests/test_stage_protocols.py`) is to verify Protocol
+conformance via `isinstance` — a misconfigured injection could pass that
+check and still crash at the call site.
+
+This was not a responsibility overlap — `HomotopyAnalyzer` (post-
+crystallization, id/centroid only) and `HomotopyPathAnalyzer`
+(pre-crystallization, full coordinate path) remain two genuinely different
+jobs, and stay two separate Protocols. Fixed by renaming
+`HomotopyPathAnalyzer.is_homotopic` to `paths_are_homotopic` (and the
+matching method on `EpsilonGraphBettiAnalyzer`) — a pure rename, no
+behavior change. `test_betti_analyzer_does_not_falsely_satisfy_homotopy_analyzer`
+locks in `isinstance(EpsilonGraphBettiAnalyzer(), HomotopyAnalyzer)` being
+`False` going forward.
+
+Noted, not fixed (by direction — deferred, not forgotten): the same
+category of risk pre-dates this phase — `CategoryConstructor.construct` and
+`FunctorConstructor.construct` (both Phase 0/1) collide exactly the same
+way, confirmed the same way
+(`isinstance(CanonicalInclusionFunctorConstructor(), CategoryConstructor)`
+is also `True`). Phase 2 did not introduce this category of risk, it
+surfaced a second instance of an existing one. Left alone per direction —
+Betti-number ABI representation (RFC-CLE002's `ObjectNode.betti_numbers`)
+is likewise deliberately deferred, to whenever a `TopologicalInvariant`-
+shaped ABI addition is actually needed by Phase 3+'s
+`Concept -> Knowledge` flow, not before.
+
 ## Assumptions carried from real, existing RFCs
 
 Unlike the RFC-CLE series itself, these dependencies are real, published

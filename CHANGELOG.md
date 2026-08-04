@@ -2,6 +2,49 @@
 
 ## Unreleased
 
+### Added — Phase 2: Homotopy Path Analyzer (RFC-CLE001 §3.3)
+
+Correctness-first, minimum-mathematics implementation — no persistent
+homology, no simplicial-complex library, per direction. Full rationale and
+the documented scope limitation in `docs/RFC_ALIGNMENT.md`.
+
+- `cle.homotopy.HomotopyPathAnalyzer` (new Protocol, additive alongside the
+  pre-existing `HomotopyAnalyzer`, untouched) + `EpsilonGraphBettiAnalyzer`:
+  `compute_betti_numbers` builds a single-scale eps-neighborhood graph
+  (union-find) and returns `(b_0, b_1)` — connected-component count and
+  circuit rank. `paths_are_homotopic` decides equivalence by Betti-tuple
+  equality at a shared tolerance, documented as a necessary-condition
+  proxy, not a full homotopy-equivalence decision procedure.
+- `cle.geometry` (new module): `euclidean_distance`, shared by `cle.homotopy`.
+- 16 new tests: mathematical validation against hand-verified graphs
+  (single point, disconnected points, a genuine 4-cycle, and a
+  mutually-close triangle that deliberately demonstrates this analyzer's
+  documented upper-bound-on-`b_1` limitation), plus explicit invariance
+  properties proving *why* `b_0`/`b_1` are invariant (translation,
+  rotation, reflection, and point-reordering all preserve pairwise
+  distances, hence the eps-graph, hence the Betti numbers — and a
+  contrasting test confirming scale is *not* free the same way).
+- 100% line + branch coverage, ruff clean, mypy `--strict` clean maintained
+  (81 tests total, up from 65).
+
+### Fixed — Phase 2 architectural review
+
+An architecture-only review (additive Protocol growth, ABI consistency,
+mathematical correctness claims, determinism, unnecessary abstraction, and
+specifically whether `HomotopyPathAnalyzer` overlaps `HomotopyAnalyzer`)
+found one real issue, fixed — see `docs/RFC_ALIGNMENT.md`'s Phase 2
+addendum.
+
+- Renamed `HomotopyPathAnalyzer.is_homotopic` (and
+  `EpsilonGraphBettiAnalyzer`'s implementation) to `paths_are_homotopic`.
+  It shared a method name with the differently-shaped, pre-existing
+  `HomotopyAnalyzer.is_homotopic`, which made `@runtime_checkable`
+  `isinstance(EpsilonGraphBettiAnalyzer(), HomotopyAnalyzer)` incorrectly
+  return `True` (confirmed) — `runtime_checkable` only checks method names,
+  not signatures. Pure rename, no behavior change.
+- 1 new regression test (82 total) locking in
+  `isinstance(EpsilonGraphBettiAnalyzer(), HomotopyAnalyzer)` being `False`.
+
 ### Added — Phase 1: Functorial Lift Engine (RFC-CLE001 §3.1)
 
 First concrete categorical-theory implementations, against RFC-CLE001–005

@@ -47,14 +47,15 @@ or a `typing.Protocol` port (`cle.ports`), read by shape.
 |---|---|
 | `cle.abi.inputs` | `MeaningStateLike`, `StabilizedTrajectoryLike`, `FieldPriorLike`, `HEKBConceptLike`, `HEKBContextLike` — structural, read-only shapes |
 | `cle.abi.outputs` | `Concept`, `ConceptDelta`, `Category`, `CategoryRelation`, `ConceptMorphism`, `MorphismType`, `KnowledgeDelta`, `KnowledgeDeltaKind`, `HEKBCommitCandidate` — frozen, owned (`ConceptMorphism`/`MorphismType` added Phase 1, see `RFC_ALIGNMENT.md`) |
-| `cle.errors` | `CLEError` and its four subclasses (`NotStabilized`, `DimensionMismatch`, `NoStrategyConfigured`, `FunctorialityViolation` — added Phase 1) |
+| `cle.errors` | `CLEError` and its five subclasses (`NotStabilized`, `DimensionMismatch`, `NoStrategyConfigured`, `FunctorialityViolation`, `InvalidTrajectory` — latter two added Phase 1) |
 | `cle.identity` | `deterministic_id` — content-addressed id generation, added Phase 1 |
+| `cle.geometry` | `euclidean_distance` — shared geometric primitive, added Phase 2 |
 | `cle.ports.commit` | `CommitSink` — the one outbound port, toward HEKB |
 | `cle.categorical_lift.engine` | `CategoricalLiftEngine` — the orchestrator; CLE's only entry point |
 | `cle.concept` | `ConceptDiscoveryStrategy` (interface) + `FunctorialConceptLift` (Phase 1: object lifting) — trajectory -> `Concept`/`ConceptDelta` |
 | `cle.morphism` | `MorphismLiftStrategy` (interface, added Phase 1) + `IdentityInclusionMorphismLift` (Phase 1: morphism lifting) — a lifted concept -> its `ConceptMorphism`s |
 | `cle.category` | `CategoryConstructor` — artifact -> `Category`, optionally |
-| `cle.homotopy` | `HomotopyAnalyzer` — are two concepts the same knowledge, differently reached |
+| `cle.homotopy` | `HomotopyAnalyzer` — are two concepts the same knowledge, differently reached; `HomotopyPathAnalyzer` (interface, added Phase 2) + `EpsilonGraphBettiAnalyzer` (Phase 2: single-scale graph Betti numbers) — trajectory-level topology |
 | `cle.quotient` | `QuotientConstructor` — collapse an equivalence class into one `Category` |
 | `cle.functor` | `FunctorConstructor` (interface) + `CanonicalInclusionFunctorConstructor` (Phase 1: functor construction) — a structure-preserving `Category` -> `Category` mapping |
 | `cle.natural_transformation` | `NaturalTransformationAnalyzer` — a mapping between two functors |
@@ -101,12 +102,15 @@ the concept-level artifact, one for the category.
 - **Evolve runtime meaning-space state** — that is MSR's; CLE reads only
   what MSR already decided was stabilized.
 - **Decide categorical-theory algorithms it hasn't implemented yet** — as of
-  Phase 1, object lifting, morphism lifting, and functor construction have
-  concrete implementations (`FunctorialConceptLift`,
-  `IdentityInclusionMorphismLift`, `CanonicalInclusionFunctorConstructor`);
-  homotopy equivalence, quotient collapse, and natural-transformation
-  analysis remain interface-only, pending later phases. See
-  `RFC_ALIGNMENT.md` for the phase-by-phase status.
+  Phase 2, object lifting, morphism lifting, functor construction
+  (`FunctorialConceptLift`, `IdentityInclusionMorphismLift`,
+  `CanonicalInclusionFunctorConstructor`), and single-scale trajectory
+  topology (`EpsilonGraphBettiAnalyzer`) have concrete implementations;
+  quotient collapse and natural-transformation analysis remain
+  interface-only, pending later phases. `EpsilonGraphBettiAnalyzer` is
+  itself deliberately scope-limited — no persistent homology, no
+  simplicial-complex library — see `RFC_ALIGNMENT.md` for exactly what its
+  Betti numbers do and don't prove.
 - **Write to HEKB** — `HEKBCommitCandidate` is a proposal. Acceptance is
   HEKB's decision alone.
 - **Import neighbour code** — every neighbour is a structural `Protocol`

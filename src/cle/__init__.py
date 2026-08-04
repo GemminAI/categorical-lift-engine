@@ -46,7 +46,11 @@ from cle.errors import (
     NotStabilized,
 )
 from cle.functor import CanonicalInclusionFunctorConstructor, FunctorConstructor
-from cle.homotopy import HomotopyAnalyzer
+from cle.homotopy import (
+    EpsilonGraphBettiAnalyzer,
+    HomotopyAnalyzer,
+    HomotopyPathAnalyzer,
+)
 from cle.knowledge_delta import KnowledgeDeltaGenerator
 from cle.morphism import IdentityInclusionMorphismLift, MorphismLiftStrategy
 from cle.natural_transformation import NaturalTransformationAnalyzer
@@ -68,6 +72,7 @@ __all__ = [
     "ConceptDiscoveryStrategy",
     "ConceptMorphism",
     "DimensionMismatch",
+    "EpsilonGraphBettiAnalyzer",
     "FieldPriorLike",
     "FunctorConstructor",
     "FunctorialConceptLift",
@@ -76,6 +81,7 @@ __all__ = [
     "HEKBConceptLike",
     "HEKBContextLike",
     "HomotopyAnalyzer",
+    "HomotopyPathAnalyzer",
     "IdentityInclusionMorphismLift",
     "InvalidTrajectory",
     "KnowledgeCrystallizer",
