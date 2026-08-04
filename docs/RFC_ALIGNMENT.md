@@ -389,31 +389,20 @@ additive calls to a new, independently-tested helper; neither changes any
 existing Protocol signature, ABI field, or previously-tested behavior
 (all 157 pre-existing tests still pass unmodified).
 
-**Not yet extended to `cle.evolution`/`cle.commit_candidate`, and the exact
-shape of the remaining gap was checked, not just assumed.** A NaN
-`NodeState.centroid` behaves *differently* depending on which event type
-it flows into, verified directly:
+**Update — `cle.evolution` gap closed (see Milestone 5D below).** This
+section originally documented the gap as deferred; it has since been
+fixed by validating `NodeState` itself at construction, closing it
+uniformly for every event type rather than relying on each event's
+confidence formula to notice by accident (`DRIFT` happened to; `BIRTH`/
+`DEATH` did not — see Milestone 5D for the full before/after). Left here,
+not deleted, as the record of what was actually found before the fix —
+per this document's own convention of recording a gap when it's found,
+not rewriting history once it's closed.
 
-- **DRIFT** gets *accidental* protection: its `confidence_score` is
-  computed from the NaN-poisoned distance, and `EvolutionEvent.__post_init__`'s
-  pre-existing `0.0 <= confidence_score <= 1.0` bounds check already raises
-  `ValueError` on it (`0.0 <= float('nan')` is `False` in Python, so the
-  bounds check fails) — confirmed by direct test. This is a side effect of
-  an unrelated check, not a designed guarantee.
-- **BIRTH/DEATH have zero protection**, confirmed the same way: their
-  `confidence_score` is a hardcoded `1.0` that never touches the centroid,
-  so a NaN-centroid'd BIRTH event is accepted completely silently — the
-  node is registered as "born" with a permanently corrupt position, and
-  every later `detect_evolution` call comparing against it computes NaN
-  distances that never satisfy `<=` (always `False`), so that node can
-  never again be detected as drifting, merging, or matching.
-
-Left as a documented, deferred finding (not patched now) — consistent with
-this repository's established practice of fixing the highest-value entry
-points and recording the rest for a follow-up rather than a same-day sweep
-of every module — but the imprecise version of this note ("same class of
-gap") has been replaced with what was actually verified, since "deferred"
-should name the exact exposure, not gesture at it.
+`cle.commit_candidate`'s confidence-evidence floats (`dwell_steps`,
+`reinforcement_count`, `len(concept_ids)`) remain unvalidated — still
+deferred, not yet checked with the same precision as the `cle.evolution`
+case above.
 
 8 new tests in `tests/test_fuzz_quarantine.py`: hand-picked NaN/Inf cases
 for both fixed entry points, a Hypothesis property confirming *any*
@@ -421,6 +410,35 @@ single non-finite component in a vector of any tested dimension is
 rejected, and a Hypothesis property confirming all-finite input is never
 false-positively rejected (the fault-injection guard must not reject
 ordinary data).
+
+### Milestone 5D — close the NodeState NaN/Inf gap at the struct level
+
+Follow-up to the Milestone 4B/5A architecture review, which precisely
+characterized (not just flagged) an asymmetry: a NaN `NodeState.centroid`
+reaching `DRIFT` was rejected only as a side effect of
+`EvolutionEvent.__post_init__`'s unrelated confidence-bounds check, while
+the same NaN reaching `BIRTH`/`DEATH` was accepted with zero protection —
+both hardcode `confidence_score=1.0`, so nothing in either path ever
+touches the centroid.
+
+Fixed at the data-structure level rather than at each event constructor:
+`NodeState.__post_init__` now calls `assert_finite(self.centroid)`
+directly. This closes the gap uniformly for all five event types by
+construction — a `NodeState` carrying a non-finite centroid can no longer
+exist at all, so there is no `_birth`/`_death`/`_drift`/`_merge`/`_split`
+call path left that could ever receive one. This is a stronger fix than
+extending the two Milestone 5A entry-point guards (`FunctorialConceptLift`,
+`EpsilonGraphBettiAnalyzer`) would have been, since those guard *inputs to
+a function*, not the *data type itself* — any future `cle.evolution` code
+path that constructs a `NodeState` inherits the guarantee automatically,
+without needing its own explicit `assert_finite` call.
+
+4 new tests in `tests/test_evolution.py`: `NodeState` rejects NaN/+Inf/-Inf
+at construction (parametrized), and a direct confirmation that the
+specific previously-open BIRTH path now raises before `detect_evolution`
+ever runs. All 177 pre-existing tests still pass unmodified (181 total).
+`cle.commit_candidate`'s confidence-evidence floats remain unvalidated —
+still an open, deferred item, not yet checked with the same precision.
 
 ### Milestone 5B — property-based invariant tests
 

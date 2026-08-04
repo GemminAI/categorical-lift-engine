@@ -31,7 +31,7 @@ from typing import Any, Protocol, runtime_checkable
 
 from cle.abi.inputs import Vector
 from cle.abi.outputs import MorphismType
-from cle.geometry import euclidean_distance
+from cle.geometry import assert_finite, euclidean_distance
 from cle.identity import deterministic_id
 
 
@@ -67,10 +67,24 @@ class NodeState:
     duplicate by last-occurrence-wins, silently and without warning; this
     is undefined behavior from the caller's perspective, not a documented
     contract, and callers must not rely on which occurrence wins.
+
+    `centroid` is validated finite at construction (`__post_init__`). This
+    closes, at the data-structure level, the exact gap the Phase 4/5
+    architecture review found and precisely characterized: a NaN
+    `centroid` reaching a `BIRTH` or `DEATH` event previously slipped
+    through completely silently, since those events hardcode
+    `confidence_score=1.0` and never touch the centroid (unlike `DRIFT`,
+    which happened to catch it only as a side effect of its own confidence
+    bounds check). Rejecting it here, once, closes the gap for every event
+    type uniformly rather than relying on each event's confidence formula
+    to catch it by accident.
     """
 
     node_id: str
     centroid: Vector
+
+    def __post_init__(self) -> None:
+        assert_finite(self.centroid)
 
 
 @dataclass(frozen=True, slots=True)

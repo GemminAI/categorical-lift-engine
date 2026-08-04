@@ -7,9 +7,12 @@ and `trace_lineage` are covered.
 
 from __future__ import annotations
 
+import math
+
 import pytest
 
 from cle.abi.outputs import MorphismType
+from cle.errors import NonFiniteValue
 from cle.evolution import (
     AncestryLink,
     CategoryEvolutionTracker,
@@ -44,6 +47,31 @@ def test_node_state_is_a_plain_id_and_position() -> None:
     node = NodeState(node_id="n1", centroid=(1.0, 2.0))
     assert node.node_id == "n1"
     assert node.centroid == (1.0, 2.0)
+
+
+@pytest.mark.parametrize("bad_value", [math.nan, math.inf, -math.inf])
+def test_node_state_rejects_a_non_finite_centroid_at_construction(
+    bad_value: float,
+) -> None:
+    # Closes the Phase 4/5 review's precisely-characterized gap: BIRTH/DEATH
+    # previously accepted a NaN centroid silently (their confidence_score
+    # is a hardcoded 1.0 that never touches it, unlike DRIFT, which only
+    # caught it by accident via its own confidence bounds check).
+    # Validating at NodeState's own construction closes it uniformly for
+    # every event type, not just the ones whose formula happens to notice.
+    with pytest.raises(NonFiniteValue):
+        NodeState(node_id="n1", centroid=(bad_value, 0.0))
+
+
+def test_node_state_rejection_closes_the_birth_death_gap() -> None:
+    # The gap was specifically that BIRTH/DEATH let a NaN centroid through
+    # with zero protection. Confirm directly: constructing the NodeState
+    # that would have fed a BIRTH event now raises before detect_evolution
+    # ever runs.
+    tracker = _tracker()
+    with pytest.raises(NonFiniteValue):
+        current = (NodeState(node_id="n1", centroid=(math.nan, 0.0)),)
+        tracker.detect_evolution((), current)
 
 
 def test_ancestry_link_reuses_morphism_type() -> None:

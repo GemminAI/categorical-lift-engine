@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Fixed — Phase 5 Milestone 5D: close the NodeState NaN/Inf gap at the struct level
+
+Follow-up to the Milestone 4B/5A review's precise finding: a NaN
+`NodeState.centroid` was rejected on `DRIFT` only by accident (via an
+unrelated confidence-bounds check) and not rejected at all on `BIRTH`/
+`DEATH` (hardcoded `confidence_score=1.0` never touches the centroid).
+
+- `NodeState.__post_init__` now calls `assert_finite(self.centroid)` —
+  closes the gap for all five event types uniformly, at the data
+  structure itself rather than at each call site.
+- 4 new tests in `tests/test_evolution.py` (181 total, up from 177), 100%
+  line coverage, 100% branch coverage, ruff clean, mypy `--strict` clean.
+- `cle.commit_candidate`'s confidence-evidence floats remain unvalidated —
+  still deferred, documented in `docs/RFC_ALIGNMENT.md`.
+
 ### Added — Phase 5 Milestones 5B/5C: property tests + end-to-end replay
 
 - `tests/test_functor_properties.py`: Hypothesis property tests for
