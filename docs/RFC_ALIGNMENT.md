@@ -207,6 +207,59 @@ generation, the injected clock, or any ABI/Protocol — purely an added
 precondition check. 3 new regression tests (0.0 and negative rejected at
 construction; a valid positive value's existing behavior unchanged).
 
+## Phase 4 — Category Evolution Tracking (RFC-CLE004) — experimental
+
+Explicit change of directive for this phase, stated up front rather than
+discovered by contrast with Phases 1–3: those phases optimized for the
+smallest possible ABI footprint, implementing existing Protocols and adding
+new surface only when "strictly required." Phase 4 optimizes for the
+opposite — discovering the right shape for knowledge-evolution tracking by
+actually building RFC-CLE004's intermediate representations, not by
+minimizing what gets added. Git history is the stated safety net for this:
+every type below is expected to be revised or removed as the discovery
+continues, and none of them are load-bearing for Phases 1–3.
+
+### What was added, and why it's self-contained
+
+Everything lives in one new module, `cle.evolution`, deliberately kept
+*outside* `cle.abi` — unlike Phase 1's `ConceptMorphism`/`MorphismType`
+(added to `cle.abi.outputs` because they were judged stable enough to join
+the core ABI), Phase 4's types are explicitly provisional. Deleting
+`src/cle/evolution/` and `tests/test_evolution.py` entirely would not
+change one line of `cle.abi`, `cle.concept`, `cle.homotopy`,
+`cle.crystallization`, `cle.knowledge_delta`, or `cle.commit_candidate` —
+verified by construction, not just claimed (the only imports *into*
+`cle.evolution` are `cle.abi.inputs.Vector`, `cle.abi.outputs.MorphismType`,
+`cle.geometry.euclidean_distance`, and `cle.identity.deterministic_id` —
+all one-directional; nothing outside `cle.evolution` imports from it).
+
+| RFC-CLE004 concept | Resolution |
+|---|---|
+| `EvolutionEventType` (BIRTH/DEATH/MERGE/SPLIT/DRIFT) | Added verbatim, all five members, matching RFC-CLE004 §4 exactly. Only `BIRTH`/`DEATH`/`DRIFT` are constructible by this milestone's tracker — `MERGE`/`SPLIT` need a pushout/pullback mechanism this milestone doesn't build (see below). |
+| `AncestryLink` | Added, with `morphism_type` typed as Phase 1's existing `cle.abi.outputs.MorphismType` rather than a second, parallel string vocabulary — RFC-CLE004's own examples ("canonical_inclusion", "pushout_projection") already map onto `INCLUSION`/`PUSHOUT_CANONICAL`. |
+| `EvolutionEvent` | Added close to RFC-CLE004 §4's shape, with `betti_delta: tuple[int, ...]` finally giving `cle.homotopy`'s Betti numbers a place to travel — the exact gap flagged and deliberately deferred in the Phase 2 and Phase 3 reviews. This milestone always sets it to `()`: computing a real delta needs each node's trajectory, which `NodeState` (below) doesn't carry. The field exists now so a later milestone can populate it without another type-shaped change. `confidence_score` is bounds-validated at construction (`__post_init__`), matching the `Category`/`KnowledgeDelta`/`HEKBCommitCandidate` convention already established in the ABI proper. |
+| `LineageSnapshot` | Added verbatim (ids + parent pointer only, no geometry) — RFC-CLE004's own design is already minimal here, and there was no reason to enrich it: `NodeState` is where geometry lives. |
+| **New, not in RFC-CLE004**: `NodeState` (`node_id`, `centroid`) | RFC-CLE004 §5's `detect_evolution(previous_snapshot, current_lift_objects: Sequence[Any], current_lift_morphisms: Sequence[Any])` leaves "lift objects" unspecified. Using `Concept \| ConceptDelta` directly doesn't work: a `ConceptDelta` only carries a *shift*, not an absolute position, so the previous absolute centroid isn't reconstructable from a `ConceptDelta` alone, and `LineageSnapshot.active_node_ids` carries no geometry at all. `NodeState` is the smallest representation that makes BIRTH/DEATH/DRIFT detection well-defined and testable — introduced exactly because "optimize for discovery" invites it, not smuggled in as a minimal necessity. |
+| `CategoryEvolutionTrackingProtocol.detect_evolution` / `apply_events` | Added as `CategoryEvolutionTracker.detect_evolution(previous_nodes, current_nodes) -> tuple[EvolutionEvent, ...]` / `apply_events(previous_snapshot, events) -> LineageSnapshot`, implemented by `GeometricEvolutionTracker`. Signature adapted from RFC-CLE004's literal one: `detect_evolution` takes `tuple[NodeState, ...]` pairs instead of a `LineageSnapshot` (id-only, insufficient for DRIFT's geometry) plus untyped object/morphism sequences. |
+| `CategoryEvolutionTrackingProtocol.trace_lineage` | **Not added yet.** With only BIRTH/DEATH/DRIFT producible, every node has at most one trivial parent — a lineage trace has nothing genuine to demonstrate before `MERGE`/`SPLIT` exist to create real multi-parent ancestry. Declaring it now would ship an untested, unmotivated method. Deferred to the same follow-up milestone as `MERGE`/`SPLIT`, added additively (this Protocol is brand new this phase, so there is no "existing shipped signature" being redesigned by extending it later). |
+| `MERGE` / `SPLIT` | Not implemented. RFC-CLE004 §2.1–2.2 defines them via pullback/pushout diagrams over multiple concepts — a real mechanism, not a naming exercise, and building one honestly is its own milestone rather than a same-day addition. |
+| Determinism (`timestamp_utc`) | Same resolution as Phase 3's `created_at_ns`: an injectable `clock_utc: Callable[[], str]` constructor field on `GeometricEvolutionTracker` (default: real UTC time). `EvolutionEvent.event_id` and `LineageSnapshot.snapshot_id` are both derived only from semantic content (`cle.identity.deterministic_id` over node ids / prior event ids), never from `timestamp_utc` — verified directly: two trackers with different injected clocks produce identical `event_id`s and different `timestamp_utc`s for the same detection. |
+| Event ordering | `detect_evolution`'s returned tuple is sorted by `(event_type, source_node_ids, target_node_ids)`, not left in whatever order the input `NodeState` tuples or Python's set-difference iteration happened to produce — the same host/iteration-order independence lesson the Phase 2 review's tie-break fix established for `FunctorialConceptLift`, applied proactively here instead of found by a later review. |
+| Configuration validation | `GeometricEvolutionTracker.drift_tolerance` is validated at construction (`__post_init__`, `>= 0.0`) — applying the Phase 3 review's lesson (`confidence_half_life`'s unvalidated precondition) proactively rather than waiting for it to be found again. Note the bound differs deliberately: `drift_tolerance = 0.0` is valid (means "any movement at all is drift"), where Phase 3's `confidence_half_life` required strictly `> 0` (it is a divisor that must never be zero); `drift_tolerance` is only ever a comparison threshold, not a divisor, so zero is safe and meaningful. |
+
+### Independent testability / reviewability
+
+24 new tests in `tests/test_evolution.py`, covering: ABI-shape construction
+for all four new types, BIRTH/DEATH/DRIFT detection (including the
+boundary — movement exactly at `drift_tolerance` is *not* drift), DRIFT
+confidence monotonicity, `apply_events`' set arithmetic (including that
+DRIFT never changes `active_node_ids`), determinism (fixed-clock
+reproducibility, input-order independence, event-id/timestamp separation),
+and the two new configuration-validation guards. 100% line + branch
+coverage achieved without a second pass — no coverage-driven test
+gymnastics were needed, a mild signal that the module's branching is
+already about as simple as the problem allows.
+
 ## Assumptions carried from real, existing RFCs
 
 Unlike the RFC-CLE series itself, these dependencies are real, published

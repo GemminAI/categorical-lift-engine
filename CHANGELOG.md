@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Added — Phase 4: Category Evolution Tracking (RFC-CLE004) — experimental
+
+Explicit change of directive for this phase: optimize for discovering the
+right shape for knowledge-evolution tracking, not for a minimal ABI. Every
+type is new, deliberately kept outside `cle.abi`, and independently
+removable — deleting `src/cle/evolution/` changes nothing in Phases 1–3.
+Full rationale for every choice in `docs/RFC_ALIGNMENT.md`.
+
+- `cle.evolution` (new module): `EvolutionEventType` (all five RFC-CLE004
+  members: BIRTH/DEATH/MERGE/SPLIT/DRIFT — only the first three are
+  constructible this milestone), `NodeState` (a node's id + position; not
+  in RFC-CLE004, introduced because neither `LineageSnapshot` nor
+  `ConceptDelta` alone carries what BIRTH/DEATH/DRIFT detection needs),
+  `AncestryLink` (reuses Phase 1's `MorphismType`), `EvolutionEvent`
+  (`betti_delta` finally gives `cle.homotopy`'s Betti numbers a place to
+  travel, deferred since the Phase 2 review), `LineageSnapshot`.
+- `CategoryEvolutionTracker` (new Protocol: `detect_evolution`,
+  `apply_events` — `trace_lineage` deferred until `MERGE`/`SPLIT` exist to
+  give it a real multi-parent case to prove) + `GeometricEvolutionTracker`:
+  BIRTH (new node id), DEATH (missing node id), DRIFT (moved beyond
+  `drift_tolerance`, Euclidean distance) detection from two `NodeState`
+  sequences; `apply_events` replays them into a new `LineageSnapshot`.
+  `MERGE`/`SPLIT` need a real pushout/pullback mechanism, not implemented
+  yet.
+- Determinism and validation lessons from the Phase 2/3 reviews applied
+  proactively rather than found again: event ordering is sorted, not
+  iteration-order-dependent; `event_id`/`snapshot_id` are content-addressed
+  and verified independent of the injectable `clock_utc`; `drift_tolerance`
+  is validated (`>= 0.0`) at construction.
+- 24 new tests, 100% line + branch coverage, ruff clean, mypy `--strict`
+  clean maintained (134 tests total, up from 110).
+
 ### Added — Phase 3: Knowledge Crystallization Pipeline (RFC-CLE003)
 
 Zero ABI changes this phase — the mission's four steps (ConceptCandidate

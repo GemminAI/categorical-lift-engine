@@ -62,6 +62,7 @@ or a `typing.Protocol` port (`cle.ports`), read by shape.
 | `cle.crystallization` | `KnowledgeCrystallizer` — finalize an artifact into committable form |
 | `cle.knowledge_delta` | `KnowledgeDeltaGenerator` — artifact -> `KnowledgeDelta` |
 | `cle.commit_candidate` | `CommitCandidateBuilder` — `KnowledgeDelta` -> `HEKBCommitCandidate` |
+| `cle.evolution` *(experimental, Phase 4)* | `CategoryEvolutionTracker` (interface) + `GeometricEvolutionTracker` — `NodeState` pairs -> `EvolutionEvent`s (BIRTH/DEATH/DRIFT only so far) and `LineageSnapshot` replay. Deliberately outside `cle.abi` and not wired into `CategoricalLiftEngine.lift()` — see `RFC_ALIGNMENT.md`'s Phase 4 section for why, and what "experimental" means concretely here. |
 
 ## The lift, in detail
 
