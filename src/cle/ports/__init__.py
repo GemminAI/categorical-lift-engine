@@ -1,11 +1,13 @@
-"""Structural ports to CLE's one neighbour with a write direction: HEKB.
+"""Structural ports to CLE's neighbours.
 
-CLE imports no HEKB code. `CommitSink` is a `typing.Protocol`, so HEKB (or a
-test double) satisfies it by shape alone.
+CLE imports no HEKB or NVS-Kernel code. `CommitSink` and
+`ThreeViewRecoveryLike` are `typing.Protocol`s, so HEKB / NVS-Kernel (or a
+test double) satisfy them by shape alone.
 """
 
 from __future__ import annotations
 
 from cle.ports.commit import CommitSink
+from cle.ports.recovery import ThreeViewRecoveryLike
 
-__all__ = ["CommitSink"]
+__all__ = ["CommitSink", "ThreeViewRecoveryLike"]

@@ -61,11 +61,24 @@ from cle.knowledge_delta import ArtifactKnowledgeDeltaGenerator, KnowledgeDeltaG
 from cle.morphism import IdentityInclusionMorphismLift, MorphismLiftStrategy
 from cle.natural_transformation import NaturalTransformationAnalyzer
 from cle.ports.commit import CommitSink
+from cle.ports.recovery import ThreeViewRecoveryLike
 from cle.quotient import QuotientConstructor
+from cle.runtime import (
+    CLEEngine,
+    HEKBStore,
+    InMemorySCHEngine,
+    InvariantComparison,
+    LiftResult,
+    ProofCertificate,
+    RecoveredContext,
+    SCHEngineLike,
+)
+from cle.topology import InvariantSignature
 from cle.version import __version__
 
 __all__ = [
     "ArtifactKnowledgeDeltaGenerator",
+    "CLEEngine",
     "CLEError",
     "CanonicalInclusionFunctorConstructor",
     "CategoricalLiftEngine",
@@ -87,14 +100,19 @@ __all__ = [
     "HEKBCommitCandidate",
     "HEKBConceptLike",
     "HEKBContextLike",
+    "HEKBStore",
     "HomotopyAnalyzer",
     "HomotopyPathAnalyzer",
     "IdentityInclusionMorphismLift",
+    "InMemorySCHEngine",
     "InvalidTrajectory",
+    "InvariantComparison",
+    "InvariantSignature",
     "KnowledgeCrystallizer",
     "KnowledgeDelta",
     "KnowledgeDeltaGenerator",
     "KnowledgeDeltaKind",
+    "LiftResult",
     "MeaningStateLike",
     "MorphismLiftStrategy",
     "MorphismType",
@@ -102,8 +120,12 @@ __all__ = [
     "NoStrategyConfigured",
     "NotStabilized",
     "ObservationalCommitCandidateBuilder",
+    "ProofCertificate",
     "ProvenanceCanonicalizingCrystallizer",
     "QuotientConstructor",
+    "RecoveredContext",
+    "SCHEngineLike",
     "StabilizedTrajectoryLike",
+    "ThreeViewRecoveryLike",
     "__version__",
 ]
