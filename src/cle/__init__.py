@@ -65,13 +65,10 @@ from cle.ports.recovery import ThreeViewRecoveryLike
 from cle.quotient import QuotientConstructor
 from cle.runtime import (
     CLEEngine,
-    HEKBStore,
-    InMemorySCHEngine,
     InvariantComparison,
     LiftResult,
     ProofCertificate,
     RecoveredContext,
-    SCHEngineLike,
 )
 from cle.topology import InvariantSignature
 from cle.version import __version__
@@ -100,11 +97,9 @@ __all__ = [
     "HEKBCommitCandidate",
     "HEKBConceptLike",
     "HEKBContextLike",
-    "HEKBStore",
     "HomotopyAnalyzer",
     "HomotopyPathAnalyzer",
     "IdentityInclusionMorphismLift",
-    "InMemorySCHEngine",
     "InvalidTrajectory",
     "InvariantComparison",
     "InvariantSignature",
@@ -124,7 +119,6 @@ __all__ = [
     "ProvenanceCanonicalizingCrystallizer",
     "QuotientConstructor",
     "RecoveredContext",
-    "SCHEngineLike",
     "StabilizedTrajectoryLike",
     "ThreeViewRecoveryLike",
     "__version__",

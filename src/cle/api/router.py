@@ -43,10 +43,12 @@ def get_engine() -> CLEEngine:
     """Dependency-injection point for `CLEEngine`.
 
     The default instance has no `recovery_engine`/`hekb_store` configured —
-    those are outbound ports (`cle.ports.recovery.ThreeViewRecoveryLike`,
-    `cle.runtime.hekb_store`) owned by whatever composes CLE into a running
-    system (HEKB v2), not by this API. Override via
-    `app.dependency_overrides[get_engine]` to inject a configured instance.
+    both are generic outbound hooks (`cle.ports.recovery.ThreeViewRecoveryLike`,
+    and `CLEEngine`'s duck-typed `hekb_store: Any` slot) that a real HEKB
+    client satisfies structurally; CLE holds no concrete store implementation
+    of its own. Owned by whatever composes CLE into a running system, not by
+    this API. Override via `app.dependency_overrides[get_engine]` to inject a
+    configured instance.
     """
     return _default_engine
 
