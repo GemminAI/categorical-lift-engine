@@ -10,7 +10,6 @@ modules are not removed — `CLEEngine` composes them — see
 from __future__ import annotations
 
 from cle.runtime.engine import CLEEngine
-from cle.runtime.hekb_store import HEKBStore, InMemorySCHEngine, SCHEngineLike
 from cle.runtime.models import (
     InvariantComparison,
     InvariantSignature,
@@ -21,12 +20,9 @@ from cle.runtime.models import (
 
 __all__ = [
     "CLEEngine",
-    "HEKBStore",
-    "InMemorySCHEngine",
     "InvariantComparison",
     "InvariantSignature",
     "LiftResult",
     "ProofCertificate",
     "RecoveredContext",
-    "SCHEngineLike",
 ]
