@@ -17,6 +17,11 @@ from cle.api.models import (
     CompressRequest,
     CompressResponse,
     FiniteCategoryInput,
+    FiveW1HFieldModel,
+    FiveW1HModel,
+    GroundedStateModel,
+    GroundRequest,
+    GroundResponse,
     HealthResponse,
     InvariantSignatureModel,
     LiftRequest,
@@ -27,9 +32,15 @@ from cle.api.models import (
     PullbackResponse,
     RecoverRequest,
     RecoverResponse,
+    SOKModel,
 )
 from cle.compression import measure_compression
+from cle.grounding.five_w1h import FiveW1HOverrides
+from cle.grounding.semantic_state import GroundedState
+from cle.grounding.service import GroundingResult, ground
+from cle.grounding.sok import SOKOverrides
 from cle.runtime.engine import CLEEngine
+from cle.runtime.models import LiftResult
 from cle.topology.category_theory import FiniteCategory, Morphism
 from cle.topology.three_view_pullback import compute_common_invariant_subgraph
 from cle.version import __version__
@@ -69,16 +80,7 @@ def health() -> HealthResponse:
     return HealthResponse(status="ok", service="cle", version=__version__)
 
 
-@router.post("/lift", response_model=LiftResponse)
-def lift(
-    request: LiftRequest, engine: CLEEngine = Depends(get_engine)  # noqa: B008
-) -> LiftResponse:
-    result = engine.lift(
-        request.concept,
-        request.subject_context,
-        request.observer_context,
-        request.human_knowledge_context,
-    )
+def _lift_response(result: LiftResult) -> LiftResponse:
     return LiftResponse(
         concept_id=result.concept_id,
         normalized_hash=result.normalized_hash,
@@ -102,6 +104,87 @@ def lift(
     )
 
 
+@router.post("/lift", response_model=LiftResponse)
+def lift(
+    request: LiftRequest,
+    engine: CLEEngine = Depends(get_engine),  # noqa: B008
+) -> LiftResponse:
+    result = engine.lift(
+        request.concept,
+        request.subject_context,
+        request.observer_context,
+        request.human_knowledge_context,
+    )
+    return _lift_response(result)
+
+
+def _grounded_state_response(state: GroundedState) -> GroundedStateModel:
+    return GroundedStateModel(
+        prompt=state.prompt,
+        goal=state.goal,
+        five_w1h=FiveW1HModel(
+            who=FiveW1HFieldModel(
+                value=state.five_w1h.who.value, source=state.five_w1h.who.source
+            ),
+            what=FiveW1HFieldModel(
+                value=state.five_w1h.what.value, source=state.five_w1h.what.source
+            ),
+            when=FiveW1HFieldModel(
+                value=state.five_w1h.when.value, source=state.five_w1h.when.source
+            ),
+            where=FiveW1HFieldModel(
+                value=state.five_w1h.where.value, source=state.five_w1h.where.source
+            ),
+            why=FiveW1HFieldModel(
+                value=state.five_w1h.why.value, source=state.five_w1h.why.source
+            ),
+            how=FiveW1HFieldModel(
+                value=state.five_w1h.how.value, source=state.five_w1h.how.source
+            ),
+        ),
+        sok=SOKModel(
+            subject=state.sok.subject,
+            subject_source=state.sok.subject_source,
+            observer=state.sok.observer,
+            observer_source=state.sok.observer_source,
+            knowledge_reference=state.sok.knowledge_reference,
+            knowledge_reference_source=state.sok.knowledge_reference_source,
+        ),
+        fingerprint=list(state.fingerprint),
+        goal_fingerprint=list(state.goal_fingerprint),
+        subject_fingerprint=list(state.subject_fingerprint),
+        observer_fingerprint=list(state.observer_fingerprint),
+        knowledge_fingerprint=list(state.knowledge_fingerprint),
+    )
+
+
+@router.post("/ground", response_model=GroundResponse)
+def ground_endpoint(
+    request: GroundRequest,
+    engine: CLEEngine = Depends(get_engine),  # noqa: B008
+) -> GroundResponse:
+    """Input -> Semantic Grounding -> S/O/K(t) + GroundedState -> CLEEngine.lift().
+
+    Uses the same `engine` dependency as `/lift` and `/recover` (so a
+    composition root's configured `recovery_engine`/`hekb_store` also
+    apply here) -- Grounding calls the engine's existing `lift`, it does
+    not bypass it.
+    """
+    result: GroundingResult = ground(
+        request.prompt,
+        request.goal,
+        five_w1h_overrides=FiveW1HOverrides(**request.five_w1h_overrides.model_dump()),
+        sok_overrides=SOKOverrides(**request.sok_overrides.model_dump()),
+        default_knowledge_reference=request.default_knowledge_reference,
+        embedding_dimension=request.embedding_dimension,
+        engine=engine,
+    )
+    return GroundResponse(
+        semantic_state=_grounded_state_response(result.semantic_state),
+        lift=_lift_response(result.lift),
+    )
+
+
 @router.post("/pullback", response_model=PullbackResponse)
 def pullback(request: PullbackRequest) -> PullbackResponse:
     shared = compute_common_invariant_subgraph(
@@ -119,7 +202,8 @@ def pullback(request: PullbackRequest) -> PullbackResponse:
 
 @router.post("/recover", response_model=RecoverResponse)
 def recover(
-    request: RecoverRequest, engine: CLEEngine = Depends(get_engine)  # noqa: B008
+    request: RecoverRequest,
+    engine: CLEEngine = Depends(get_engine),  # noqa: B008
 ) -> RecoverResponse:
     result = engine.recover(request.subject, request.observer, request.knowledge)
     return RecoverResponse(
