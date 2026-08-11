@@ -1,0 +1,21 @@
+{
+  "run_id": "run_02",
+  "input_kind": "numpy.ndarray (explicitly converted)",
+  "dimension": 3,
+  "dtype": "float64",
+  "recovered_state": [
+    0.41145635857568136,
+    0.2898797039851121,
+    0.29866393743920644
+  ],
+  "gradient": [
+    0.1629127171513628,
+    -0.08024059202977585,
+    -0.08267212512158717
+  ],
+  "gradient_norm": 0.19953392265739736,
+  "latency_ms": 0.07224990986287594,
+  "success": true,
+  "exception": null,
+  "canonical_sha256": "23ae15d225fd37be685f9b787553e39012731e136309fcc482c1776cd0953ed3"
+}

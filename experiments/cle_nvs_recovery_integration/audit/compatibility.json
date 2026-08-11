@@ -1,0 +1,79 @@
+{
+  "cle_contract": "cle.ports.recovery.ThreeViewRecoveryLike",
+  "nvs_implementation": "nvs_kernel.nvs_kernel_physics.recovery.ThreeViewTrajectoryRecovery",
+  "cle_version": "0.1.0",
+  "nvs_version": "5.0.0",
+  "rows": [
+    {
+      "item": "method: recover_state",
+      "cle_contract": "recover_state(current_x, x_subject, x_observer, x_human, *, steps=20, lr=0.05) -> Any",
+      "nvs_implementation": "recover_state(current_x, x_subject, x_observer, x_human, *, steps=20, lr=0.05) -> Vector",
+      "compatible": "YES",
+      "note": "Name, arity, parameter names, keyword-only steps/lr with identical defaults all match exactly."
+    },
+    {
+      "item": "method: compute_recovery_gradient",
+      "cle_contract": "compute_recovery_gradient(current_x, x_subject, x_observer, x_human) -> Any",
+      "nvs_implementation": "compute_recovery_gradient(current_x, x_subject, x_observer, x_human) -> Vector",
+      "compatible": "YES",
+      "note": "Exact signature match."
+    },
+    {
+      "item": "current_x / x_subject / x_observer / x_human (type)",
+      "cle_contract": "Any (Protocol declares no representation); in practice cle.runtime.engine.CLEEngine.recover passes plain tuple[float, ...] (from cle.runtime.engine._coordinates_of)",
+      "nvs_implementation": "numpy.ndarray specifically -- every nvs_kernel.manifold.Manifold method (distance/log_map/project_point) reads .shape off both arguments",
+      "compatible": "NO (bare pass-through) / ADAPTER REQUIRED",
+      "note": "Confirmed empirically: calling ThreeViewTrajectoryRecovery.recover_state with CLE's actual tuple-shaped arguments raises AttributeError: 'tuple' object has no attribute 'shape' inside EuclideanManifold.log_map via require_same_dimension. See nvs_unit/tuple_input_probe.json for the full traceback. Resolved by cle.ports.recovery.NumpyCoercingRecovery, which coerces every vector to numpy.ndarray(dtype=float64) before delegating -- no NVS-Kernel import required."
+    },
+    {
+      "item": "steps (type/semantics)",
+      "cle_contract": "int, default 20 -- gradient-descent iteration count",
+      "nvs_implementation": "int, default 20 -- identical: number of manifold-projected gradient steps",
+      "compatible": "YES",
+      "note": "Same default, same meaning, confirmed by reading nvs_kernel_physics/recovery.py's recover_state loop."
+    },
+    {
+      "item": "lr (type/semantics)",
+      "cle_contract": "float, default 0.05 -- gradient-descent step size",
+      "nvs_implementation": "float, default 0.05 -- identical",
+      "compatible": "YES",
+      "note": "Same default, same meaning."
+    },
+    {
+      "item": "return value of recover_state",
+      "cle_contract": "Any; cle.runtime.engine.CLEEngine.recover iterates it as `tuple(float(c) for c in recovered_state)`",
+      "nvs_implementation": "numpy.ndarray (float64), iterable, float(np.float64(...)) is well-defined",
+      "compatible": "YES",
+      "note": "No adapter needed on the *output* side -- CLE's own consumption code already tolerates a numpy array. Confirmed by the live HTTP run (cle_http/response.json) using the real NVS implementation."
+    },
+    {
+      "item": "exception behavior",
+      "cle_contract": "cle.errors.NoStrategyConfigured only when recovery_engine is None; no declared exception contract for a configured engine's own failures",
+      "nvs_implementation": "ValueError on invalid steps/lr/weights; AttributeError on non-ndarray input (an implementation leak, not an intentional contract)",
+      "compatible": "ADAPTER REQUIRED (partial)",
+      "note": "NumpyCoercingRecovery removes the AttributeError leak by construction (inputs are always coerced first). ValueError from NVS-side validation (e.g. lr<=0) is not translated to a CLE-specific error type by this integration -- it propagates as a bare ValueError, which cle.api.app's existing _value_error_handler already maps to HTTP 422 (see engine.py's own use of the same convention for FiniteCategory). Not further adapted; flagged as a minor open item, not a blocker."
+    },
+    {
+      "item": "numerical shape (dimension handling)",
+      "cle_contract": "Whatever dimension the caller's coordinates have; no fixed dimension enforced by CLE",
+      "nvs_implementation": "EuclideanManifold(dimension) fixes the dimension at construction; recover_state/compute_recovery_gradient raise via require_same_dimension on any mismatch",
+      "compatible": "YES (caller responsibility)",
+      "note": "Both sides defer to the caller to keep dimensions consistent; neither hardcodes a dimension. Confirmed with dimension=3 synthetic vectors end-to-end."
+    },
+    {
+      "item": "construction / dependencies",
+      "cle_contract": "CLEEngine(recovery_engine=<any ThreeViewRecoveryLike>) -- no construction knowledge needed",
+      "nvs_implementation": "ThreeViewTrajectoryRecovery(manifold, *, weights=(0.33,0.33,0.34)) requires a nvs_kernel.manifold.Manifold instance; EuclideanManifold(dimension) itself only needs numpy, but importing nvs_kernel.manifold (the package __init__) eagerly imports nvs_kernel.config.settings, which requires pyyaml and pydantic-settings even though EuclideanManifold's own code path does not use them",
+      "compatible": "ADAPTER REQUIRED (deployment-side, not CLE-side)",
+      "note": "F7 dependency finding: a process that composes CLE with NVS-Kernel's recovery module transitively needs pyyaml + pydantic-settings installed (NVS-Kernel's own declared dependencies -- confirmed present in nvs-kernel's own .venv). This is NOT a CLE dependency addition; cle's own pyproject.toml is untouched. It is a fact about the composition-root process's environment, recorded here for whoever builds that process."
+    },
+    {
+      "item": "semantic equivalence: CLE's x_subject/x_observer/x_human === NVS's Subject/Observer/Human anchors",
+      "cle_contract": "cle.topology.three_view_pullback and cle.runtime.engine both use the terms 'Subject', 'Observer', 'Human-Knowledge' and the phrase 'Three-View Constraint (三視点拘束)'",
+      "nvs_implementation": "nvs_kernel_physics/recovery.py uses the identical terms and the identical Japanese phrase 'Three-View Constraint (三視点拘束)', describing x_S/x_O/x_H as 'three epistemic anchors'",
+      "compatible": "UNRESOLVED",
+      "note": "Strong naming/vocabulary alignment (identical parameter names, identical Japanese term, CLE's own docstring asserting the two are 'structurally identical') is suggestive of a shared design origin, but no single RFC document was found in either repository (grepped docs/, docs/rfc/ in both) that formally cross-references both implementations and asserts the semantic correspondence. Per the audit's own instruction not to treat matching names as proof of semantic equivalence, this row is marked UNRESOLVED rather than YES. Does not block the numeric/API integration verified here; matters if/when EXP-CLE-0001+ calibration draws conclusions from /recover's *meaning*, not just its numeric execution."
+    }
+  ],
+  "overall": "ADAPTER REQUIRED -- resolved by cle.ports.recovery.NumpyCoercingRecovery for the numeric/type mismatch; semantic-equivalence row remains UNRESOLVED and is out of scope for a numeric-execution integration test."
+}

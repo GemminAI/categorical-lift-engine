@@ -8,6 +8,6 @@ test double) satisfy them by shape alone.
 from __future__ import annotations
 
 from cle.ports.commit import CommitSink
-from cle.ports.recovery import ThreeViewRecoveryLike
+from cle.ports.recovery import NumpyCoercingRecovery, ThreeViewRecoveryLike
 
-__all__ = ["CommitSink", "ThreeViewRecoveryLike"]
+__all__ = ["CommitSink", "NumpyCoercingRecovery", "ThreeViewRecoveryLike"]

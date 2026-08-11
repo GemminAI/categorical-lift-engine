@@ -1,0 +1,23 @@
+{
+  "dimension": 3,
+  "x_subject": [
+    1.0,
+    0.0,
+    0.0
+  ],
+  "x_observer": [
+    0.0,
+    1.0,
+    0.0
+  ],
+  "x_human": [
+    0.0,
+    0.0,
+    1.0
+  ],
+  "steps": 20,
+  "lr": 0.05,
+  "weights": "default (0.33, 0.33, 0.34)",
+  "manifold": "nvs_kernel.manifold.euclidean.EuclideanManifold",
+  "source": "synthetic controlled input"
+}

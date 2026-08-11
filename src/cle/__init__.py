@@ -61,7 +61,7 @@ from cle.knowledge_delta import ArtifactKnowledgeDeltaGenerator, KnowledgeDeltaG
 from cle.morphism import IdentityInclusionMorphismLift, MorphismLiftStrategy
 from cle.natural_transformation import NaturalTransformationAnalyzer
 from cle.ports.commit import CommitSink
-from cle.ports.recovery import ThreeViewRecoveryLike
+from cle.ports.recovery import NumpyCoercingRecovery, ThreeViewRecoveryLike
 from cle.quotient import QuotientConstructor
 from cle.runtime import (
     CLEEngine,
@@ -114,6 +114,7 @@ __all__ = [
     "NaturalTransformationAnalyzer",
     "NoStrategyConfigured",
     "NotStabilized",
+    "NumpyCoercingRecovery",
     "ObservationalCommitCandidateBuilder",
     "ProofCertificate",
     "ProvenanceCanonicalizingCrystallizer",

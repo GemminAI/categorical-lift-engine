@@ -1,0 +1,8 @@
+{
+  "run_id": "tuple_incompatibility_probe",
+  "input_kind": "plain python tuple[float, ...] (CLE's actual call shape)",
+  "success": false,
+  "exception_type": "AttributeError",
+  "exception_message": "'tuple' object has no attribute 'shape'",
+  "traceback": "Traceback (most recent call last):\n  File \"/private/tmp/claude-501/-Users-tomonam3-Projects/d0abcd60-16e0-4260-a39a-b94e221a8cb6/scratchpad/nvs_recovery_unit_probe.py\", line 83, in run_with_cle_shaped_tuple_inputs\n    recovered = recovery.recover_state(current_x, x_s, x_o, x_h, steps=STEPS, lr=LR)\n  File \"/Users/tomonam3/GemminAI/nvs-kernel/nvs_kernel/nvs_kernel_physics/recovery.py\", line 106, in recover_state\n    gradient = self.compute_recovery_gradient(position, x_subject, x_observer, x_human)\n  File \"/Users/tomonam3/GemminAI/nvs-kernel/nvs_kernel/nvs_kernel_physics/recovery.py\", line 84, in compute_recovery_gradient\n    w.subject * log(current_x, x_subject)\n                ~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/tomonam3/GemminAI/nvs-kernel/nvs_kernel/manifold/euclidean.py\", line 46, in log_map\n    require_same_dimension(base, target)\n    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/Users/tomonam3/GemminAI/nvs-kernel/nvs_kernel/linalg.py\", line 39, in require_same_dimension\n    if left.shape != right.shape:\n                     ^^^^^^^^^^^\nAttributeError: 'tuple' object has no attribute 'shape'\n"
+}

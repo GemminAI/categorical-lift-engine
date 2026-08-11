@@ -47,8 +47,10 @@ def get_engine() -> CLEEngine:
     and `CLEEngine`'s duck-typed `hekb_store: Any` slot) that a real HEKB
     client satisfies structurally; CLE holds no concrete store implementation
     of its own. Owned by whatever composes CLE into a running system, not by
-    this API. Override via `app.dependency_overrides[get_engine]` to inject a
-    configured instance.
+    this API. A production composition root calls
+    `cle.api.app.create_app(recovery_engine=..., hekb_store=...)` to get an
+    app already wired to a configured instance; tests override this
+    dependency directly via `app.dependency_overrides[get_engine]`.
     """
     return _default_engine
 

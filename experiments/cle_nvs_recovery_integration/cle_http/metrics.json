@@ -1,0 +1,19 @@
+{
+  "status_code": 200,
+  "runs": 3,
+  "byte_identical_across_runs": true,
+  "recovered_state_matches_nvs_unit_probe_run_01": true,
+  "latency_ms_first_call": 12,
+  "converged": false,
+  "converged_note": "gradient_norm ~0.1995 with default steps=20, lr=0.05 does not clear CLEEngine.recover's 1e-3 convergence threshold for these well-separated orthogonal anchors -- expected numerical-methods behavior, not a compatibility defect. Not retuned, per scope.",
+  "regression_checks": {
+    "health": 200,
+    "lift": 200,
+    "pullback": 200,
+    "compress": 200,
+    "recover_malformed_request": 422,
+    "lift_pullback_compress_bodies_identical_to_pre_integration_baseline": true
+  },
+  "engine_composition": "cle.api.app.create_app(recovery_engine=cle.ports.recovery.NumpyCoercingRecovery(nvs_kernel.nvs_kernel_physics.recovery.ThreeViewTrajectoryRecovery(nvs_kernel.manifold.euclidean.EuclideanManifold(3))))",
+  "process_environment": "nvs-kernel/.venv, PYTHONPATH extended with categorical-lift-engine/src (no repository files modified in either repo)"
+}

@@ -1,0 +1,9 @@
+{
+  "recovered_state_id": "recovered:2b95d555eb951848b1419505",
+  "reconstructed_closure": {
+    "shared_morphisms": ["id_v0"],
+    "recovered_state": [0.41145635857568136, 0.2898797039851121, 0.29866393743920644]
+  },
+  "three_view_discrepancy": 0.0,
+  "converged": false
+}
