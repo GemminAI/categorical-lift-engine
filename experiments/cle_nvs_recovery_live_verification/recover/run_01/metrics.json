@@ -1,0 +1,8 @@
+{
+  "run_id": "run_01",
+  "http_status": 503,
+  "time_total_s": 0.501723,
+  "body": {
+    "detail": "recovery_engine is not configured"
+  }
+}

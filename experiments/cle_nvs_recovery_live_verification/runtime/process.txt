@@ -1,0 +1,10 @@
+UNRESOLVED.
+
+`gcloud compute instances list` failed with an expired/non-interactive
+credential (see deployment_identity.json). No SSH session was established.
+No process command line, uvicorn invocation, container command, or
+deployment manifest was obtained. Per task instructions, no
+reauthentication or configuration change was attempted to work around this.
+
+The one directly observable fact -- the live /recover HTTP behavior itself
+-- is recorded in ../recover/ and does not depend on this being resolved.

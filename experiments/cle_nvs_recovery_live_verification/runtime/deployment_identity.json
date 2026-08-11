@@ -1,0 +1,23 @@
+{
+  "attempted": [
+    {
+      "method": "gcloud compute instances list",
+      "purpose": "identify the GCE instance/service backing 34.61.86.172 to inspect startup script / metadata / process command line",
+      "result": "FAILED",
+      "detail": "gcloud reported an expired credential requiring interactive reauthentication ('Reauthentication failed. cannot prompt during non-interactive execution.', suggesting `gcloud auth login`). Per instructions, no reauthentication or configuration change was performed.",
+      "classification": "UNRESOLVED, not attempted further"
+    },
+    {
+      "method": "HTTP response headers on GET /health",
+      "purpose": "weak, non-invasive process-identity signal",
+      "result": "server: uvicorn",
+      "detail": "Confirms the service is fronted directly by uvicorn (or a proxy that passes this header through unchanged) -- consistent with, but not proof of, either `uvicorn cle.api.app:app` or a `create_app(...)`-based composition, since both produce an identically-titled/versioned FastAPI app on the same routes. Does not distinguish Case A from Case B/C/D in the task's own taxonomy.",
+      "classification": "Level 2/weak Level 3 evidence only"
+    }
+  ],
+  "ssh_or_shell_access": {
+    "attempted": false,
+    "reason": "Not attempted. Reading process command line / container command / deployment manifest / environment variables would require either GCE API access (blocked by the expired credential above) or an interactive SSH session into a live production host, which is a materially more invasive read than a metadata API call. Per instructions ('既存のread-onlyアクセスだけを使用する'), no new access was established and no reauthentication was performed."
+  },
+  "conclusion": "Runtime process identity, application-object identity, container/deployment manifest, and environment variables are all UNRESOLVED -- not confirmed NOT-composed, not confirmed composed. The one fact that IS confirmed directly is the live /recover behavior itself (see ../recover/), which is decisive on its own regardless of composition-identity access."
+}

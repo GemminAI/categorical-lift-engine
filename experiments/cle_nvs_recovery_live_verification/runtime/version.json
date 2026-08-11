@@ -1,0 +1,20 @@
+{
+  "note": "CLE defines no /version route (confirmed via openapi.json's path list); this is expected, not an anomaly.",
+  "version_source_used_instead": "/health response body's \"version\" field",
+  "live_version": "0.1.0",
+  "local_cle_version": "0.1.0",
+  "match": true,
+  "probe": {
+    "endpoint": "/version",
+    "http_status": 404,
+    "body": {"detail": "Not Found"},
+    "attempts": 1
+  },
+  "metrics_probe": {
+    "endpoint": "/metrics",
+    "http_status": 404,
+    "body": {"detail": "Not Found"},
+    "attempts": 1,
+    "note": "Also not a route CLE defines; single attempt only, per instructions not to guess-probe repeatedly."
+  }
+}
