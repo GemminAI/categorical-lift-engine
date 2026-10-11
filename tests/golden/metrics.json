@@ -1,0 +1,66 @@
+{
+  "description": "Small, answer-known inputs for each of the 5 metrics (except homotopy_class_determinism, which is cross-process by nature and has no single-process golden value). Floats are repr() strings, not JSON numbers.",
+  "functorial_invariance_score": {
+    "input": {
+      "category": {
+        "objects": ["A", "B"],
+        "morphisms": [
+          {"name": "id_A", "source": "A", "target": "A"},
+          {"name": "id_B", "source": "B", "target": "B"},
+          {"name": "f", "source": "A", "target": "B"}
+        ],
+        "composition": {
+          "id_A,id_A": "id_A",
+          "id_B,id_B": "id_B",
+          "f,id_A": "f",
+          "id_B,f": "f"
+        }
+      },
+      "object_map": {"A": "A", "B": "B"},
+      "morphism_map": {"id_A": "id_A", "id_B": "id_B", "f": "f"},
+      "source_identities": {"A": "id_A", "B": "id_B"},
+      "target_identities": {"A": "id_A", "B": "id_B"}
+    },
+    "output": "1.0"
+  },
+  "entropic_reduction": {
+    "input": {
+      "weights": {"a": "1.0", "b": "1.0", "c": "1.0", "d": "1.0"},
+      "quotient": {"a": "c1", "b": "c1", "c": "c2", "d": "c2"}
+    },
+    "output": "1.0"
+  },
+  "cet_lineage_integrity": {
+    "input": {
+      "records": [
+        {"content": "genesis", "prev_hash": null},
+        {"content": "second", "prev_hash": "sha256(genesis)"}
+      ]
+    },
+    "genesis_hash": "aeebad4a796fcc2e15dc4c6061b45ed9b373f26adfc798ca7d2d8cc58182718e",
+    "output": "1.0"
+  },
+  "hekb_transaction_yield": {
+    "input": {
+      "submissions": [
+        {"candidate_id": "c1", "accept": true},
+        {"candidate_id": "c2", "accept": true},
+        {"candidate_id": "c3", "accept": false}
+      ]
+    },
+    "output": "0.6666666666666666"
+  },
+  "delay_embed": {
+    "input": {
+      "x": [["0.0"], ["1.0"], ["2.0"], ["3.0"], ["4.0"], ["5.0"]],
+      "m": 2,
+      "tau": 2
+    },
+    "output": [
+      ["0.0", "2.0"],
+      ["1.0", "3.0"],
+      ["2.0", "4.0"],
+      ["3.0", "5.0"]
+    ]
+  }
+}

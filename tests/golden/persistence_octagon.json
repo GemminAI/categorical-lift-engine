@@ -1,0 +1,39 @@
+{
+  "description": "Regular 8-point octagon on the unit circle (no noise, no RNG seed -- fully reproducible), max_dimension=1. Reference values for a future Rust port of cle.topology.persistence to match. Floats are stored as repr() strings, not JSON numbers, so the exact decimal text this Python implementation produced is preserved verbatim.",
+  "input": {
+    "points": [
+      ["1.0", "0.0"],
+      ["0.7071067811865476", "0.7071067811865475"],
+      ["6.123233995736766e-17", "1.0"],
+      ["-0.7071067811865475", "0.7071067811865476"],
+      ["-1.0", "1.2246467991473532e-16"],
+      ["-0.7071067811865477", "-0.7071067811865475"],
+      ["-1.8369701987210297e-16", "-1.0"],
+      ["0.7071067811865474", "-0.7071067811865477"]
+    ],
+    "max_dimension": 1
+  },
+  "output": {
+    "diagrams": {
+      "0": [
+        ["0.0", "0.7653668522834778"],
+        ["0.0", "0.7653668522834778"],
+        ["0.0", "0.7653668522834778"],
+        ["0.0", "0.7653668522834778"],
+        ["0.0", "0.7653668522834778"],
+        ["0.0", "0.7653668522834778"],
+        ["0.0", "0.7653668522834778"],
+        ["0.0", "inf"]
+      ],
+      "1": [
+        ["0.7653668522834778", "1.8477590084075928"]
+      ]
+    },
+    "betti_numbers": {
+      "1.0": [1, 1],
+      "0.5": [8, 0]
+    },
+    "total_persistence_dim1": "1.082392156124115",
+    "max_persistence_dim1": "1.082392156124115"
+  }
+}
