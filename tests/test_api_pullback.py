@@ -11,9 +11,7 @@ from cle.api.app import app
 client = TestClient(app)
 
 
-def _category(
-    objects: list[str], morphisms: list[dict[str, str]]
-) -> dict[str, object]:
+def _category(objects: list[str], morphisms: list[dict[str, str]]) -> dict[str, object]:
     return {"objects": objects, "morphisms": morphisms, "composition": []}
 
 

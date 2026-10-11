@@ -83,9 +83,7 @@ class VietorisRipsComplex:
         if count:
             dimension = len(coordinates[0])
             if any(len(point) != dimension for point in coordinates):
-                raise DimensionMismatch(
-                    "all coordinates must share the same dimension"
-                )
+                raise DimensionMismatch("all coordinates must share the same dimension")
             for point in coordinates:
                 assert_finite(point)
 

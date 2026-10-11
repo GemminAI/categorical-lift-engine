@@ -46,8 +46,7 @@ def compute_common_invariant_subgraph(
         for other in morphisms[1:]:
             if other != first:
                 raise FunctorialityViolation(
-                    f"morphism {name!r} disagrees across views: "
-                    f"{first!r} vs {other!r}"
+                    f"morphism {name!r} disagrees across views: {first!r} vs {other!r}"
                 )
 
     names_s = set(category_s.morphisms)

@@ -85,9 +85,7 @@ class Functor:
     def __post_init__(self) -> None:
         for obj in self.source.objects:
             if obj not in self.object_map:
-                raise FunctorialityViolation(
-                    f"object {obj!r} has no image under F"
-                )
+                raise FunctorialityViolation(f"object {obj!r} has no image under F")
             if self.object_map[obj] not in self.target.objects:
                 raise FunctorialityViolation(
                     f"F({obj!r}) = {self.object_map[obj]!r} is not an object "
@@ -96,9 +94,7 @@ class Functor:
 
         for name, morphism in self.source.morphisms.items():
             if name not in self.morphism_map:
-                raise FunctorialityViolation(
-                    f"morphism {name!r} has no image under F"
-                )
+                raise FunctorialityViolation(f"morphism {name!r} has no image under F")
             image_name = self.morphism_map[name]
             if image_name not in self.target.morphisms:
                 raise FunctorialityViolation(

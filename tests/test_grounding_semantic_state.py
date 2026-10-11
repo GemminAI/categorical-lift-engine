@@ -8,15 +8,15 @@ from __future__ import annotations
 import json
 
 from cle.grounding.five_w1h import FiveW1HOverrides, extract_five_w1h
-from cle.grounding.semantic_state import build_grounded_state
+from cle.grounding.semantic_state import GroundedState, build_grounded_state
 from cle.grounding.sok import SOKOverrides, build_sok
 
 
 def _state(
     prompt: str = "軌跡が不安定なので安定化してほしい。",
     goal: str = "stabilize trajectory",
-    **sok_kwargs,
-):  # type: ignore[no-untyped-def]
+    **sok_kwargs: str | None,
+) -> GroundedState:
     five_w1h = extract_five_w1h(prompt, goal, FiveW1HOverrides())
     sok = build_sok(
         five_w1h, SOKOverrides(**sok_kwargs), default_knowledge_reference="test-ref"
