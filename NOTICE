@@ -17,7 +17,5 @@ dynamics, and LLM-rendering integration all work with no dependency on
 CLE. Installing CLE extends that stack by turning stabilized semantic
 trajectories into reusable knowledge; it does not complete it.
 
-This repository's inclusion outside the current OSS distribution is a
-product-strategy decision, not a technical limitation. See LICENSE —
-license status is intentionally reserved, and commercial licensing terms
-will be determined separately.
+This repository is licensed under Apache-2.0, the same license as the
+SensOS OSS stack above. See LICENSE for the full terms.

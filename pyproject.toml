@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Categorical Lift Engine (CLE) — SensOS's Knowledge Generation engine: StabilizedTrajectory -> HEKB commit candidates"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "LicenseRef-Proprietary" }
+license = { text = "Apache-2.0" }
 authors = [{ name = "Gemmina Intelligence LLC." }]
 keywords = [
     "categorical-lift-engine",
@@ -17,7 +17,7 @@ keywords = [
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
-    "License :: Other/Proprietary License",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
