@@ -250,3 +250,42 @@ def test_paths_are_homotopic_depends_on_the_shared_tolerance() -> None:
 
     assert not analyzer.paths_are_homotopic(loop, broken, tolerance=_SQUARE_EPS)
     assert analyzer.paths_are_homotopic(loop, broken, tolerance=0.001)
+
+
+# --- 4. betti_signature_equal (the honestly-named replacement) -------------
+
+
+def test_betti_signature_equal_true_for_matching_betti_signatures() -> None:
+    analyzer = EpsilonGraphBettiAnalyzer()
+    trajectory_a = _trajectory_from(_SQUARE, "loop-a")
+    trajectory_b = _trajectory_from(_rotate_2d(_SQUARE, math.pi / 3), "loop-b")
+
+    assert analyzer.betti_signature_equal(
+        trajectory_a, trajectory_b, tolerance=_SQUARE_EPS
+    )
+
+
+def test_betti_signature_equal_false_for_differing_betti_signatures() -> None:
+    analyzer = EpsilonGraphBettiAnalyzer()
+    loop = _trajectory_from(_SQUARE, "loop")
+    disconnected = _trajectory_from(((0.0, 0.0), (100.0, 100.0)), "disconnected")
+
+    assert not analyzer.betti_signature_equal(loop, disconnected, tolerance=_SQUARE_EPS)
+
+
+def test_paths_are_homotopic_warns_deprecated_and_delegates() -> None:
+    # The deprecated alias must still compute the same answer as
+    # betti_signature_equal — it only adds a warning, never changes the
+    # result.
+    analyzer = EpsilonGraphBettiAnalyzer()
+    trajectory_a = _trajectory_from(_SQUARE, "loop-a")
+    trajectory_b = _trajectory_from(_rotate_2d(_SQUARE, math.pi / 3), "loop-b")
+
+    with pytest.warns(DeprecationWarning, match="betti_signature_equal"):
+        result = analyzer.paths_are_homotopic(
+            trajectory_a, trajectory_b, tolerance=_SQUARE_EPS
+        )
+
+    assert result == analyzer.betti_signature_equal(
+        trajectory_a, trajectory_b, tolerance=_SQUARE_EPS
+    )

@@ -41,6 +41,15 @@ dev = [
     "hypothesis>=6.100.0",
     "httpx>=0.27",
 ]
+# cle.topology.persistence's core (PersistenceDiagram, delay_embed) imports
+# only numpy; these two (both MIT) are only needed to actually *compute* a
+# diagram (ripser) or a bottleneck distance (persim) -- imported lazily
+# inside those specific functions, which raise a clear error without this
+# extra installed.
+topology = [
+    "ripser>=0.6.4",
+    "persim>=0.3.1",
+]
 
 [project.urls]
 Homepage = "https://github.com/GemminAI/categorical-lift-engine"
@@ -87,6 +96,13 @@ python_version = "3.12"
 strict = true
 mypy_path = "src"
 files = ["src", "tests"]
+
+# Both are the optional "topology" extra, imported lazily inside individual
+# functions in cle.topology.persistence specifically so the core module
+# stays numpy-only; neither ships type stubs or a py.typed marker.
+[[tool.mypy.overrides]]
+module = ["ripser", "ripser.*", "persim", "persim.*"]
+ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 88

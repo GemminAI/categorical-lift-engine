@@ -17,6 +17,7 @@ Two Protocols live here at two different granularities:
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
@@ -138,13 +139,18 @@ class EpsilonGraphBettiAnalyzer:
     scoped not to build (see `tests/test_homotopy_path_analyzer.py`, which
     has a case demonstrating this known, deliberate discrepancy directly).
 
-    `paths_are_homotopic` decides equivalence by Betti-tuple equality at a
-    shared scale (`tolerance`). Betti numbers are homotopy invariants: unequal
-    Betti numbers *proves* two trajectories are not homotopy-equivalent;
-    equal Betti numbers is evidence, not proof (distinct spaces can share
-    Betti numbers). That is the necessary-condition proxy RFC-CLE005 §2.2's
-    determinism test needs — not a full homotopy-equivalence decision
-    procedure.
+    `betti_signature_equal` (the method to call; `paths_are_homotopic` is a
+    deprecated alias for it, below) decides equality by Betti-tuple
+    equality at a shared scale (`tolerance`). Betti numbers are homotopy
+    invariants: unequal Betti numbers *proves* two trajectories are not
+    homotopy-equivalent; equal Betti numbers is evidence, not proof
+    (distinct spaces can share Betti numbers — and, per the caveat above,
+    this particular `b_1` is itself only an upper bound on the real
+    simplicial complex's). That is the necessary-condition proxy
+    RFC-CLE005 §2.2's determinism test needs — not a full
+    homotopy-equivalence decision procedure, and the name
+    `betti_signature_equal` says exactly that and nothing more; it compares
+    a *signature* (a Betti-number tuple), not homotopy type.
 
     Raises `NonFiniteValue` (RFC-CLE005 §4.1, added during Phase 5
     validation) if any coordinate is NaN or infinite — discovered
@@ -158,17 +164,46 @@ class EpsilonGraphBettiAnalyzer:
     ) -> tuple[int, ...]:
         return _graph_betti_numbers(coordinates, eps)
 
+    def betti_signature_equal(
+        self,
+        trajectory_a: StabilizedTrajectoryLike,
+        trajectory_b: StabilizedTrajectoryLike,
+        tolerance: float,
+    ) -> bool:
+        """`True` iff both trajectories' eps-graph Betti tuples match at `tolerance`.
+
+        The honestly-named replacement for `paths_are_homotopic` (deprecated
+        below): this compares a Betti-number *signature*, which is a
+        necessary but not sufficient condition for homotopy equivalence —
+        see the class docstring's caveat on `b_1` specifically.
+        """
+        coordinates_a = tuple(state.theta for state in trajectory_a.states)
+        coordinates_b = tuple(state.theta for state in trajectory_b.states)
+        return self.compute_betti_numbers(
+            coordinates_a, tolerance
+        ) == self.compute_betti_numbers(coordinates_b, tolerance)
+
     def paths_are_homotopic(
         self,
         trajectory_a: StabilizedTrajectoryLike,
         trajectory_b: StabilizedTrajectoryLike,
         tolerance: float,
     ) -> bool:
-        coordinates_a = tuple(state.theta for state in trajectory_a.states)
-        coordinates_b = tuple(state.theta for state in trajectory_b.states)
-        return self.compute_betti_numbers(
-            coordinates_a, tolerance
-        ) == self.compute_betti_numbers(coordinates_b, tolerance)
+        """Deprecated: use `betti_signature_equal` — same computation, honest name.
+
+        This method's name implies homotopy equivalence; what it actually
+        computes (and always has) is Betti-tuple equality at one scale,
+        which `betti_signature_equal` now names accurately. Kept, unchanged
+        in behavior, for callers that already depend on this name.
+        """
+        warnings.warn(
+            "EpsilonGraphBettiAnalyzer.paths_are_homotopic is deprecated and "
+            "will be removed; it computes Betti-tuple equality at one scale, "
+            "not homotopy equivalence — use betti_signature_equal instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.betti_signature_equal(trajectory_a, trajectory_b, tolerance)
 
 
 __all__ = ["EpsilonGraphBettiAnalyzer", "HomotopyAnalyzer", "HomotopyPathAnalyzer"]
