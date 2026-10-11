@@ -61,7 +61,7 @@ def test_fis_identity_functor_scores_one() -> None:
     assert score == 1.0
 
 
-def test_fis_is_vacuously_one_with_nothing_to_check() -> None:
+def test_fis_is_none_with_nothing_to_check() -> None:
     empty = FiniteCategory(objects=frozenset(), morphisms={}, composition={})
 
     score = functorial_invariance_score(
@@ -73,7 +73,7 @@ def test_fis_is_vacuously_one_with_nothing_to_check() -> None:
         target_identities={},
     )
 
-    assert score == 1.0
+    assert score is None
 
 
 def test_fis_missing_object_map_entry_counts_as_unsatisfied() -> None:
@@ -88,6 +88,7 @@ def test_fis_missing_object_map_entry_counts_as_unsatisfied() -> None:
         target_identities={"A": "id_A", "B": "id_B"},
     )
 
+    assert score is not None
     assert score < 1.0
 
 
@@ -103,6 +104,7 @@ def test_fis_missing_morphism_map_entry_fails_composition_checks() -> None:
         target_identities={"A": "id_A", "B": "id_B"},
     )
 
+    assert score is not None
     assert score < 1.0
 
 
@@ -182,14 +184,17 @@ def test_lineage_integrity_is_one_for_an_intact_chain() -> None:
     assert cet_lineage_integrity((first, second)) == 1.0
 
 
-def test_lineage_integrity_empty_chain_is_vacuously_one() -> None:
-    assert cet_lineage_integrity(()) == 1.0
+def test_lineage_integrity_empty_chain_is_none() -> None:
+    assert cet_lineage_integrity(()) is None
 
 
 def test_lineage_integrity_first_record_must_have_no_prev_hash() -> None:
     tampered_first = LineageRecord(content="genesis", prev_hash="not-none")
 
-    assert cet_lineage_integrity((tampered_first,)) < 1.0
+    score = cet_lineage_integrity((tampered_first,))
+
+    assert score is not None
+    assert score < 1.0
 
 
 def test_lineage_integrity_valid_transformation_claim_does_not_lower_score() -> None:
@@ -243,7 +248,9 @@ def test_lineage_integrity_broken_transformation_claim_lowers_score() -> None:
             components=broken_claim.components,
         )
 
-    assert cet_lineage_integrity((record,)) < 1.0
+    score = cet_lineage_integrity((record,))
+    assert score is not None
+    assert score < 1.0
 
 
 # --- 5. hekb_transaction_yield -------------------------------------------------

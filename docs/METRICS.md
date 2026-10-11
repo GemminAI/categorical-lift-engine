@@ -25,7 +25,10 @@ violation, which makes it impossible to use for measuring a **partial**
 score.
 
 Vacuous case: a candidate with nothing to check (no identities, no
-composable pairs in the source category) scores `1.0`.
+composable pairs in the source category) returns `None` — **not
+measured**, not a pass. An empty category is not evidence of a correct
+functor; scoring it `1.0` would be indistinguishable from a real,
+fully-checked pass.
 
 ## 2. Homotopy Class Determinism
 
@@ -72,6 +75,9 @@ For a hash-chained sequence of lineage records, the fraction whose:
 `1.0` is required; anything less means at least one record in the chain
 was tampered with (content changed without updating the next record's
 `prev_hash`, or a transformation claim that doesn't actually commute).
+An empty chain returns `None` — **not measured**, not a pass: there is no
+record to have been tampered with, so this is not evidence of integrity,
+just the absence of anything to check.
 
 `TransformationClaim` exists specifically because
 `NaturalTransformation`'s own constructor already raises on an invalid

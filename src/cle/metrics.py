@@ -39,7 +39,7 @@ def functorial_invariance_score(
     morphism_map: Mapping[str, str],
     source_identities: Mapping[Obj, str],
     target_identities: Mapping[Obj, str],
-) -> float:
+) -> float | None:
     """Fraction of the two functor axioms a *candidate* mapping satisfies.
 
     `cle.topology.category_theory.Functor`'s constructor already validates
@@ -63,9 +63,12 @@ def functorial_invariance_score(
     missing from `object_map`/`morphism_map`, or the mapped morphisms are
     not composable in `target`) counts as *not* satisfied, not skipped.
 
-    Returns `1.0` if there is nothing to check (empty `source_identities`
-    and empty `source.composition`) — vacuously true, the same convention
-    `FiniteCategory`/`Functor` themselves use for an empty category.
+    Returns `None` — not measured, not a pass — if there is nothing to
+    check (empty `source_identities` and empty `source.composition`).
+    An empty category is not evidence of a correct functor; it is simply
+    a candidate this score cannot speak to, so `None` says that plainly
+    instead of reporting a score (`1.0`) indistinguishable from a real,
+    fully-checked pass.
     """
     total = 0
     satisfied = 0
@@ -91,7 +94,7 @@ def functorial_invariance_score(
         if composed is not None and composed == h_image:
             satisfied += 1
 
-    return satisfied / total if total else 1.0
+    return satisfied / total if total else None
 
 
 # --- 2. Homotopy Class Determinism -------------------------------------------
@@ -196,7 +199,7 @@ class LineageRecord:
     transformation_claim: TransformationClaim | None = None
 
 
-def cet_lineage_integrity(records: tuple[LineageRecord, ...]) -> float:
+def cet_lineage_integrity(records: tuple[LineageRecord, ...]) -> float | None:
     """Fraction of `records` whose hash-chain link AND transformation claim
     (if any) both verify.
 
@@ -211,11 +214,13 @@ def cet_lineage_integrity(records: tuple[LineageRecord, ...]) -> float:
 
     `1.0` requires every record in the chain to satisfy both; CLE's own
     tests treat anything less as "this lineage was tampered with"
-    (RFC-CLE005's CET requirement). Returns `1.0` for an empty chain
-    (vacuously true).
+    (RFC-CLE005's CET requirement). Returns `None` — not measured, not a
+    pass — for an empty chain: there is no record to have tampered with,
+    so this is not evidence of integrity, just the absence of anything to
+    check.
     """
     if not records:
-        return 1.0
+        return None
 
     integral_count = 0
     previous: LineageRecord | None = None

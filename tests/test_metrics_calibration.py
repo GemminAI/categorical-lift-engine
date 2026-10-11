@@ -95,6 +95,7 @@ def test_fis_deliberately_broken_composition_is_below_one() -> None:
         target_identities=identities,
     )
 
+    assert score is not None
     assert 0.0 < score < 1.0
 
 
@@ -137,7 +138,9 @@ def test_lineage_integrity_below_one_after_tampering_with_one_record() -> None:
     )
     tampered_chain = (genesis, tampered_second, third)
 
-    assert cet_lineage_integrity(tampered_chain) < 1.0
+    tampered_score = cet_lineage_integrity(tampered_chain)
+    assert tampered_score is not None
+    assert tampered_score < 1.0
 
 
 def test_lineage_integrity_below_one_for_a_non_commuting_transformation_claim() -> None:
@@ -170,7 +173,9 @@ def test_lineage_integrity_below_one_for_a_non_commuting_transformation_claim() 
         content="genesis", prev_hash=None, transformation_claim=non_commuting_claim
     )
 
-    assert cet_lineage_integrity((record,)) < 1.0
+    score = cet_lineage_integrity((record,))
+    assert score is not None
+    assert score < 1.0
 
 
 # --- Homotopy Class Determinism: 3 real processes, 3 real PYTHONHASHSEEDs -
