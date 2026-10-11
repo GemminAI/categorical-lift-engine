@@ -28,6 +28,7 @@ from cle.topology.simplicial import (
     betti_numbers,
     boundary_matrix,
 )
+from cle.topology.spaced_points import SpacedPointSequence
 from cle.topology.three_view_pullback import (
     ThreeViewPullbackEngine,
     compute_common_invariant_subgraph,
@@ -40,6 +41,7 @@ __all__ = [
     "Morphism",
     "NaturalTransformation",
     "Simplex",
+    "SpacedPointSequence",
     "ThreeViewPullbackEngine",
     "VietorisRipsComplex",
     "betti_numbers",
