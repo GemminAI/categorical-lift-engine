@@ -1,0 +1,77 @@
+{
+  "description": "no eligibility verdict was supplied",
+  "expected": [
+    {
+      "locations": [
+        {
+          "field": "span",
+          "id": "A",
+          "kind": "state"
+        }
+      ],
+      "reason_code": "ELIGIBILITY_MISSING",
+      "status": "UNVERIFIABLE"
+    }
+  ],
+  "inputs": {
+    "history": {
+      "abandoned_branches": [],
+      "compositions": [],
+      "history_hash": "0de54f091c4f0e671a038bc3b9ba8850c09d8bb86f432e4b15ad53c594a9b8c4",
+      "history_id": "h",
+      "morphisms": [
+        {
+          "carry": {
+            "count": "count",
+            "shape": "shape"
+          },
+          "evidence": [],
+          "invertibility": {
+            "claim": "unknown",
+            "inverse_morphism_id": null
+          },
+          "lost": [],
+          "morphism_id": "ia",
+          "preserved": [
+            "count",
+            "shape"
+          ],
+          "role": "identity",
+          "rule_ref": null,
+          "rule_text": "",
+          "source": "unknown",
+          "source_state_id": "A",
+          "target_state_id": "A",
+          "verification": "UNVERIFIED"
+        }
+      ],
+      "prev_history_hash": null,
+      "states": [
+        {
+          "description": "",
+          "history_id": "h",
+          "kind": "kind",
+          "source": "unknown",
+          "span": {
+            "p_end": 3,
+            "p_start": 0,
+            "session_id": "s1"
+          },
+          "state_id": "A",
+          "verification": "UNVERIFIED"
+        }
+      ],
+      "task_ref": "task",
+      "vocabulary_ref": {
+        "kind": "hext",
+        "name": null,
+        "seal_status": "SEAL_OK",
+        "validity": null,
+        "value": "vocab-v1",
+        "version": null
+      }
+    }
+  },
+  "recorded_inputs_sha256": "d4cc648d7b0b81f827c49d0824f0da477139f809736abc7998607a6baa0ae6bb",
+  "rule": "R7"
+}

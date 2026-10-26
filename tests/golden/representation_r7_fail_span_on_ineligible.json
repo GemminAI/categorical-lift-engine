@@ -1,0 +1,80 @@
+{
+  "description": "state A has a span in an INELIGIBLE session",
+  "expected": [
+    {
+      "locations": [
+        {
+          "field": "span",
+          "id": "A",
+          "kind": "state"
+        }
+      ],
+      "reason_code": "SPAN_ON_INELIGIBLE",
+      "status": "FAIL"
+    }
+  ],
+  "inputs": {
+    "eligibility": {
+      "s1": false
+    },
+    "history": {
+      "abandoned_branches": [],
+      "compositions": [],
+      "history_hash": "0de54f091c4f0e671a038bc3b9ba8850c09d8bb86f432e4b15ad53c594a9b8c4",
+      "history_id": "h",
+      "morphisms": [
+        {
+          "carry": {
+            "count": "count",
+            "shape": "shape"
+          },
+          "evidence": [],
+          "invertibility": {
+            "claim": "unknown",
+            "inverse_morphism_id": null
+          },
+          "lost": [],
+          "morphism_id": "ia",
+          "preserved": [
+            "count",
+            "shape"
+          ],
+          "role": "identity",
+          "rule_ref": null,
+          "rule_text": "",
+          "source": "unknown",
+          "source_state_id": "A",
+          "target_state_id": "A",
+          "verification": "UNVERIFIED"
+        }
+      ],
+      "prev_history_hash": null,
+      "states": [
+        {
+          "description": "",
+          "history_id": "h",
+          "kind": "kind",
+          "source": "unknown",
+          "span": {
+            "p_end": 3,
+            "p_start": 0,
+            "session_id": "s1"
+          },
+          "state_id": "A",
+          "verification": "UNVERIFIED"
+        }
+      ],
+      "task_ref": "task",
+      "vocabulary_ref": {
+        "kind": "hext",
+        "name": null,
+        "seal_status": "SEAL_OK",
+        "validity": null,
+        "value": "vocab-v1",
+        "version": null
+      }
+    }
+  },
+  "recorded_inputs_sha256": "a3d6bb7f345815b053534aa9b2ae857396e77f5382d2b7f20c5567b2c98dcc5e",
+  "rule": "R7"
+}
