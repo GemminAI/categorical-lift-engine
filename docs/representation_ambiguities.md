@@ -154,3 +154,10 @@ ambiguous the verifier leans to UNVERIFIABLE, or the choice is stated as
 32. **D-20 の枝**：枝の「同じ内容」は、前の版の状態 id・射 id がすべて残っていること（増えるのは許す）。
 33. **D-19 の理由コード**：証拠の封印が破れたときも、新しい名前を作らず `VERIFIED_WITHOUT_EVIDENCE` を使う。
 34. **D-14 の警告**：`CheckResult.warnings` は規則のすべての結果に同じものが付く。
+35. **D-19 の対象の種類**（cle-compare の再実行で見つかった。v0.4 は種類を限っていない）：`SEAL_FAIL` を数えるのは、
+    `hext`・`checker_output` の証拠だけ。`theorem_name` や `history` の参照に `seal_status=SEAL_FAIL` が付いていても、
+    その参照は封印を持つ種類ではないので数えず、UNVERIFIABLE（`EVIDENCE_NAME_ONLY`）のままにした（保守的な側）。
+    実装 B は、種類を問わず `SEAL_FAIL` を FAIL にする。設計の追記が要る。
+36. **D-06 の検査の順序**（同じく再実行で見つかった）：語彙の `ref.value` が履歴の `vocabulary_ref` と食い違い、かつ
+    語彙の `seal_status` が null のとき、A は値の食い違いを先にして `VOCABULARY_UNRESOLVED` を返し、
+    B は封印の欠落を先にして `SEAL_STATUS_MISSING` を返す。どちらも UNVERIFIABLE。v0.4 は順序を定めていない。
