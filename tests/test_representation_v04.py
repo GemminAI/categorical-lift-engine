@@ -601,3 +601,68 @@ def test_d12_no_exception_on_broken_histories(
         check_r8(a, b, sm, mm)
     derive_unit_compositions(a)
     _Index(a)
+
+
+# ------------------------------------------------- D-15 audit across R1..R8
+def test_d15_r5_reports_refuted_and_seal_failed_rule_together() -> None:
+    h = chain(
+        morphisms=[
+            mor("f", "A", "B"),
+            mor("g", "B", "C"),
+            mor(
+                "k",
+                "A",
+                "C",
+                verification="VERIFIED",
+                rule_ref=Ref("hext", "rule", "SEAL_FAIL"),
+                evidence=(Ref("hext", "e", "SEAL_OK", "REFUTED"), Ref("hext", "e2")),
+            ),
+        ]
+    )
+    out = check_r5(h)
+    assert {c for _, c in codes(out)} == {
+        "VERIFIED_ON_REFUTED",
+        "RULE_SEAL_FAILED",
+        "SEAL_STATUS_MISSING",
+    }
+
+
+def test_d15_r4_reports_missing_identity_and_endpoint_mismatch_together() -> None:
+    base = invertible_pair()
+    h = replace(
+        base,
+        morphisms=tuple(
+            replace(m, source_state_id="A", target_state_id="A")
+            if m.morphism_id == "r"
+            else m
+            for m in base.morphisms
+            if m.morphism_id != "ia"
+        ),
+    )
+    assert codes(check_r4(h)) == {
+        ("FAIL", "INVERSE_ENDPOINT_MISMATCH"),
+        ("UNVERIFIABLE", "IDENTITY_MISSING"),
+    }
+
+
+def test_d15_r4_missing_identity_still_reports_absent_terms() -> None:
+    base = invertible_pair(compositions=[Composition("f", "r", "ia")])
+    h = replace(
+        base, morphisms=tuple(m for m in base.morphisms if m.morphism_id != "ib")
+    )
+    assert codes(check_r4(h)) == {
+        ("UNVERIFIABLE", "IDENTITY_MISSING"),
+        ("UNVERIFIABLE", "INVERSE_ONE_SIDED"),
+    }
+
+
+def test_d15_r8_identity_with_wrong_endpoints_is_also_not_preserved() -> None:
+    src = chain()
+    dst = chain()
+    mm = {m.morphism_id: m.morphism_id for m in src.morphisms}
+    mm["ia"] = "f"  # an identity sent to a morphism A -> B
+    out = check_r8(src, dst, {"A": "A", "B": "B", "C": "C"}, mm)
+    assert codes(out) == {
+        ("FAIL", "FUNCTOR_ENDPOINT_MISMATCH"),
+        ("FAIL", "IDENTITY_NOT_PRESERVED"),
+    }

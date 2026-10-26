@@ -259,8 +259,16 @@ def test_r2_identity_results_do_not_count_as_independent_records() -> None:
 def test_r3_vocabulary_unresolved_cases() -> None:
     h = chain()
     assert codes(check_r3(h, None)) == [("UNVERIFIABLE", "VOCABULARY_UNRESOLVED")]
+    sealed = PropertyVocabulary(
+        "v", "1", "t", PROPS, (), Ref("hext", "different", "SEAL_OK")
+    )
+    assert codes(check_r3(h, sealed)) == [("UNVERIFIABLE", "VOCABULARY_UNRESOLVED")]
+    # v0.4 D-26: value mismatch and missing seal are both reported
     other = PropertyVocabulary("v", "1", "t", PROPS, (), Ref("hext", "different"))
-    assert codes(check_r3(h, other)) == [("UNVERIFIABLE", "VOCABULARY_UNRESOLVED")]
+    assert codes(check_r3(h, other)) == [
+        ("UNVERIFIABLE", "SEAL_STATUS_MISSING"),
+        ("UNVERIFIABLE", "VOCABULARY_UNRESOLVED"),
+    ]
 
 
 def test_r3_names_outside_the_vocabulary_and_undeclared_properties() -> None:

@@ -364,15 +364,18 @@ def check_r3(
     idx = _Index(history)
     findings: list[Finding] = []
     here = _loc("field", history.history_id, "vocabulary_ref")
-    if vocabulary is None or vocabulary.ref.value != history.vocabulary_ref.value:
+    # v0.4 D-26 (and D-15): every applicable reason is reported, whatever the
+    # order of the tests; the rule then stops, since there is no usable vocabulary.
+    if vocabulary is None:
         findings.append(("UNVERIFIABLE", "VOCABULARY_UNRESOLVED", here))
         return _results("R3", inputs, findings)
-    # v0.4 D-06: only a sealed (SEAL_OK) vocabulary reaches the ordinary checks
+    if vocabulary.ref.value != history.vocabulary_ref.value:
+        findings.append(("UNVERIFIABLE", "VOCABULARY_UNRESOLVED", here))
     if vocabulary.ref.seal_status is None:
         findings.append(("UNVERIFIABLE", "SEAL_STATUS_MISSING", here))
-        return _results("R3", inputs, findings)
-    if vocabulary.ref.seal_status != "SEAL_OK":
+    elif vocabulary.ref.seal_status != "SEAL_OK":
         findings.append(("UNVERIFIABLE", "VOCABULARY_UNRESOLVED", here))
+    if findings:
         return _results("R3", inputs, findings)
 
     properties = set(vocabulary.properties)
@@ -497,6 +500,12 @@ def check_r4(history: RepresentationHistory) -> list[CheckResult]:
             findings.append(
                 ("FAIL", "INVERTIBLE_WITH_LOSS", _loc("morphism", mid, "lost"))
             )
+        # v0.4 D-15: a missing identity is reported whatever else is wrong
+        for sid in sorted({f.source_state_id, f.target_state_id}):
+            if idx.identity_of(sid) is None:
+                findings.append(
+                    ("UNVERIFIABLE", "IDENTITY_MISSING", _loc("state", sid))
+                )
         inverse_id = f.invertibility.inverse_morphism_id
         g = idx.morphisms.get(inverse_id) if inverse_id is not None else None
         if g is None:
@@ -520,15 +529,6 @@ def check_r4(history: RepresentationHistory) -> list[CheckResult]:
                 )
             )
             continue
-        missing_identity = False
-        for sid in sorted({f.source_state_id, f.target_state_id}):
-            if idx.identity_of(sid) is None:
-                missing_identity = True
-                findings.append(
-                    ("UNVERIFIABLE", "IDENTITY_MISSING", _loc("state", sid))
-                )
-        if missing_identity:
-            continue
         sides = (
             ("g_after_f", mid, g.morphism_id, f.source_state_id),
             ("f_after_g", g.morphism_id, mid, f.target_state_id),
@@ -538,7 +538,9 @@ def check_r4(history: RepresentationHistory) -> list[CheckResult]:
             result = idx.compose(first, second)
             if result is None:
                 absent.append(name)
-            elif result not in idx.identities.get(state_id, []):
+            elif idx.identity_of(state_id) is not None and (
+                result not in idx.identities[state_id]
+            ):
                 findings.append(("FAIL", "INVERSE_NOT_IDENTITY", _pair(first, second)))
         if len(absent) == len(sides):
             for _, first, second, _state in sides:
@@ -581,16 +583,13 @@ def check_r5(history: RepresentationHistory) -> list[CheckResult]:
             )
         if m.verification != "VERIFIED":
             continue
+        where = _loc("morphism", mid, "evidence")
         if any(ref.validity == "REFUTED" for ref in m.evidence):
-            findings.append(
-                ("FAIL", "VERIFIED_ON_REFUTED", _loc("morphism", mid, "evidence"))
-            )
-            continue
+            findings.append(("FAIL", "VERIFIED_ON_REFUTED", where))
         if m.rule_ref is not None and m.rule_ref.seal_status == "SEAL_FAIL":
             findings.append(
                 ("FAIL", "RULE_SEAL_FAILED", _loc("morphism", mid, "rule_ref"))
             )
-            continue
         if m.rule_ref is not None and m.rule_ref.seal_status is None:
             findings.append(
                 (
@@ -604,18 +603,20 @@ def check_r5(history: RepresentationHistory) -> list[CheckResult]:
             r.seal_status == "SEAL_OK" and r.validity in _CHECKED for r in candidates
         ):
             continue
-        where = _loc("morphism", mid, "evidence")
         if not m.evidence:
             findings.append(("FAIL", "VERIFIED_WITHOUT_EVIDENCE", where))
             continue
-        # v0.4 D-19: a broken seal is FAIL even when other evidence is name-only
-        # or has no seal result; those are still reported (D-03).
-        broken = any(r.seal_status == "SEAL_FAIL" for r in candidates)
+        # v0.4 D-27: a broken seal makes the claim FAIL whatever the kind of
+        # the reference; a name-only reference with no seal result stays
+        # UNVERIFIABLE (D-19, D-03: all findings are reported).
+        broken = any(r.seal_status == "SEAL_FAIL" for r in m.evidence)
         unresolved = False
-        if not candidates:
+        if not candidates and (
+            not broken or any(r.seal_status is None for r in m.evidence)
+        ):
             unresolved = True
             findings.append(("UNVERIFIABLE", "EVIDENCE_NAME_ONLY", where))
-        elif any(r.seal_status is None for r in candidates):
+        if any(r.seal_status is None for r in candidates):
             unresolved = True
             findings.append(("UNVERIFIABLE", "SEAL_STATUS_MISSING", where))
         if broken or not unresolved:
@@ -807,7 +808,7 @@ def check_r8(
             findings.append(
                 ("FAIL", "FUNCTOR_ENDPOINT_MISMATCH", _loc("morphism", mid))
             )
-        elif (
+        if (
             src.is_identity(m)
             and expected[0] is not None
             and not (dst.is_identity(image) and image.source_state_id == expected[0])
