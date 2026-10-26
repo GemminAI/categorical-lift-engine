@@ -580,18 +580,15 @@ def test_r6_dropped_states_and_morphisms_and_shrunk_branch() -> None:
     ]
 
 
-def test_r6_cycles_are_failures_but_identities_and_inverse_claims_are_not() -> None:
+def test_r6_cycles_in_the_morphism_graph_are_allowed_v04_d01() -> None:
     cyc = history(
         [state("A"), state("B"), state("C")],
         [mor("f", "A", "B"), mor("g", "B", "A"), mor("h", "B", "C")],
     )
-    out = check_r6(cyc)
-    assert locs(out, "CYCLE") == [("state", "A", None), ("state", "B", None)]
+    assert "CYCLE" not in [r.reason_code for r in check_r6(cyc)]
     selfloop = history([state("A")], [mor("s", "A", "A")])
-    assert locs(check_r6(selfloop), "CYCLE") == [("state", "A", None)]
-    inverse_ok = invertible_pair()
-    assert "CYCLE" not in [r.reason_code for r in check_r6(inverse_ok)]
-    assert "CYCLE" not in [r.reason_code for r in check_r6(chain())]
+    assert "CYCLE" not in [r.reason_code for r in check_r6(selfloop)]
+    assert "CYCLE" not in [r.reason_code for r in check_r6(invertible_pair())]
 
 
 # ------------------------------------------------------------------------- R7

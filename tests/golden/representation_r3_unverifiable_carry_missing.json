@@ -22,10 +22,11 @@
           "evidence": [],
           "first": "f",
           "result": "k",
-          "second": "g"
+          "second": "g",
+          "source": "unknown"
         }
       ],
-      "history_hash": "c26c2ee761c504a197a43b959817342afc911d69d8c8e3b43a4a77acac962641",
+      "history_hash": "f748d4dd43aeaa23b80ac0a407941f32ff86e1fe76d5e417bc01f0da836c3104",
       "history_id": "h",
       "morphisms": [
         {
@@ -252,6 +253,6 @@
       "vocabulary_id": "vocab"
     }
   },
-  "recorded_inputs_sha256": "3258f6bf5501660d5a37ce681bf1ed2af7129192593fa2b539c305bddc0641c7",
+  "recorded_inputs_sha256": "c59a2030d9f11aa3041317a3a97ece4c1746e089030990d97e5943fd9cfb3e4d",
   "rule": "R3"
 }

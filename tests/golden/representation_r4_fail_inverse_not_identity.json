@@ -22,17 +22,19 @@
           "evidence": [],
           "first": "f",
           "result": "w",
-          "second": "r"
+          "second": "r",
+          "source": "unknown"
         },
         {
           "basis": "declared",
           "evidence": [],
           "first": "r",
           "result": "ib",
-          "second": "f"
+          "second": "f",
+          "source": "unknown"
         }
       ],
-      "history_hash": "438ef6ea74062f909a304859c4640785fc4cd89a06aa05f41a26635a094d52af",
+      "history_hash": "14e2f27166be5ce291f09ec26d4418ade74b87e98ae6ed242a780e666ee95a80",
       "history_id": "h",
       "morphisms": [
         {
@@ -209,6 +211,6 @@
       }
     }
   },
-  "recorded_inputs_sha256": "24080e4883334474df6e08abf30052711c820ef2031c8badd2373d2c75936601",
+  "recorded_inputs_sha256": "157a3efdd7673e421b3487ffae0eec05ad3d5e9ff4af5d59345ca8c8d7aa9edf",
   "rule": "R4"
 }

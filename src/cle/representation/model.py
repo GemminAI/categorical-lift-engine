@@ -266,9 +266,11 @@ class Composition:
     result: str
     basis: Basis = "declared"
     evidence: tuple[Ref, ...] = ()
+    source: Source = "unknown"
 
     def __post_init__(self) -> None:
         _require(self.basis, get_args(Basis), "Composition.basis")
+        _require(self.source, get_args(Source), "Composition.source")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -277,6 +279,7 @@ class Composition:
             "result": self.result,
             "basis": self.basis,
             "evidence": [ref.to_dict() for ref in self.evidence],
+            "source": self.source,
         }
 
     @classmethod
@@ -287,6 +290,7 @@ class Composition:
             result=data["result"],
             basis=data.get("basis", "declared"),
             evidence=tuple(Ref.from_dict(r) for r in data.get("evidence", ())),
+            source=data.get("source", "unknown"),
         )
 
 
@@ -323,6 +327,12 @@ class PropertyVocabulary:
 
 @dataclass(frozen=True, slots=True)
 class AbandonedBranch:
+    """A branch that was not taken (v0.4 D-25).
+
+    Shape: ``{branch_id, state_ids[], morphism_ids[]}``. The ids let R6 see a
+    branch shrink, which an id-only form could not.
+    """
+
     branch_id: str
     state_ids: tuple[str, ...] = ()
     morphism_ids: tuple[str, ...] = ()
@@ -437,6 +447,17 @@ class CheckerInfo:
 
 
 @dataclass(frozen=True, slots=True)
+class CheckWarning:
+    """A finding that does not change a rule's status (v0.4 D-14)."""
+
+    reason_code: str
+    location: Location
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"reason_code": self.reason_code, "location": self.location.to_dict()}
+
+
+@dataclass(frozen=True, slots=True)
 class CheckResult:
     """One check outcome (section 4).
 
@@ -451,6 +472,7 @@ class CheckResult:
     locations: tuple[Location, ...]
     inputs_sha256: str
     checker: CheckerInfo
+    warnings: tuple[CheckWarning, ...] = ()
 
     def __post_init__(self) -> None:
         _require(self.rule, get_args(RuleId), "CheckResult.rule")
@@ -471,6 +493,7 @@ class CheckResult:
             "locations": [loc.to_dict() for loc in self.locations],
             "inputs_sha256": self.inputs_sha256,
             "checker": self.checker.to_dict(),
+            "warnings": [w.to_dict() for w in self.warnings],
         }
 
 
@@ -491,6 +514,7 @@ def aggregate(results: Sequence[CheckResult]) -> Status:
 __all__ = [
     "AbandonedBranch",
     "CheckResult",
+    "CheckWarning",
     "CheckerInfo",
     "Composition",
     "Invertibility",

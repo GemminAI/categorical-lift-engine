@@ -1,0 +1,258 @@
+{
+  "description": "VERIFIED; SEAL_FAIL evidence plus a theorem-name reference (v0.4 D-19)",
+  "expected": [
+    {
+      "locations": [
+        {
+          "field": "evidence",
+          "id": "k",
+          "kind": "morphism"
+        }
+      ],
+      "reason_code": "VERIFIED_WITHOUT_EVIDENCE",
+      "status": "FAIL"
+    }
+  ],
+  "inputs": {
+    "history": {
+      "abandoned_branches": [],
+      "compositions": [
+        {
+          "basis": "declared",
+          "evidence": [],
+          "first": "f",
+          "result": "k",
+          "second": "g",
+          "source": "unknown"
+        }
+      ],
+      "history_hash": "be54b7e029add97c89c8ce338801523dea6cfe667d4a5733bb9784e83144717e",
+      "history_id": "h",
+      "morphisms": [
+        {
+          "carry": {
+            "count": "count",
+            "shape": "shape"
+          },
+          "evidence": [],
+          "invertibility": {
+            "claim": "unknown",
+            "inverse_morphism_id": null
+          },
+          "lost": [],
+          "morphism_id": "f",
+          "preserved": [
+            "count",
+            "shape"
+          ],
+          "role": "generator",
+          "rule_ref": {
+            "kind": "hext",
+            "name": null,
+            "seal_status": "SEAL_OK",
+            "validity": null,
+            "value": "rule-v1",
+            "version": null
+          },
+          "rule_text": "",
+          "source": "unknown",
+          "source_state_id": "A",
+          "target_state_id": "B",
+          "verification": "UNVERIFIED"
+        },
+        {
+          "carry": {
+            "count": "count",
+            "shape": "shape"
+          },
+          "evidence": [],
+          "invertibility": {
+            "claim": "unknown",
+            "inverse_morphism_id": null
+          },
+          "lost": [],
+          "morphism_id": "g",
+          "preserved": [
+            "count",
+            "shape"
+          ],
+          "role": "generator",
+          "rule_ref": {
+            "kind": "hext",
+            "name": null,
+            "seal_status": "SEAL_OK",
+            "validity": null,
+            "value": "rule-v1",
+            "version": null
+          },
+          "rule_text": "",
+          "source": "unknown",
+          "source_state_id": "B",
+          "target_state_id": "C",
+          "verification": "UNVERIFIED"
+        },
+        {
+          "carry": {
+            "count": "count",
+            "shape": "shape"
+          },
+          "evidence": [],
+          "invertibility": {
+            "claim": "unknown",
+            "inverse_morphism_id": null
+          },
+          "lost": [],
+          "morphism_id": "ia",
+          "preserved": [
+            "count",
+            "shape"
+          ],
+          "role": "identity",
+          "rule_ref": null,
+          "rule_text": "",
+          "source": "unknown",
+          "source_state_id": "A",
+          "target_state_id": "A",
+          "verification": "UNVERIFIED"
+        },
+        {
+          "carry": {
+            "count": "count",
+            "shape": "shape"
+          },
+          "evidence": [],
+          "invertibility": {
+            "claim": "unknown",
+            "inverse_morphism_id": null
+          },
+          "lost": [],
+          "morphism_id": "ib",
+          "preserved": [
+            "count",
+            "shape"
+          ],
+          "role": "identity",
+          "rule_ref": null,
+          "rule_text": "",
+          "source": "unknown",
+          "source_state_id": "B",
+          "target_state_id": "B",
+          "verification": "UNVERIFIED"
+        },
+        {
+          "carry": {
+            "count": "count",
+            "shape": "shape"
+          },
+          "evidence": [],
+          "invertibility": {
+            "claim": "unknown",
+            "inverse_morphism_id": null
+          },
+          "lost": [],
+          "morphism_id": "ic",
+          "preserved": [
+            "count",
+            "shape"
+          ],
+          "role": "identity",
+          "rule_ref": null,
+          "rule_text": "",
+          "source": "unknown",
+          "source_state_id": "C",
+          "target_state_id": "C",
+          "verification": "UNVERIFIED"
+        },
+        {
+          "carry": {
+            "count": "count",
+            "shape": "shape"
+          },
+          "evidence": [
+            {
+              "kind": "hext",
+              "name": null,
+              "seal_status": "SEAL_FAIL",
+              "validity": "CHECKED_BY_TOOL",
+              "value": "e",
+              "version": null
+            },
+            {
+              "kind": "theorem_name",
+              "name": null,
+              "seal_status": null,
+              "validity": null,
+              "value": "Pigeonhole",
+              "version": null
+            }
+          ],
+          "invertibility": {
+            "claim": "unknown",
+            "inverse_morphism_id": null
+          },
+          "lost": [],
+          "morphism_id": "k",
+          "preserved": [
+            "count",
+            "shape"
+          ],
+          "role": "generator",
+          "rule_ref": {
+            "kind": "hext",
+            "name": null,
+            "seal_status": "SEAL_OK",
+            "validity": null,
+            "value": "rule-v1",
+            "version": null
+          },
+          "rule_text": "",
+          "source": "unknown",
+          "source_state_id": "A",
+          "target_state_id": "C",
+          "verification": "VERIFIED"
+        }
+      ],
+      "prev_history_hash": null,
+      "states": [
+        {
+          "description": "",
+          "history_id": "h",
+          "kind": "kind",
+          "source": "unknown",
+          "span": null,
+          "state_id": "A",
+          "verification": "UNVERIFIED"
+        },
+        {
+          "description": "",
+          "history_id": "h",
+          "kind": "kind",
+          "source": "unknown",
+          "span": null,
+          "state_id": "B",
+          "verification": "UNVERIFIED"
+        },
+        {
+          "description": "",
+          "history_id": "h",
+          "kind": "kind",
+          "source": "unknown",
+          "span": null,
+          "state_id": "C",
+          "verification": "UNVERIFIED"
+        }
+      ],
+      "task_ref": "task",
+      "vocabulary_ref": {
+        "kind": "hext",
+        "name": null,
+        "seal_status": "SEAL_OK",
+        "validity": null,
+        "value": "vocab-v1",
+        "version": null
+      }
+    }
+  },
+  "recorded_inputs_sha256": "d4f6debfca3f59f9ba2e89637628bf7679f24b759a9ae718fd942db8ab1472b1",
+  "rule": "R5"
+}

@@ -22,24 +22,27 @@
           "evidence": [],
           "first": "f",
           "result": "k",
-          "second": "g"
+          "second": "g",
+          "source": "unknown"
         },
         {
           "basis": "declared",
           "evidence": [],
           "first": "f",
           "result": "q",
-          "second": "m"
+          "second": "m",
+          "source": "unknown"
         },
         {
           "basis": "declared",
           "evidence": [],
           "first": "k",
           "result": "p",
-          "second": "h"
+          "second": "h",
+          "source": "unknown"
         }
       ],
-      "history_hash": "bc92925018d2a45aa9aeefd7fae122636611284c3412766c4de6ffb0ce7a3a55",
+      "history_hash": "43c34e652ae45d698cdaae48f45ba38c13b0c3503fd3833ba5c125597f5ea54a",
       "history_id": "h",
       "morphisms": [
         {
@@ -406,6 +409,6 @@
       }
     }
   },
-  "recorded_inputs_sha256": "70f13a81527ebca0798be2acef6ac174afbed3992c5d5a39a72f1208d5b6cce1",
+  "recorded_inputs_sha256": "051edfc24735bb15b6f34f1e478206556c73fe0203c7775c0330c987adb92301",
   "rule": "R2"
 }

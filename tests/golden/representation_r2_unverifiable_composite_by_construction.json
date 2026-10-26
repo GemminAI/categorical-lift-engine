@@ -22,10 +22,11 @@
           "evidence": [],
           "first": "f",
           "result": "k",
-          "second": "g"
+          "second": "g",
+          "source": "unknown"
         }
       ],
-      "history_hash": "b6ffe730e8dab7498c3e0b46e0619f53bf7a05fc40d53995d141dd88c541d140",
+      "history_hash": "28155a61e1c10db54d1fe076ea00e606ec8209193d68aa36d880f18e4feef551",
       "history_id": "h",
       "morphisms": [
         {
@@ -235,6 +236,6 @@
       }
     }
   },
-  "recorded_inputs_sha256": "d9664ee7b3c789fed2eab4f40a9ad7e00931f23da674da0f462d49795b3e9e0f",
+  "recorded_inputs_sha256": "d8718da9cd9cc152b840cc8a3fbe428bd0b06f43edb5443b1ba0924329a06e58",
   "rule": "R2"
 }

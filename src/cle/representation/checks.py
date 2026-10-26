@@ -21,6 +21,8 @@ from cle.representation.canonical import sha256_hex
 from cle.representation.model import (
     CheckerInfo,
     CheckResult,
+    CheckWarning,
+    Composition,
     Location,
     PropertyVocabulary,
     Ref,
@@ -28,6 +30,12 @@ from cle.representation.model import (
     RepresentationMorphism,
     RuleId,
     Status,
+)
+from cle.representation.validate import (
+    eligibility_defects,
+    history_defects,
+    map_defects,
+    vocabulary_defects,
 )
 from cle.topology.category_theory import FiniteCategory, Morphism
 from cle.version import __version__
@@ -45,20 +53,32 @@ def _pair(first: str, second: str) -> Location:
     return Location("composition", f"{first}|{second}")
 
 
+def _defect_results(rule: RuleId, defects: Sequence[Location]) -> list[CheckResult]:
+    """v0.4 D-12: a defective input is a result, never an exception."""
+    digest = sha256_hex({"defects": [d.to_dict() for d in defects]})
+    return [
+        CheckResult(rule, "FAIL", "INPUT_TYPE_INVALID", tuple(defects), digest, CHECKER)
+    ]
+
+
 def _results(
-    rule: RuleId, inputs: Mapping[str, Any], findings: Sequence[Finding]
+    rule: RuleId,
+    inputs: Mapping[str, Any],
+    findings: Sequence[Finding],
+    warnings: Sequence[CheckWarning] = (),
 ) -> list[CheckResult]:
     digest = sha256_hex(dict(inputs))
+    extra = tuple(warnings)
     groups: dict[tuple[Status, str], list[Location]] = {}
     for status, code, location in findings:
         locations = groups.setdefault((status, code), [])
         if location not in locations:
             locations.append(location)
     if not groups:
-        return [CheckResult(rule, "PASS", None, (), digest, CHECKER)]
+        return [CheckResult(rule, "PASS", None, (), digest, CHECKER, extra)]
     ordered = sorted(groups.items(), key=lambda kv: (kv[0][0] != "FAIL", kv[0][1]))
     return [
-        CheckResult(rule, status, code, tuple(locations), digest, CHECKER)
+        CheckResult(rule, status, code, tuple(locations), digest, CHECKER, extra)
         for (status, code), locations in ordered
     ]
 
@@ -162,6 +182,9 @@ def finite_category_of(
 
 
 def check_r1(history: RepresentationHistory) -> list[CheckResult]:
+    defects = history_defects(history)
+    if defects:
+        return _defect_results("R1", defects)
     idx = _Index(history)
     findings: list[Finding] = []
     for sid in sorted(set(idx.duplicate_states)):
@@ -219,6 +242,9 @@ def check_r1(history: RepresentationHistory) -> list[CheckResult]:
 
 
 def check_r2(history: RepresentationHistory) -> list[CheckResult]:
+    defects = history_defects(history)
+    if defects:
+        return _defect_results("R2", defects)
     idx = _Index(history)
     findings: list[Finding] = []
     for sid in sorted(idx.states):
@@ -273,8 +299,14 @@ def check_r2(history: RepresentationHistory) -> list[CheckResult]:
                         ("FAIL", "ASSOCIATIVITY_VIOLATION", _pair(f.morphism_id, m))
                     )
 
+    # v0.4 D-02: both inputs non-identity and the result neither composite
+    # nor identity; unit-law terms never count.
     independent = any(
-        (r := idx.morphisms.get(c.result)) is not None
+        (f := idx.morphisms.get(c.first)) is not None
+        and (g := idx.morphisms.get(c.second)) is not None
+        and (r := idx.morphisms.get(c.result)) is not None
+        and not idx.is_identity(f)
+        and not idx.is_identity(g)
         and r.role not in ("composite", "identity")
         for c in history.compositions
     )
@@ -282,7 +314,12 @@ def check_r2(history: RepresentationHistory) -> list[CheckResult]:
         mechanical = [
             _pair(c.first, c.second)
             for c in history.compositions
-            if (r := idx.morphisms.get(c.result)) is not None and r.role == "composite"
+            if (r := idx.morphisms.get(c.result)) is not None
+            and r.role == "composite"
+            and not any(
+                (x := idx.morphisms.get(n)) is not None and idx.is_identity(x)
+                for n in (c.first, c.second)
+            )
         ]
         for location in mechanical or [
             _loc("field", history.history_id, "compositions")
@@ -314,20 +351,28 @@ def check_r3(
     Passing means no violation was found among the *declared* sets; it does
     not show the declarations are true.
     """
+    defects = [
+        *history_defects(history),
+        *vocabulary_defects(vocabulary, str(getattr(history, "history_id", "?"))),
+    ]
+    if defects:
+        return _defect_results("R3", defects)
     inputs = {
         "history": history.to_dict(),
         "vocabulary": None if vocabulary is None else vocabulary.to_dict(),
     }
     idx = _Index(history)
     findings: list[Finding] = []
+    here = _loc("field", history.history_id, "vocabulary_ref")
     if vocabulary is None or vocabulary.ref.value != history.vocabulary_ref.value:
-        findings.append(
-            (
-                "UNVERIFIABLE",
-                "VOCABULARY_UNRESOLVED",
-                _loc("field", history.history_id, "vocabulary_ref"),
-            )
-        )
+        findings.append(("UNVERIFIABLE", "VOCABULARY_UNRESOLVED", here))
+        return _results("R3", inputs, findings)
+    # v0.4 D-06: only a sealed (SEAL_OK) vocabulary reaches the ordinary checks
+    if vocabulary.ref.seal_status is None:
+        findings.append(("UNVERIFIABLE", "SEAL_STATUS_MISSING", here))
+        return _results("R3", inputs, findings)
+    if vocabulary.ref.seal_status != "SEAL_OK":
+        findings.append(("UNVERIFIABLE", "VOCABULARY_UNRESOLVED", here))
         return _results("R3", inputs, findings)
 
     properties = set(vocabulary.properties)
@@ -439,6 +484,9 @@ def check_r3(
 def check_r4(history: RepresentationHistory) -> list[CheckResult]:
     """An empty ``lost`` is necessary for invertibility, never sufficient:
     PASS needs both g.f = id_source and f.g = id_target in the table."""
+    defects = history_defects(history)
+    if defects:
+        return _defect_results("R4", defects)
     idx = _Index(history)
     findings: list[Finding] = []
     for mid in sorted(idx.morphisms):
@@ -519,6 +567,9 @@ _CHECKED = ("CHECKED_BY_TOOL", "CHECKED_BY_HUMAN")
 
 def check_r5(history: RepresentationHistory) -> list[CheckResult]:
     """Reads seal_status / validity as given; never judges the evidence."""
+    defects = history_defects(history)
+    if defects:
+        return _defect_results("R5", defects)
     idx = _Index(history)
     findings: list[Finding] = []
     for mid in sorted(idx.morphisms):
@@ -553,30 +604,22 @@ def check_r5(history: RepresentationHistory) -> list[CheckResult]:
             r.seal_status == "SEAL_OK" and r.validity in _CHECKED for r in candidates
         ):
             continue
+        where = _loc("morphism", mid, "evidence")
         if not m.evidence:
-            findings.append(
-                ("FAIL", "VERIFIED_WITHOUT_EVIDENCE", _loc("morphism", mid, "evidence"))
-            )
-        elif not candidates:
-            findings.append(
-                (
-                    "UNVERIFIABLE",
-                    "EVIDENCE_NAME_ONLY",
-                    _loc("morphism", mid, "evidence"),
-                )
-            )
+            findings.append(("FAIL", "VERIFIED_WITHOUT_EVIDENCE", where))
+            continue
+        # v0.4 D-19: a broken seal is FAIL even when other evidence is name-only
+        # or has no seal result; those are still reported (D-03).
+        broken = any(r.seal_status == "SEAL_FAIL" for r in candidates)
+        unresolved = False
+        if not candidates:
+            unresolved = True
+            findings.append(("UNVERIFIABLE", "EVIDENCE_NAME_ONLY", where))
         elif any(r.seal_status is None for r in candidates):
-            findings.append(
-                (
-                    "UNVERIFIABLE",
-                    "SEAL_STATUS_MISSING",
-                    _loc("morphism", mid, "evidence"),
-                )
-            )
-        else:
-            findings.append(
-                ("FAIL", "VERIFIED_WITHOUT_EVIDENCE", _loc("morphism", mid, "evidence"))
-            )
+            unresolved = True
+            findings.append(("UNVERIFIABLE", "SEAL_STATUS_MISSING", where))
+        if broken or not unresolved:
+            findings.append(("FAIL", "VERIFIED_WITHOUT_EVIDENCE", where))
     return _results("R5", {"history": history.to_dict()}, findings)
 
 
@@ -585,55 +628,54 @@ def check_r5(history: RepresentationHistory) -> list[CheckResult]:
 # --------------------------------------------------------------------------
 
 
-def _cyclic_states(idx: _Index) -> list[str]:
-    edges = {
-        (m.source_state_id, m.target_state_id)
-        for m in idx.morphisms.values()
-        if m.role not in ("identity", "inverse_claim")
-        and m.source_state_id in idx.states
-        and m.target_state_id in idx.states
-    }
-    nodes = set(idx.states)
-    while True:
-        sources = {a for a, _ in edges}
-        targets = {b for _, b in edges}
-        peel = {n for n in nodes if n not in sources or n not in targets}
-        if not peel:
-            return sorted(nodes)
-        nodes -= peel
-        edges = {(a, b) for a, b in edges if a in nodes and b in nodes}
-        if not edges:
-            return []
-
-
 def check_r6(
     history: RepresentationHistory,
     previous: RepresentationHistory | None = None,
 ) -> list[CheckResult]:
+    defects = [
+        *history_defects(history),
+        *([] if previous is None else history_defects(previous)),
+    ]
+    if defects:
+        return _defect_results("R6", defects)
     inputs = {
         "history": history.to_dict(),
         "previous": None if previous is None else previous.to_dict(),
     }
-    idx = _Index(history)
     findings: list[Finding] = []
-    for sid in _cyclic_states(idx):
-        findings.append(("FAIL", "CYCLE", _loc("state", sid)))
     here = _loc("field", history.history_id, "prev_history_hash")
+    # v0.4 D-01: the DAG is the chain of versions; the graph of states and
+    # morphisms may have cycles (inverses, mutual conversions).
+    own = {history.compute_hash(), history.history_hash} - {""}
+    if history.prev_history_hash in own:
+        findings.append(("FAIL", "VERSION_CYCLE", here))
     if history.prev_history_hash is None:
         findings.append(("UNVERIFIABLE", "NO_PRIOR_VERSION", here))
     elif previous is None or previous.compute_hash() != history.prev_history_hash:
         findings.append(("UNVERIFIABLE", "PREV_HISTORY_UNRESOLVED", here))
     else:
-        kept_states = {s.state_id for s in history.states}
-        kept_morphisms = {m.morphism_id for m in history.morphisms}
+        if previous.prev_history_hash in own:
+            findings.append(("FAIL", "VERSION_CYCLE", here))
+        idx = _Index(history)
         branches = {b.branch_id: b for b in history.abandoned_branches}
+        # v0.4 D-20: "remains" means the same id and the same content
         for s in sorted(previous.states, key=lambda s: s.state_id):
-            if s.state_id not in kept_states:
+            now_state = idx.states.get(s.state_id)
+            if now_state is None:
                 findings.append(("FAIL", "ELEMENT_DROPPED", _loc("state", s.state_id)))
+            elif now_state.to_dict() != s.to_dict():
+                findings.append(
+                    ("FAIL", "ELEMENT_REWRITTEN", _loc("state", s.state_id))
+                )
         for m in sorted(previous.morphisms, key=lambda m: m.morphism_id):
-            if m.morphism_id not in kept_morphisms:
+            now_morphism = idx.morphisms.get(m.morphism_id)
+            if now_morphism is None:
                 findings.append(
                     ("FAIL", "ELEMENT_DROPPED", _loc("morphism", m.morphism_id))
+                )
+            elif now_morphism.to_dict() != m.to_dict():
+                findings.append(
+                    ("FAIL", "ELEMENT_REWRITTEN", _loc("morphism", m.morphism_id))
                 )
         for b in sorted(previous.abandoned_branches, key=lambda b: b.branch_id):
             now = branches.get(b.branch_id)
@@ -660,6 +702,12 @@ def check_r6(
 def check_r7(
     history: RepresentationHistory, eligibility: Mapping[str, bool] | None
 ) -> list[CheckResult]:
+    defects = [
+        *history_defects(history),
+        *eligibility_defects(eligibility, str(getattr(history, "history_id", "?"))),
+    ]
+    if defects:
+        return _defect_results("R7", defects)
     inputs = {
         "history": history.to_dict(),
         "eligibility": None if eligibility is None else dict(eligibility),
@@ -710,6 +758,16 @@ def check_r8(
     state the term cannot be checked: UNVERIFIABLE
     (IDENTITY_PRESERVATION_UNCHECKED).
     """
+    defects = [
+        *history_defects(source),
+        *history_defects(target),
+        *map_defects(state_map, str(getattr(source, "history_id", "?")), "state_map"),
+        *map_defects(
+            morphism_map, str(getattr(source, "history_id", "?")), "morphism_map"
+        ),
+    ]
+    if defects:
+        return _defect_results("R8", defects)
     inputs = {
         "source": source.to_dict(),
         "target": target.to_dict(),
@@ -718,6 +776,15 @@ def check_r8(
     }
     src, dst = _Index(source), _Index(target)
     findings: list[Finding] = []
+    # v0.4 D-14: entries for elements the source does not have are ignored
+    # and reported as warnings; FUNCTOR_PARTIAL means a source element has no image.
+    warnings = [
+        CheckWarning("MAP_EXTRA_ENTRY", _loc("state", sid, "state_map"))
+        for sid in sorted(set(state_map) - set(src.states))
+    ] + [
+        CheckWarning("MAP_EXTRA_ENTRY", _loc("morphism", mid, "morphism_map"))
+        for mid in sorted(set(morphism_map) - set(src.morphisms))
+    ]
     for sid in sorted(src.states):
         if sid not in state_map:
             findings.append(("UNVERIFIABLE", "FUNCTOR_PARTIAL", _loc("state", sid)))
@@ -758,6 +825,11 @@ def check_r8(
                     ("FAIL", "IDENTITY_NOT_PRESERVED", _loc("morphism", mid))
                 )
     for c in source.compositions:
+        sf, sg = src.morphisms.get(c.first), src.morphisms.get(c.second)
+        # v0.4 D-23: R8 presumes R1 holds for the source; skip entries that
+        # do not chain there (R1 reports them)
+        if sf is None or sg is None or sf.target_state_id != sg.source_state_id:
+            continue
         images = [morphism_map.get(x) for x in (c.first, c.second, c.result)]
         if any(i is None or i not in dst.morphisms for i in images):
             continue
@@ -773,7 +845,7 @@ def check_r8(
             findings.append(
                 ("FAIL", "FUNCTOR_COMPOSITION_NOT_PRESERVED", _pair(c.first, c.second))
             )
-    return _results("R8", inputs, findings)
+    return _results("R8", inputs, findings, warnings)
 
 
 # --------------------------------------------------------------------------
@@ -798,6 +870,51 @@ def verify_history(
         *check_r6(history, previous),
         *check_r7(history, eligibility),
     ]
+
+
+def derive_unit_compositions(
+    history: RepresentationHistory,
+) -> tuple[Composition, ...]:
+    """The unit-law terms the checks derive (v0.4 D-05), written out.
+
+    For each non-identity ``f: A -> B``: ``id_A`` then ``f`` is ``f``, and
+    ``f`` then ``id_B`` is ``f``; for each identity, ``id`` then ``id`` is
+    ``id``. Terms the recorder already wrote are not repeated. Each derived
+    term has ``basis="recomputed"``, ``source="verifier"`` and this checker as
+    evidence. A history with type defects yields nothing.
+    """
+    if history_defects(history):
+        return ()
+    idx = _Index(history)
+    evidence = (
+        Ref(
+            kind="checker_output",
+            value=sha256_hex({"checker": CHECKER.to_dict(), "terms": "unit-law"}),
+            name=CHECKER.name,
+            version=CHECKER.version,
+        ),
+    )
+    out: list[Composition] = []
+    for mid in sorted(idx.morphisms):
+        m = idx.morphisms[mid]
+        if idx.is_identity(m):
+            pairs = [(mid, mid)] if idx.identity_of(m.source_state_id) == mid else []
+        else:
+            before = idx.identity_of(m.source_state_id)
+            after = idx.identity_of(m.target_state_id)
+            pairs = [(before, mid), (mid, after)] if before and after else []
+            if before and not after:
+                pairs = [(before, mid)]
+            if after and not before:
+                pairs = [(mid, after)]
+        for first, second in pairs:
+            if first is None or second is None or (first, second) in idx.table:
+                continue
+            result = mid
+            out.append(
+                Composition(first, second, result, "recomputed", evidence, "verifier")
+            )
+    return tuple(out)
 
 
 def complete_identities(
@@ -863,6 +980,7 @@ __all__ = [
     "check_r7",
     "check_r8",
     "complete_identities",
+    "derive_unit_compositions",
     "finite_category_of",
     "verify_history",
 ]

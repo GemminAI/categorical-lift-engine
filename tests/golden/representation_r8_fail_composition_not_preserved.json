@@ -22,10 +22,11 @@
           "evidence": [],
           "first": "f",
           "result": "k",
-          "second": "g"
+          "second": "g",
+          "source": "unknown"
         }
       ],
-      "history_hash": "f4c4dac4483049578b440b1bdcf12350401ba8beb577aa911d377effce1eb168",
+      "history_hash": "9ffca2c0a230b9ae4e4ccfd3ed66fe98eb108b3c7bab7ace60481a250f5ad245",
       "history_id": "h",
       "morphisms": [
         {
@@ -255,10 +256,11 @@
           "evidence": [],
           "first": "f2",
           "result": "j2",
-          "second": "g2"
+          "second": "g2",
+          "source": "unknown"
         }
       ],
-      "history_hash": "81b7d10d64681b28938502a8f93619143a651708deb6cf73f8e2787951b6e37b",
+      "history_hash": "54be05522381d9192b975d8b70c37c1702ca2e8f0db596bd994088d73925f975",
       "history_id": "h",
       "morphisms": [
         {
@@ -499,6 +501,6 @@
       }
     }
   },
-  "recorded_inputs_sha256": "74e7a7cb9755fdfcc966256ec730953d7230d8fb1631ea9a0750c0646be7d971",
+  "recorded_inputs_sha256": "eb85736ed77466877202eb28e79395c70b58123c8604674078015e8be0daac95",
   "rule": "R8"
 }

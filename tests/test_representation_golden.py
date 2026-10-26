@@ -84,6 +84,8 @@ def test_golden_case(path: Path) -> None:
         for r in results
     ]
     assert got == doc["expected"]
+    if "expected_warnings" in doc:
+        assert [w.to_dict() for w in results[0].warnings] == doc["expected_warnings"]
     assert all(r.rule == doc["rule"] for r in results)
     assert results[0].inputs_sha256 == doc["recorded_inputs_sha256"]
     # run again from the same file: bit-identical, inputs_sha256 included
