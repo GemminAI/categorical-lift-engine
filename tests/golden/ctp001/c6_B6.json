@@ -1,0 +1,672 @@
+{
+  "applicability": {
+    "c1": "applicable",
+    "c2": "applicable"
+  },
+  "applicability_basis": "fixture",
+  "carry_evidence": {
+    "f1": [
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f1/c1.condition",
+        "property": "c1.condition",
+        "source": "verifier",
+        "status": "lost"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f1/c1.modality",
+        "property": "c1.modality",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f1/c1.threshold",
+        "property": "c1.threshold",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f1/c2.modality",
+        "property": "c2.modality",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f1/c2.scope",
+        "property": "c2.scope",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ],
+    "f2": [
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f2/c1.condition",
+        "property": "c1.condition",
+        "source": "verifier",
+        "status": "lost"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f2/c1.modality",
+        "property": "c1.modality",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f2/c1.threshold",
+        "property": "c1.threshold",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f2/c2.modality",
+        "property": "c2.modality",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f2/c2.scope",
+        "property": "c2.scope",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ],
+    "f3": [
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f3/c1.condition",
+        "property": "c1.condition",
+        "source": "verifier",
+        "status": "lost"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f3/c1.modality",
+        "property": "c1.modality",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f3/c1.threshold",
+        "property": "c1.threshold",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f3/c2.modality",
+        "property": "c2.modality",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c6/B6/f3/c2.scope",
+        "property": "c2.scope",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ]
+  },
+  "chain": [
+    "f1",
+    "f2",
+    "f3"
+  ],
+  "constraint_schema": [
+    {
+      "condition": "manager approval",
+      "constraint_id": "c1",
+      "exception": null,
+      "kind": "conditional_permission",
+      "modality": "may",
+      "order": null,
+      "scope": null,
+      "threshold": {
+        "comparator": ">",
+        "unit": "USD",
+        "value": 500
+      }
+    },
+    {
+      "condition": null,
+      "constraint_id": "c2",
+      "exception": null,
+      "kind": "scope_restriction",
+      "modality": "may",
+      "order": null,
+      "scope": "EU-region storage",
+      "threshold": null
+    }
+  ],
+  "constraint_type": "C6",
+  "example": "B6",
+  "expected": {
+    "compliance": {
+      "L1": "FAIL",
+      "L2": "UNVERIFIABLE",
+      "L3": "FAIL",
+      "f3": "FAIL",
+      "overall": "FAIL"
+    },
+    "r1": {
+      "value": "PASS"
+    },
+    "r2": {
+      "value": "PASS"
+    },
+    "r3": {
+      "reason_codes": [],
+      "value": "PASS"
+    },
+    "r9": {
+      "m1": {
+        "annotations": [],
+        "locations": [],
+        "reason_codes": [],
+        "value": "PASS"
+      },
+      "m2": {
+        "annotations": [],
+        "locations": [
+          "f1"
+        ],
+        "reason_codes": [
+          "PRESERVED_CONTRADICTED_BY_EVIDENCE"
+        ],
+        "value": "FAIL"
+      }
+    },
+    "two_axis": {
+      "class": "LOST_VIOLATED",
+      "compliance": "VIOLATED",
+      "retention": "LOST",
+      "undetermined_axes": []
+    }
+  },
+  "history": {
+    "abandoned_branches": [],
+    "compositions": [
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k12",
+        "second": "f2",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k123",
+        "second": "k23",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f2",
+        "result": "k23",
+        "second": "f3",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "k12",
+        "result": "k123",
+        "second": "f3",
+        "source": "human"
+      }
+    ],
+    "history_hash": "e8c26779ba4ce6f34e17cf770e04c3a273670d13f9dbc4a0c43ee3eaa4ea22e0",
+    "history_id": "ctp001-c6-B6",
+    "morphisms": [
+      {
+        "carry": {
+          "c1.condition": "c1.condition",
+          "c1.modality": "c1.modality",
+          "c1.threshold": "c1.threshold",
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f1",
+        "preserved": [
+          "c1.condition",
+          "c1.modality",
+          "c1.threshold",
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "retrieval and chunking",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c1.condition": "c1.condition",
+          "c1.modality": "c1.modality",
+          "c1.threshold": "c1.threshold",
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f2",
+        "preserved": [
+          "c1.condition",
+          "c1.modality",
+          "c1.threshold",
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "decision",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c1.condition": "c1.condition",
+          "c1.modality": "c1.modality",
+          "c1.threshold": "c1.threshold",
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f3",
+        "preserved": [
+          "c1.condition",
+          "c1.modality",
+          "c1.threshold",
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "execution",
+        "source": "human",
+        "source_state_id": "Y",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c1.condition": "c1.condition",
+          "c1.modality": "c1.modality",
+          "c1.threshold": "c1.threshold",
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iK",
+        "preserved": [
+          "c1.condition",
+          "c1.modality",
+          "c1.threshold",
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "K",
+        "target_state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c1.condition": "c1.condition",
+          "c1.modality": "c1.modality",
+          "c1.threshold": "c1.threshold",
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iX",
+        "preserved": [
+          "c1.condition",
+          "c1.modality",
+          "c1.threshold",
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "X",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c1.condition": "c1.condition",
+          "c1.modality": "c1.modality",
+          "c1.threshold": "c1.threshold",
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iY",
+        "preserved": [
+          "c1.condition",
+          "c1.modality",
+          "c1.threshold",
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Y",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c1.condition": "c1.condition",
+          "c1.modality": "c1.modality",
+          "c1.threshold": "c1.threshold",
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iZ",
+        "preserved": [
+          "c1.condition",
+          "c1.modality",
+          "c1.threshold",
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Z",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c1.condition": "c1.condition",
+          "c1.modality": "c1.modality",
+          "c1.threshold": "c1.threshold",
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k12",
+        "preserved": [
+          "c1.condition",
+          "c1.modality",
+          "c1.threshold",
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f2 after f1, recorded independently",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c1.condition": "c1.condition",
+          "c1.modality": "c1.modality",
+          "c1.threshold": "c1.threshold",
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k123",
+        "preserved": [
+          "c1.condition",
+          "c1.modality",
+          "c1.threshold",
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2 after f1, recorded",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c1.condition": "c1.condition",
+          "c1.modality": "c1.modality",
+          "c1.threshold": "c1.threshold",
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k23",
+        "preserved": [
+          "c1.condition",
+          "c1.modality",
+          "c1.threshold",
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2, recorded independently",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "prev_history_hash": null,
+    "states": [
+      {
+        "description": "",
+        "history_id": "ctp001-c6-B6",
+        "kind": "knowledge",
+        "source": "human",
+        "span": null,
+        "state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001-c6-B6",
+        "kind": "context",
+        "source": "human",
+        "span": null,
+        "state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001-c6-B6",
+        "kind": "decision",
+        "source": "human",
+        "span": null,
+        "state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001-c6-B6",
+        "kind": "action",
+        "source": "human",
+        "span": null,
+        "state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "task_ref": "EXP-RAG-CTP001/C6",
+    "vocabulary_ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001-c6-v1",
+      "version": null
+    }
+  },
+  "id": "c6_B6",
+  "note": "Breaks c1 (the condition, as in D0) but every stage declares all properties preserved.",
+  "obligation_exclusions": [],
+  "obligations": [
+    "c1.condition",
+    "c1.modality",
+    "c1.threshold",
+    "c2.modality",
+    "c2.scope"
+  ],
+  "situation": {
+    "action_type": "refund_and_export",
+    "amount_usd": 800,
+    "approval_obtained": false,
+    "approver": null,
+    "export_destination": "eu-west-1",
+    "export_destination_region": "EU"
+  },
+  "texts": {
+    "f1_context": "Refunds over $500 may be issued. Customer records may be exported only to EU-region storage.",
+    "f2_decision": "Refunds over $500 may be issued. Customer records may be exported only to EU-region storage. I will issue the $800 refund and export the records to EU-region storage.",
+    "f3_action": "policy: refunds over $500 may be issued; customer records may be exported only to EU-region storage | refund: $800 | approver: none | export: eu-west-1 (EU-region) | status: done",
+    "knowledge": "Refunds over $500 may be issued only with manager approval. Customer records may be exported only to EU-region storage."
+  },
+  "vocabulary": {
+    "information": [],
+    "properties": [
+      "c1.condition",
+      "c1.modality",
+      "c1.threshold",
+      "c2.modality",
+      "c2.scope"
+    ],
+    "ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001-c6-v1",
+      "version": null
+    },
+    "task_ref": "EXP-RAG-CTP001/C6",
+    "version": "1",
+    "vocabulary_id": "ctp001-c6-vocab"
+  }
+}

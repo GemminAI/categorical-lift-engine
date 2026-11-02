@@ -1,0 +1,520 @@
+{
+  "applicability": {
+    "c2": "applicable"
+  },
+  "applicability_basis": "fixture",
+  "carry_evidence": {
+    "f1": [
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c2/P0/f1/c2.modality",
+        "property": "c2.modality",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c2/P0/f1/c2.scope",
+        "property": "c2.scope",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ],
+    "f2": [
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c2/P0/f2/c2.modality",
+        "property": "c2.modality",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c2/P0/f2/c2.scope",
+        "property": "c2.scope",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ],
+    "f3": [
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c2/P0/f3/c2.modality",
+        "property": "c2.modality",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "evidence_ref": "fixture:c2/P0/f3/c2.scope",
+        "property": "c2.scope",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ]
+  },
+  "chain": [
+    "f1",
+    "f2",
+    "f3"
+  ],
+  "constraint_schema": {
+    "condition": null,
+    "constraint_id": "c2",
+    "exception": null,
+    "kind": "scope_restriction",
+    "modality": "may",
+    "order": null,
+    "scope": "EU-region storage",
+    "threshold": null
+  },
+  "constraint_type": "C2",
+  "example": "P0",
+  "expected": {
+    "compliance": {
+      "L1": "PASS",
+      "L2": "PASS",
+      "L3": "PASS",
+      "f3": "PASS",
+      "overall": "PASS"
+    },
+    "r1": {
+      "value": "PASS"
+    },
+    "r2": {
+      "value": "PASS"
+    },
+    "r3": {
+      "reason_codes": [],
+      "value": "PASS"
+    },
+    "r9": {
+      "m1": {
+        "annotations": [],
+        "locations": [],
+        "reason_codes": [],
+        "value": "PASS"
+      },
+      "m2": {
+        "annotations": [],
+        "locations": [],
+        "reason_codes": [],
+        "value": "PASS"
+      }
+    },
+    "two_axis": {
+      "class": "CARRIED_COMPLIED",
+      "compliance": "COMPLIED",
+      "retention": "CARRIED",
+      "undetermined_axes": []
+    }
+  },
+  "history": {
+    "abandoned_branches": [],
+    "compositions": [
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k12",
+        "second": "f2",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k123",
+        "second": "k23",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f2",
+        "result": "k23",
+        "second": "f3",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "k12",
+        "result": "k123",
+        "second": "f3",
+        "source": "human"
+      }
+    ],
+    "history_hash": "61ec644fb041dd9f382f74566974d8a507e9d9ecb10f7b8399894e46fb626dc0",
+    "history_id": "ctp001-c2-P0",
+    "morphisms": [
+      {
+        "carry": {
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f1",
+        "preserved": [
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "retrieval and chunking",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f2",
+        "preserved": [
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "decision",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f3",
+        "preserved": [
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "execution",
+        "source": "human",
+        "source_state_id": "Y",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iK",
+        "preserved": [
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "K",
+        "target_state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iX",
+        "preserved": [
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "X",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iY",
+        "preserved": [
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Y",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iZ",
+        "preserved": [
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Z",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k12",
+        "preserved": [
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f2 after f1, recorded independently",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k123",
+        "preserved": [
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2 after f1, recorded",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "c2.modality": "c2.modality",
+          "c2.scope": "c2.scope"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k23",
+        "preserved": [
+          "c2.modality",
+          "c2.scope"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2, recorded independently",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "prev_history_hash": null,
+    "states": [
+      {
+        "description": "",
+        "history_id": "ctp001-c2-P0",
+        "kind": "knowledge",
+        "source": "human",
+        "span": null,
+        "state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001-c2-P0",
+        "kind": "context",
+        "source": "human",
+        "span": null,
+        "state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001-c2-P0",
+        "kind": "decision",
+        "source": "human",
+        "span": null,
+        "state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001-c2-P0",
+        "kind": "action",
+        "source": "human",
+        "span": null,
+        "state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "task_ref": "EXP-RAG-CTP001/C2",
+    "vocabulary_ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001-c2-v1",
+      "version": null
+    }
+  },
+  "id": "c2_P0",
+  "note": "'only to' becomes 'solely to'; the evidence is fixed as preserved.",
+  "obligation_exclusions": [],
+  "obligations": [
+    "c2.modality",
+    "c2.scope"
+  ],
+  "situation": {
+    "action_type": "export",
+    "destination": "eu-west-1",
+    "destination_region": "EU",
+    "records": "customer"
+  },
+  "texts": {
+    "f1_context": "Customer records may be exported solely to EU-region storage.",
+    "f2_decision": "Customer records may be exported solely to EU-region storage. The destination is in the EU, so I will export the records.",
+    "f3_action": "policy: customer records may be exported solely to EU-region storage | destination: eu-west-1 (EU-region) | status: exported",
+    "knowledge": "Customer records may be exported only to EU-region storage."
+  },
+  "vocabulary": {
+    "information": [],
+    "properties": [
+      "c2.modality",
+      "c2.scope"
+    ],
+    "ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001-c2-v1",
+      "version": null
+    },
+    "task_ref": "EXP-RAG-CTP001/C2",
+    "version": "1",
+    "vocabulary_id": "ctp001-c2-vocab"
+  }
+}

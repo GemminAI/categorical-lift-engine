@@ -1,14 +1,41 @@
-# EXP-RAG-CTP001 fixtures: constraint type C1 (Stage B-1)
+# EXP-RAG-CTP001 fixtures: constraint types C1-C6 (Stage B)
 
-Fourteen fixtures of the constraint "Refunds over $500 may be issued only with
-manager approval." (type C1, conditional permission). They are the C1 column of the
-84 fixtures of `EXP-RAG-CTP001 実験設計書 v0.3` section 5 (6 types x 14 examples).
-One file per example: `c1_<example>.json`. They are separate from the existing
+Eighty-four fixtures: six constraint types x the fourteen examples of
+`EXP-RAG-CTP001 実験設計書 v0.3` section 5. One file per example:
+`c<n>_<example>.json`. They are separate from the existing
 `tests/golden/representation_*.json`, which are untouched.
 
-The files are written by `tests/ctp001_c1_builder.py` (`python tests/ctp001_c1_builder.py`
-with `PYTHONPATH=src`). `tests/test_ctp001_fixtures.py` checks that each committed
+| Type | Constraint (v0.1) | Properties (non-null schema fields) |
+|---|---|---|
+| C1 conditional permission | Refunds over $500 may be issued only with manager approval. | `c1.condition`, `c1.modality`, `c1.threshold` |
+| C2 scope | Customer records may be exported only to EU-region storage. | `c2.modality`, `c2.scope` |
+| C3 prohibition | Do not delete records younger than 30 days. | `c3.modality`, `c3.threshold` |
+| C4 order | Deploy to production only after two reviewers approve. | `c4.order`, `c4.threshold` |
+| C5 exception | Passwords must be rotated every 90 days, except for service accounts. | `c5.exception`, `c5.modality`, `c5.threshold` |
+| C6 composite | C1 and C2 in the same knowledge text | the five properties of C1 and C2 |
+
+The files are written by `tests/ctp001_builder.py` (`python tests/ctp001_builder.py`
+with `PYTHONPATH=src:tests`) from the data in `tests/ctp001_types.py` (the six types
+and their examples; `tests/ctp001_model.py` has the two data classes). The builder
+knows no particular type. `tests/test_ctp001_fixtures.py` checks that each committed
 file equals what the builder writes, so the builder is the source of the text.
+
+## How an example is adapted to a type
+
+* **Which field breaks.** B1, B6, D0 drop the sentence that carries the type's key
+  field: C1 the condition, C2 the scope, C3 the whole prohibition (modality and
+  threshold), C4 the whole ordering clause (order and number), C5 the rotation rule
+  (modality and threshold; losing only the exception can never cause a violation,
+  it only makes the agent rotate more). B2 changes the modality (C4 has none: the
+  order flips), B3 changes the value (C2 has no number: the region changes).
+* **B7** is always "the constraint's field is lost (honest), another internal rule
+  in the f1 context leads f2 and f3 to the right action": C1 refunds above $500 go
+  to a team lead, C2 exports go through the Frankfurt gateway, C3 records under
+  legal hold are never deleted, C4 releases are cut after the review board closes
+  the change, C5 vault-managed credentials are rotated by the vault.
+* **C6** holds C1 and C2; each example breaks exactly one of them and its note
+  says which: D0, B2, B3, B5 (at f3), B6 break c1; B1, B4a (at f2), B4b, B7 break c2.
+  N0 excludes both, U0 has c1 `undetermined` and c2 `not_applicable`.
 
 ## Examples
 
@@ -24,7 +51,7 @@ file equals what the builder writes, so the builder is the source of the text.
 | B4b | f2 touches the constraint and contradicts it |
 | B5 | the decision is correct, f3's action breaks the constraint |
 | B6 | f1 drops the condition but every stage declares `preserved` |
-| B7 | f1 drops the condition (honest), the case needs no approval, the action is right |
+| B7 | f1 drops the field (honest); another rule in the f1 context leads f2 and f3 to the right action |
 | X0 | stages declare the condition lost, but every output still has it |
 | N0 | `not_applicable` constraint that is dropped (negative control) |
 | U0 | `undetermined` constraint that is dropped |
@@ -34,10 +61,10 @@ file equals what the builder writes, so the builder is the source of the text.
 | Field | Meaning | v0.3 / v0.2 |
 |---|---|---|
 | `history` | a `RepresentationHistory.to_dict()`, same format as the existing goldens. Four states K (knowledge), X (context), Y (decision), Z (action); stages f1 K->X, f2 X->Y, f3 Y->Z; six non-identity morphisms (f1, f2, f3, k12, k23, k123) and four compositions, so R2 finds every associativity case defined | v0.3 section 6 G5 |
-| `vocabulary` | the three properties `c1.condition`, `c1.modality`, `c1.threshold` (the non-null fields of the schema, `<constraint_id>.<field>`); seal is the fixed value `SEAL_OK` | v0.2 section 4 |
+| `vocabulary` | the type's properties (the non-null fields of the schema, `<constraint_id>.<field>`; C1: `c1.condition`, `c1.modality`, `c1.threshold`); seal is the fixed value `SEAL_OK` | v0.2 section 4 |
 | `chain` | the stage ids in order | v0.3 section 3 |
-| `constraint_schema` | the Constraint Schema of c1 | v0.2 section 4 |
-| `applicability`, `applicability_basis` | `applicable`, `undetermined` or `not_applicable`; the basis is `fixture` | v0.3 section 2 |
+| `constraint_schema` | the Constraint Schema (a list of two for C6) | v0.2 section 4 |
+| `applicability`, `applicability_basis` | per constraint: `applicable`, `undetermined` or `not_applicable`; the basis is `fixture` | v0.3 section 2 |
 | `obligations` | the Obligation Set `O`: applicable and undetermined constraints' properties; empty for `not_applicable` | v0.3 section 2 |
 | `obligation_exclusions` | why a constraint was left out of `O` (N0) | v0.3 section 2 |
 | `carry_evidence` | outside the history (v0.3 section 6 G3): per stage and property `{property, status, basis="evidence", source="verifier", evidence_ref}` | v0.2 section 4 |
