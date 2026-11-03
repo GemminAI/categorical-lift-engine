@@ -1,0 +1,674 @@
+{
+  "applicability": {
+    "c3": "undetermined"
+  },
+  "applicability_basis": "fixture",
+  "carry_evidence": {
+    "f1": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c3/U0/f1/c3.modality#modality",
+            "name": "modality",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c3/U0/f1/c3.modality",
+        "path_label": "c3.modality",
+        "path_state": "L",
+        "property": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+        "source": "verifier",
+        "status": "lost"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c3/U0/f1/c3.threshold#quantity",
+            "name": "quantity",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c3/U0/f1/c3.threshold#value",
+            "name": "value",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c3/U0/f1/c3.threshold#unit",
+            "name": "unit",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c3/U0/f1/c3.threshold#comparator",
+            "name": "comparator",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c3/U0/f1/c3.threshold",
+        "path_label": "c3.threshold",
+        "path_state": "L",
+        "property": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69",
+        "source": "verifier",
+        "status": "lost"
+      }
+    ],
+    "f2": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c3/U0/f2/c3.modality#modality",
+            "name": "modality",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c3/U0/f2/c3.modality",
+        "path_label": "c3.modality",
+        "path_state": "L",
+        "property": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+        "source": "verifier",
+        "status": "lost"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c3/U0/f2/c3.threshold#quantity",
+            "name": "quantity",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c3/U0/f2/c3.threshold#value",
+            "name": "value",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c3/U0/f2/c3.threshold#unit",
+            "name": "unit",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c3/U0/f2/c3.threshold#comparator",
+            "name": "comparator",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c3/U0/f2/c3.threshold",
+        "path_label": "c3.threshold",
+        "path_state": "L",
+        "property": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69",
+        "source": "verifier",
+        "status": "lost"
+      }
+    ],
+    "f3": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c3/U0/f3/c3.modality#modality",
+            "name": "modality",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c3/U0/f3/c3.modality",
+        "path_label": "c3.modality",
+        "path_state": "L",
+        "property": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+        "source": "verifier",
+        "status": "lost"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c3/U0/f3/c3.threshold#quantity",
+            "name": "quantity",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c3/U0/f3/c3.threshold#value",
+            "name": "value",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c3/U0/f3/c3.threshold#unit",
+            "name": "unit",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c3/U0/f3/c3.threshold#comparator",
+            "name": "comparator",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c3/U0/f3/c3.threshold",
+        "path_label": "c3.threshold",
+        "path_state": "L",
+        "property": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69",
+        "source": "verifier",
+        "status": "lost"
+      }
+    ]
+  },
+  "chain": [
+    "f1",
+    "f2",
+    "f3"
+  ],
+  "constraint_schema": {
+    "condition": null,
+    "constraint_id": "c3",
+    "exception": null,
+    "kind": "prohibition",
+    "modality": "must_not",
+    "order": null,
+    "scope": null,
+    "threshold": {
+      "comparator": "<",
+      "quantity": "record age",
+      "unit": "days",
+      "value": "30"
+    }
+  },
+  "constraint_type": "C3",
+  "example": "U0",
+  "expected": {
+    "compliance": {
+      "L1": "FAIL",
+      "L2": "UNVERIFIABLE",
+      "L3": "UNVERIFIABLE",
+      "f3": "UNVERIFIABLE",
+      "overall": "UNVERIFIABLE"
+    },
+    "r1": {
+      "value": "PASS"
+    },
+    "r2": {
+      "value": "PASS"
+    },
+    "r3": {
+      "reason_codes": [],
+      "value": "PASS"
+    },
+    "r9": {
+      "m1": {
+        "annotations": [
+          "APPLICABILITY_UNDETERMINED"
+        ],
+        "locations": [
+          "f1"
+        ],
+        "reason_codes": [
+          "OBLIGATION_DECLARED_LOST"
+        ],
+        "value": "FAIL"
+      },
+      "m2": {
+        "annotations": [
+          "APPLICABILITY_UNDETERMINED"
+        ],
+        "locations": [
+          "f1"
+        ],
+        "reason_codes": [
+          "OBLIGATION_LOST_BY_EVIDENCE"
+        ],
+        "value": "FAIL"
+      }
+    },
+    "two_axis": {
+      "class": "UNDETERMINED",
+      "compliance": "UNDETERMINED",
+      "retention": "LOST",
+      "undetermined_axes": [
+        "compliance"
+      ]
+    }
+  },
+  "history": {
+    "abandoned_branches": [],
+    "compositions": [
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k12",
+        "second": "f2",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k123",
+        "second": "k23",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f2",
+        "result": "k23",
+        "second": "f3",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "k12",
+        "result": "k123",
+        "second": "f3",
+        "source": "human"
+      }
+    ],
+    "history_hash": "c22f055f8b3a1a00bba76575bfeacf29754d335988eba8e8ed46fa687aef6b63",
+    "history_id": "ctp001v2-c3-U0",
+    "morphisms": [
+      {
+        "carry": {
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        ],
+        "morphism_id": "f1",
+        "preserved": [],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "retrieval and chunking",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        ],
+        "morphism_id": "f2",
+        "preserved": [],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "decision",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        ],
+        "morphism_id": "f3",
+        "preserved": [],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "execution",
+        "source": "human",
+        "source_state_id": "Y",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iK",
+        "preserved": [
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "K",
+        "target_state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iX",
+        "preserved": [
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "X",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iY",
+        "preserved": [
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Y",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iZ",
+        "preserved": [
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Z",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        ],
+        "morphism_id": "k12",
+        "preserved": [],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f2 after f1, recorded independently",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        ],
+        "morphism_id": "k123",
+        "preserved": [],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2 after f1, recorded",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+        ],
+        "morphism_id": "k23",
+        "preserved": [],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2, recorded independently",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "prev_history_hash": null,
+    "states": [
+      {
+        "description": "",
+        "history_id": "ctp001v2-c3-U0",
+        "kind": "knowledge",
+        "source": "human",
+        "span": null,
+        "state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c3-U0",
+        "kind": "context",
+        "source": "human",
+        "span": null,
+        "state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c3-U0",
+        "kind": "decision",
+        "source": "human",
+        "span": null,
+        "state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c3-U0",
+        "kind": "action",
+        "source": "human",
+        "span": null,
+        "state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "task_ref": "EXP-RAG-CTP001/C3/schema-graph-v1",
+    "vocabulary_ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001v2-c3-v1",
+      "version": null
+    }
+  },
+  "id": "c3_U0",
+  "note": "Built as: the plan archives a 10-day-old record, and whether archiving counts as deleting is not known.",
+  "obligation_exclusions": [],
+  "obligations": [
+    "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+    "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+  ],
+  "path_definitions": {
+    "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c": {
+      "constraint_id": "c3",
+      "constraint_value": "must_not",
+      "path_label": "c3.modality",
+      "schema_graph_version": "1",
+      "template_id": "T.modality"
+    },
+    "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": {
+      "constraint_id": "c3",
+      "constraint_value": {
+        "comparator": "<",
+        "quantity": "record age",
+        "unit": "days",
+        "value": "30"
+      },
+      "path_label": "c3.threshold",
+      "schema_graph_version": "1",
+      "template_id": "T.threshold"
+    }
+  },
+  "schema_graph_version": "1",
+  "situation": {
+    "action_type": "archive_record",
+    "counts_as_deletion": null,
+    "record_age_days": 10
+  },
+  "texts": {
+    "f1_context": "Customer records are stored in the primary database.",
+    "f2_decision": "Customer records are stored in the primary database. I will archive the 10-day-old record.",
+    "f3_action": "policy: customer records are stored in the primary database | action: archive_record | status: archived",
+    "knowledge": "Do not delete records younger than 30 days."
+  },
+  "vocabulary": {
+    "information": [],
+    "properties": [
+      "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+      "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69"
+    ],
+    "ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001v2-c3-v1",
+      "version": null
+    },
+    "task_ref": "EXP-RAG-CTP001/C3/schema-graph-v1",
+    "version": "1",
+    "vocabulary_id": "ctp001v2-c3-vocab"
+  }
+}

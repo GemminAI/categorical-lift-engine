@@ -1,0 +1,275 @@
+{
+  "granularity_changed_templates": [
+    "T.threshold",
+    "T.ordering"
+  ],
+  "mappings": [
+    {
+      "old_property": "c1.condition",
+      "paths": [
+        {
+          "granularity": "same",
+          "path_id": "path:6cbf0f5277e5cf67c83d16dfe9dac8613531bfa9b0a6cd360cfa087f2a81f851",
+          "path_label": "c1.condition",
+          "template_id": "T.condition"
+        }
+      ]
+    },
+    {
+      "old_property": "c1.modality",
+      "paths": [
+        {
+          "granularity": "same",
+          "path_id": "path:4f0c77fc0e8e454af3a88ff478d6fd669d4975b708df98e5c9a4d2bf239c1e4f",
+          "path_label": "c1.modality",
+          "template_id": "T.modality"
+        }
+      ]
+    },
+    {
+      "old_property": "c1.threshold",
+      "paths": [
+        {
+          "granularity": "changed",
+          "path_id": "path:a79e49f61fa639332f894ca2ad7237e4140423b143d42be2ae070f73020af859",
+          "path_label": "c1.threshold",
+          "template_id": "T.threshold"
+        }
+      ]
+    },
+    {
+      "old_property": "c2.modality",
+      "paths": [
+        {
+          "granularity": "same",
+          "path_id": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path_label": "c2.modality",
+          "template_id": "T.modality"
+        }
+      ]
+    },
+    {
+      "old_property": "c2.scope",
+      "paths": [
+        {
+          "granularity": "same",
+          "path_id": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e",
+          "path_label": "c2.scope",
+          "template_id": "T.scope"
+        }
+      ]
+    },
+    {
+      "old_property": "c3.modality",
+      "paths": [
+        {
+          "granularity": "same",
+          "path_id": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+          "path_label": "c3.modality",
+          "template_id": "T.modality"
+        }
+      ]
+    },
+    {
+      "old_property": "c3.threshold",
+      "paths": [
+        {
+          "granularity": "changed",
+          "path_id": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69",
+          "path_label": "c3.threshold",
+          "template_id": "T.threshold"
+        }
+      ]
+    },
+    {
+      "old_property": "c4.order",
+      "paths": [
+        {
+          "granularity": "changed",
+          "path_id": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582",
+          "path_label": "c4.ordering",
+          "template_id": "T.ordering"
+        }
+      ]
+    },
+    {
+      "old_property": "c4.threshold",
+      "paths": [
+        {
+          "granularity": "changed",
+          "path_id": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path_label": "c4.threshold",
+          "template_id": "T.threshold"
+        }
+      ]
+    },
+    {
+      "old_property": "c5.exception",
+      "paths": [
+        {
+          "granularity": "same",
+          "path_id": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path_label": "c5.exception",
+          "template_id": "T.exception"
+        }
+      ]
+    },
+    {
+      "old_property": "c5.modality",
+      "paths": [
+        {
+          "granularity": "same",
+          "path_id": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a",
+          "path_label": "c5.modality",
+          "template_id": "T.modality"
+        }
+      ]
+    },
+    {
+      "old_property": "c5.threshold",
+      "paths": [
+        {
+          "granularity": "changed",
+          "path_id": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path_label": "c5.threshold",
+          "template_id": "T.threshold"
+        }
+      ]
+    }
+  ],
+  "new_paths": [
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c1.condition"
+        ]
+      },
+      "path_id": "path:6cbf0f5277e5cf67c83d16dfe9dac8613531bfa9b0a6cd360cfa087f2a81f851",
+      "path_label": "c1.condition",
+      "template_id": "T.condition"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c1.modality"
+        ]
+      },
+      "path_id": "path:4f0c77fc0e8e454af3a88ff478d6fd669d4975b708df98e5c9a4d2bf239c1e4f",
+      "path_label": "c1.modality",
+      "template_id": "T.modality"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c1.threshold"
+        ]
+      },
+      "path_id": "path:a79e49f61fa639332f894ca2ad7237e4140423b143d42be2ae070f73020af859",
+      "path_label": "c1.threshold",
+      "template_id": "T.threshold"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c2.modality"
+        ]
+      },
+      "path_id": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+      "path_label": "c2.modality",
+      "template_id": "T.modality"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c2.scope"
+        ]
+      },
+      "path_id": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e",
+      "path_label": "c2.scope",
+      "template_id": "T.scope"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c3.modality"
+        ]
+      },
+      "path_id": "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+      "path_label": "c3.modality",
+      "template_id": "T.modality"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c3.threshold"
+        ]
+      },
+      "path_id": "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69",
+      "path_label": "c3.threshold",
+      "template_id": "T.threshold"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c4.order"
+        ]
+      },
+      "path_id": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582",
+      "path_label": "c4.ordering",
+      "template_id": "T.ordering"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c4.threshold"
+        ]
+      },
+      "path_id": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+      "path_label": "c4.threshold",
+      "template_id": "T.threshold"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c5.exception"
+        ]
+      },
+      "path_id": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+      "path_label": "c5.exception",
+      "template_id": "T.exception"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c5.modality"
+        ]
+      },
+      "path_id": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a",
+      "path_label": "c5.modality",
+      "template_id": "T.modality"
+    },
+    {
+      "origin": {
+        "kind": "migrated",
+        "old_properties": [
+          "c5.threshold"
+        ]
+      },
+      "path_id": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+      "path_label": "c5.threshold",
+      "template_id": "T.threshold"
+    }
+  ],
+  "schema_graph_version": "1"
+}

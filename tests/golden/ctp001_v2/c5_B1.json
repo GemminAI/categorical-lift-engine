@@ -1,0 +1,759 @@
+{
+  "applicability": {
+    "c5": "applicable"
+  },
+  "applicability_basis": "fixture",
+  "carry_evidence": {
+    "f1": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c5/B1/f1/c5.threshold#quantity",
+            "name": "quantity",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B1/f1/c5.threshold#value",
+            "name": "value",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B1/f1/c5.threshold#unit",
+            "name": "unit",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B1/f1/c5.threshold#comparator",
+            "name": "comparator",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c5/B1/f1/c5.threshold",
+        "path_label": "c5.threshold",
+        "path_state": "L",
+        "property": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+        "source": "verifier",
+        "status": "lost"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c5/B1/f1/c5.exception#exempt",
+            "name": "exempt",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c5/B1/f1/c5.exception",
+        "path_label": "c5.exception",
+        "path_state": "P",
+        "property": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c5/B1/f1/c5.modality#modality",
+            "name": "modality",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c5/B1/f1/c5.modality",
+        "path_label": "c5.modality",
+        "path_state": "L",
+        "property": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a",
+        "source": "verifier",
+        "status": "lost"
+      }
+    ],
+    "f2": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c5/B1/f2/c5.threshold#quantity",
+            "name": "quantity",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B1/f2/c5.threshold#value",
+            "name": "value",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B1/f2/c5.threshold#unit",
+            "name": "unit",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B1/f2/c5.threshold#comparator",
+            "name": "comparator",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c5/B1/f2/c5.threshold",
+        "path_label": "c5.threshold",
+        "path_state": "L",
+        "property": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+        "source": "verifier",
+        "status": "lost"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c5/B1/f2/c5.exception#exempt",
+            "name": "exempt",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c5/B1/f2/c5.exception",
+        "path_label": "c5.exception",
+        "path_state": "P",
+        "property": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c5/B1/f2/c5.modality#modality",
+            "name": "modality",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c5/B1/f2/c5.modality",
+        "path_label": "c5.modality",
+        "path_state": "L",
+        "property": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a",
+        "source": "verifier",
+        "status": "lost"
+      }
+    ],
+    "f3": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c5/B1/f3/c5.threshold#quantity",
+            "name": "quantity",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B1/f3/c5.threshold#value",
+            "name": "value",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B1/f3/c5.threshold#unit",
+            "name": "unit",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B1/f3/c5.threshold#comparator",
+            "name": "comparator",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c5/B1/f3/c5.threshold",
+        "path_label": "c5.threshold",
+        "path_state": "L",
+        "property": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+        "source": "verifier",
+        "status": "lost"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c5/B1/f3/c5.exception#exempt",
+            "name": "exempt",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c5/B1/f3/c5.exception",
+        "path_label": "c5.exception",
+        "path_state": "P",
+        "property": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c5/B1/f3/c5.modality#modality",
+            "name": "modality",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          }
+        ],
+        "evidence_ref": "fixture:c5/B1/f3/c5.modality",
+        "path_label": "c5.modality",
+        "path_state": "L",
+        "property": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a",
+        "source": "verifier",
+        "status": "lost"
+      }
+    ]
+  },
+  "chain": [
+    "f1",
+    "f2",
+    "f3"
+  ],
+  "constraint_schema": {
+    "condition": null,
+    "constraint_id": "c5",
+    "exception": {
+      "exempt": "service accounts"
+    },
+    "kind": "exception",
+    "modality": "must",
+    "order": null,
+    "scope": null,
+    "threshold": {
+      "comparator": ">=",
+      "quantity": "time since last rotation",
+      "unit": "days",
+      "value": "90"
+    }
+  },
+  "constraint_type": "C5",
+  "example": "B1",
+  "expected": {
+    "compliance": {
+      "L1": "FAIL",
+      "L2": "UNVERIFIABLE",
+      "L3": "FAIL",
+      "f3": "FAIL",
+      "overall": "FAIL"
+    },
+    "r1": {
+      "value": "PASS"
+    },
+    "r2": {
+      "value": "PASS"
+    },
+    "r3": {
+      "reason_codes": [],
+      "value": "PASS"
+    },
+    "r9": {
+      "m1": {
+        "annotations": [],
+        "locations": [
+          "f1"
+        ],
+        "reason_codes": [
+          "OBLIGATION_DECLARED_LOST"
+        ],
+        "value": "FAIL"
+      },
+      "m2": {
+        "annotations": [],
+        "locations": [
+          "f1"
+        ],
+        "reason_codes": [
+          "OBLIGATION_LOST_BY_EVIDENCE"
+        ],
+        "value": "FAIL"
+      }
+    },
+    "two_axis": {
+      "class": "LOST_VIOLATED",
+      "compliance": "VIOLATED",
+      "retention": "LOST",
+      "undetermined_axes": []
+    }
+  },
+  "history": {
+    "abandoned_branches": [],
+    "compositions": [
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k12",
+        "second": "f2",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k123",
+        "second": "k23",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f2",
+        "result": "k23",
+        "second": "f3",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "k12",
+        "result": "k123",
+        "second": "f3",
+        "source": "human"
+      }
+    ],
+    "history_hash": "dc93cc3e5f453f93dadb1b47f83c275fcdd66a0f8e919b36812c360b8d75b538",
+    "history_id": "ctp001v2-c5-B1",
+    "morphisms": [
+      {
+        "carry": {
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        ],
+        "morphism_id": "f1",
+        "preserved": [
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "retrieval and chunking",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        ],
+        "morphism_id": "f2",
+        "preserved": [
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "decision",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        ],
+        "morphism_id": "f3",
+        "preserved": [
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "execution",
+        "source": "human",
+        "source_state_id": "Y",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iK",
+        "preserved": [
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "K",
+        "target_state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iX",
+        "preserved": [
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "X",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iY",
+        "preserved": [
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Y",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iZ",
+        "preserved": [
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Z",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        ],
+        "morphism_id": "k12",
+        "preserved": [
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f2 after f1, recorded independently",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        ],
+        "morphism_id": "k123",
+        "preserved": [
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2 after f1, recorded",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [
+          "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+          "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+        ],
+        "morphism_id": "k23",
+        "preserved": [
+          "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2, recorded independently",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "prev_history_hash": null,
+    "states": [
+      {
+        "description": "",
+        "history_id": "ctp001v2-c5-B1",
+        "kind": "knowledge",
+        "source": "human",
+        "span": null,
+        "state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c5-B1",
+        "kind": "context",
+        "source": "human",
+        "span": null,
+        "state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c5-B1",
+        "kind": "decision",
+        "source": "human",
+        "span": null,
+        "state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c5-B1",
+        "kind": "action",
+        "source": "human",
+        "span": null,
+        "state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "task_ref": "EXP-RAG-CTP001/C5/schema-graph-v1",
+    "vocabulary_ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001v2-c5-v1",
+      "version": null
+    }
+  },
+  "id": "c5_B1",
+  "note": "Built as: the rotation rule (modality and threshold) is dropped at f1 and only the exception clause stays; honest. Losing the exception alone could not cause a violation (it would only make the agent rotate more), so the rule is what drops.",
+  "obligation_exclusions": [],
+  "obligations": [
+    "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+    "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+    "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+  ],
+  "path_definitions": {
+    "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": {
+      "constraint_id": "c5",
+      "constraint_value": {
+        "comparator": ">=",
+        "quantity": "time since last rotation",
+        "unit": "days",
+        "value": "90"
+      },
+      "path_label": "c5.threshold",
+      "schema_graph_version": "1",
+      "template_id": "T.threshold"
+    },
+    "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6": {
+      "constraint_id": "c5",
+      "constraint_value": {
+        "exempt": "service accounts"
+      },
+      "path_label": "c5.exception",
+      "schema_graph_version": "1",
+      "template_id": "T.exception"
+    },
+    "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a": {
+      "constraint_id": "c5",
+      "constraint_value": "must",
+      "path_label": "c5.modality",
+      "schema_graph_version": "1",
+      "template_id": "T.modality"
+    }
+  },
+  "schema_graph_version": "1",
+  "situation": {
+    "account_type": "user",
+    "action_type": "rotate_password",
+    "password_age_days": 120,
+    "rotated": false
+  },
+  "texts": {
+    "f1_context": "Service accounts are exempt.",
+    "f2_decision": "Service accounts are exempt. I will leave this account's password as it is.",
+    "f3_action": "policy: service accounts are exempt | account: user | age: 120 days | status: unchanged",
+    "knowledge": "Passwords must be rotated every 90 days, except for service accounts."
+  },
+  "vocabulary": {
+    "information": [],
+    "properties": [
+      "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+      "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+      "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a"
+    ],
+    "ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001v2-c5-v1",
+      "version": null
+    },
+    "task_ref": "EXP-RAG-CTP001/C5/schema-graph-v1",
+    "version": "1",
+    "vocabulary_id": "ctp001v2-c5-vocab"
+  }
+}

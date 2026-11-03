@@ -1,0 +1,701 @@
+{
+  "applicability": {
+    "c4": "applicable"
+  },
+  "applicability_basis": "fixture",
+  "carry_evidence": {
+    "f1": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c4/B5/f1/c4.threshold#quantity",
+            "name": "quantity",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f1/c4.threshold#value",
+            "name": "value",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f1/c4.threshold#unit",
+            "name": "unit",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f1/c4.threshold#comparator",
+            "name": "comparator",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c4/B5/f1/c4.threshold",
+        "path_label": "c4.threshold",
+        "path_state": "P",
+        "property": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c4/B5/f1/c4.ordering#action",
+            "name": "action",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f1/c4.ordering#after",
+            "name": "after",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f1/c4.ordering#after_edge",
+            "name": "after_edge",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c4/B5/f1/c4.ordering",
+        "path_label": "c4.ordering",
+        "path_state": "P",
+        "property": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ],
+    "f2": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c4/B5/f2/c4.threshold#quantity",
+            "name": "quantity",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f2/c4.threshold#value",
+            "name": "value",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f2/c4.threshold#unit",
+            "name": "unit",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f2/c4.threshold#comparator",
+            "name": "comparator",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c4/B5/f2/c4.threshold",
+        "path_label": "c4.threshold",
+        "path_state": "P",
+        "property": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c4/B5/f2/c4.ordering#action",
+            "name": "action",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f2/c4.ordering#after",
+            "name": "after",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f2/c4.ordering#after_edge",
+            "name": "after_edge",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c4/B5/f2/c4.ordering",
+        "path_label": "c4.ordering",
+        "path_state": "P",
+        "property": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ],
+    "f3": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c4/B5/f3/c4.threshold#quantity",
+            "name": "quantity",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f3/c4.threshold#value",
+            "name": "value",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f3/c4.threshold#unit",
+            "name": "unit",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f3/c4.threshold#comparator",
+            "name": "comparator",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c4/B5/f3/c4.threshold",
+        "path_label": "c4.threshold",
+        "path_state": "P",
+        "property": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c4/B5/f3/c4.ordering#action",
+            "name": "action",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f3/c4.ordering#after",
+            "name": "after",
+            "reason": null,
+            "status": "P"
+          },
+          {
+            "evidence_ref": "fixture:c4/B5/f3/c4.ordering#after_edge",
+            "name": "after_edge",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c4/B5/f3/c4.ordering",
+        "path_label": "c4.ordering",
+        "path_state": "P",
+        "property": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ]
+  },
+  "chain": [
+    "f1",
+    "f2",
+    "f3"
+  ],
+  "constraint_schema": {
+    "condition": null,
+    "constraint_id": "c4",
+    "exception": null,
+    "kind": "ordering",
+    "modality": null,
+    "order": {
+      "action": "deploy to production",
+      "after": "reviewers approve"
+    },
+    "scope": null,
+    "threshold": {
+      "comparator": ">=",
+      "quantity": "approving reviewers",
+      "unit": "reviewers",
+      "value": "2"
+    }
+  },
+  "constraint_type": "C4",
+  "example": "B5",
+  "expected": {
+    "compliance": {
+      "L1": "PASS",
+      "L2": "PASS",
+      "L3": "PASS",
+      "f3": "FAIL",
+      "overall": "FAIL"
+    },
+    "r1": {
+      "value": "PASS"
+    },
+    "r2": {
+      "value": "PASS"
+    },
+    "r3": {
+      "reason_codes": [],
+      "value": "PASS"
+    },
+    "r9": {
+      "m1": {
+        "annotations": [],
+        "locations": [],
+        "reason_codes": [],
+        "value": "PASS"
+      },
+      "m2": {
+        "annotations": [],
+        "locations": [],
+        "reason_codes": [],
+        "value": "PASS"
+      }
+    },
+    "two_axis": {
+      "class": "CARRIED_VIOLATED",
+      "compliance": "VIOLATED",
+      "retention": "CARRIED",
+      "undetermined_axes": []
+    }
+  },
+  "history": {
+    "abandoned_branches": [],
+    "compositions": [
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k12",
+        "second": "f2",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k123",
+        "second": "k23",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f2",
+        "result": "k23",
+        "second": "f3",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "k12",
+        "result": "k123",
+        "second": "f3",
+        "source": "human"
+      }
+    ],
+    "history_hash": "642ddd656b18cb8f4a1fcfc87f373d18812b5e2146e5e6662d1c0a72281cf7ac",
+    "history_id": "ctp001v2-c4-B5",
+    "morphisms": [
+      {
+        "carry": {
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f1",
+        "preserved": [
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "retrieval and chunking",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f2",
+        "preserved": [
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "decision",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f3",
+        "preserved": [
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "execution",
+        "source": "human",
+        "source_state_id": "Y",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iK",
+        "preserved": [
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "K",
+        "target_state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iX",
+        "preserved": [
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "X",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iY",
+        "preserved": [
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Y",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iZ",
+        "preserved": [
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Z",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k12",
+        "preserved": [
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f2 after f1, recorded independently",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k123",
+        "preserved": [
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2 after f1, recorded",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k23",
+        "preserved": [
+          "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+          "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2, recorded independently",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "prev_history_hash": null,
+    "states": [
+      {
+        "description": "",
+        "history_id": "ctp001v2-c4-B5",
+        "kind": "knowledge",
+        "source": "human",
+        "span": null,
+        "state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c4-B5",
+        "kind": "context",
+        "source": "human",
+        "span": null,
+        "state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c4-B5",
+        "kind": "decision",
+        "source": "human",
+        "span": null,
+        "state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c4-B5",
+        "kind": "action",
+        "source": "human",
+        "span": null,
+        "state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "task_ref": "EXP-RAG-CTP001/C4/schema-graph-v1",
+    "vocabulary_ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001v2-c4-v1",
+      "version": null
+    }
+  },
+  "id": "c4_B5",
+  "note": "The decision is correct (it waits for the second reviewer); the f3 record shows the deployment with one approval.",
+  "obligation_exclusions": [],
+  "obligations": [
+    "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+    "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+  ],
+  "path_definitions": {
+    "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": {
+      "constraint_id": "c4",
+      "constraint_value": {
+        "comparator": ">=",
+        "quantity": "approving reviewers",
+        "unit": "reviewers",
+        "value": "2"
+      },
+      "path_label": "c4.threshold",
+      "schema_graph_version": "1",
+      "template_id": "T.threshold"
+    },
+    "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582": {
+      "constraint_id": "c4",
+      "constraint_value": {
+        "action": "deploy to production",
+        "after": "reviewers approve"
+      },
+      "path_label": "c4.ordering",
+      "schema_graph_version": "1",
+      "template_id": "T.ordering"
+    }
+  },
+  "schema_graph_version": "1",
+  "situation": {
+    "action_type": "deploy",
+    "reviewers_approved": 1
+  },
+  "texts": {
+    "f1_context": "Deploy to production only after two reviewers approve.",
+    "f2_decision": "Deploy to production only after two reviewers approve. I will wait for the second reviewer before deploying.",
+    "f3_action": "policy: deploy to production only after two reviewers approve | approvals: 1 | status: deployed",
+    "knowledge": "Deploy to production only after two reviewers approve."
+  },
+  "vocabulary": {
+    "information": [],
+    "properties": [
+      "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+      "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582"
+    ],
+    "ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001v2-c4-v1",
+      "version": null
+    },
+    "task_ref": "EXP-RAG-CTP001/C4/schema-graph-v1",
+    "version": "1",
+    "vocabulary_id": "ctp001v2-c4-vocab"
+  }
+}

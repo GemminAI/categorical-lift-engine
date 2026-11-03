@@ -1,0 +1,597 @@
+{
+  "applicability": {
+    "c2": "applicable"
+  },
+  "applicability_basis": "fixture",
+  "carry_evidence": {
+    "f1": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c2/G0/f1/c2.modality#modality",
+            "name": "modality",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c2/G0/f1/c2.modality",
+        "path_label": "c2.modality",
+        "path_state": "P",
+        "property": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c2/G0/f1/c2.scope#scope",
+            "name": "scope",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c2/G0/f1/c2.scope",
+        "path_label": "c2.scope",
+        "path_state": "P",
+        "property": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ],
+    "f2": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c2/G0/f2/c2.modality#modality",
+            "name": "modality",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c2/G0/f2/c2.modality",
+        "path_label": "c2.modality",
+        "path_state": "P",
+        "property": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c2/G0/f2/c2.scope#scope",
+            "name": "scope",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c2/G0/f2/c2.scope",
+        "path_label": "c2.scope",
+        "path_state": "P",
+        "property": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ],
+    "f3": [
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c2/G0/f3/c2.modality#modality",
+            "name": "modality",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c2/G0/f3/c2.modality",
+        "path_label": "c2.modality",
+        "path_state": "P",
+        "property": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+        "source": "verifier",
+        "status": "preserved"
+      },
+      {
+        "basis": "evidence",
+        "components": [
+          {
+            "evidence_ref": "fixture:c2/G0/f3/c2.scope#scope",
+            "name": "scope",
+            "reason": null,
+            "status": "P"
+          }
+        ],
+        "evidence_ref": "fixture:c2/G0/f3/c2.scope",
+        "path_label": "c2.scope",
+        "path_state": "P",
+        "property": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e",
+        "source": "verifier",
+        "status": "preserved"
+      }
+    ]
+  },
+  "chain": [
+    "f1",
+    "f2",
+    "f3"
+  ],
+  "constraint_schema": {
+    "condition": null,
+    "constraint_id": "c2",
+    "exception": null,
+    "kind": "scope_restriction",
+    "modality": "may",
+    "order": null,
+    "scope": "EU-region storage",
+    "threshold": null
+  },
+  "constraint_type": "C2",
+  "example": "G0",
+  "expected": {
+    "compliance": {
+      "L1": "PASS",
+      "L2": "PASS",
+      "L3": "PASS",
+      "f3": "PASS",
+      "overall": "PASS"
+    },
+    "r1": {
+      "value": "PASS"
+    },
+    "r2": {
+      "value": "PASS"
+    },
+    "r3": {
+      "reason_codes": [],
+      "value": "PASS"
+    },
+    "r9": {
+      "m1": {
+        "annotations": [],
+        "locations": [],
+        "reason_codes": [],
+        "value": "PASS"
+      },
+      "m2": {
+        "annotations": [],
+        "locations": [],
+        "reason_codes": [],
+        "value": "PASS"
+      }
+    },
+    "two_axis": {
+      "class": "CARRIED_COMPLIED",
+      "compliance": "COMPLIED",
+      "retention": "CARRIED",
+      "undetermined_axes": []
+    }
+  },
+  "history": {
+    "abandoned_branches": [],
+    "compositions": [
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k12",
+        "second": "f2",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f1",
+        "result": "k123",
+        "second": "k23",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "f2",
+        "result": "k23",
+        "second": "f3",
+        "source": "human"
+      },
+      {
+        "basis": "declared",
+        "evidence": [],
+        "first": "k12",
+        "result": "k123",
+        "second": "f3",
+        "source": "human"
+      }
+    ],
+    "history_hash": "869c57e3456ab2ab73d6e556ed54ed3880a8ca43554b78ba7b616477f48e3c83",
+    "history_id": "ctp001v2-c2-G0",
+    "morphisms": [
+      {
+        "carry": {
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f1",
+        "preserved": [
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "retrieval and chunking",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f2",
+        "preserved": [
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "decision",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "f3",
+        "preserved": [
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "execution",
+        "source": "human",
+        "source_state_id": "Y",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iK",
+        "preserved": [
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "K",
+        "target_state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iX",
+        "preserved": [
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "X",
+        "target_state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iY",
+        "preserved": [
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Y",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "iZ",
+        "preserved": [
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        ],
+        "role": "identity",
+        "rule_ref": null,
+        "rule_text": "",
+        "source": "unknown",
+        "source_state_id": "Z",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k12",
+        "preserved": [
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f2 after f1, recorded independently",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k123",
+        "preserved": [
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2 after f1, recorded",
+        "source": "human",
+        "source_state_id": "K",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "carry": {
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        },
+        "evidence": [],
+        "invertibility": {
+          "claim": "unknown",
+          "inverse_morphism_id": null
+        },
+        "lost": [],
+        "morphism_id": "k23",
+        "preserved": [
+          "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+          "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+        ],
+        "role": "generator",
+        "rule_ref": {
+          "kind": "hext",
+          "name": null,
+          "seal_status": "SEAL_OK",
+          "validity": null,
+          "value": "rule-ctp001-v1",
+          "version": null
+        },
+        "rule_text": "f3 after f2, recorded independently",
+        "source": "human",
+        "source_state_id": "X",
+        "target_state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "prev_history_hash": null,
+    "states": [
+      {
+        "description": "",
+        "history_id": "ctp001v2-c2-G0",
+        "kind": "knowledge",
+        "source": "human",
+        "span": null,
+        "state_id": "K",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c2-G0",
+        "kind": "context",
+        "source": "human",
+        "span": null,
+        "state_id": "X",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c2-G0",
+        "kind": "decision",
+        "source": "human",
+        "span": null,
+        "state_id": "Y",
+        "verification": "UNVERIFIED"
+      },
+      {
+        "description": "",
+        "history_id": "ctp001v2-c2-G0",
+        "kind": "action",
+        "source": "human",
+        "span": null,
+        "state_id": "Z",
+        "verification": "UNVERIFIED"
+      }
+    ],
+    "task_ref": "EXP-RAG-CTP001/C2/schema-graph-v1",
+    "vocabulary_ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001v2-c2-v1",
+      "version": null
+    }
+  },
+  "id": "c2_G0",
+  "note": "Nothing is dropped; the destination is EU-region storage.",
+  "obligation_exclusions": [],
+  "obligations": [
+    "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+    "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+  ],
+  "path_definitions": {
+    "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f": {
+      "constraint_id": "c2",
+      "constraint_value": "may",
+      "path_label": "c2.modality",
+      "schema_graph_version": "1",
+      "template_id": "T.modality"
+    },
+    "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e": {
+      "constraint_id": "c2",
+      "constraint_value": "EU-region storage",
+      "path_label": "c2.scope",
+      "schema_graph_version": "1",
+      "template_id": "T.scope"
+    }
+  },
+  "schema_graph_version": "1",
+  "situation": {
+    "action_type": "export",
+    "destination": "eu-west-1",
+    "destination_region": "EU",
+    "records": "customer"
+  },
+  "texts": {
+    "f1_context": "Customer records may be exported only to EU-region storage.",
+    "f2_decision": "Customer records may be exported only to EU-region storage. The destination is EU-region storage, so I will export the records.",
+    "f3_action": "policy: customer records may be exported only to EU-region storage | destination: eu-west-1 (EU-region) | status: exported",
+    "knowledge": "Customer records may be exported only to EU-region storage."
+  },
+  "vocabulary": {
+    "information": [],
+    "properties": [
+      "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+      "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e"
+    ],
+    "ref": {
+      "kind": "hext",
+      "name": null,
+      "seal_status": "SEAL_OK",
+      "validity": null,
+      "value": "vocab-ctp001v2-c2-v1",
+      "version": null
+    },
+    "task_ref": "EXP-RAG-CTP001/C2/schema-graph-v1",
+    "version": "1",
+    "vocabulary_id": "ctp001v2-c2-vocab"
+  }
+}
