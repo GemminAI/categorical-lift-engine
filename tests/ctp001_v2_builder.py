@@ -159,8 +159,14 @@ SUBJECTS = {
 KIND_RENAMES = {"order": "ordering", "exception_rule": "exception"}
 
 
+# v0.5 section 10: only a C4 schema's threshold quantity is linked to its ordering event
+APPLIES_TO_TYPE = "C4"
+
+
 def canonical_schema(
-    schema: dict[str, Any], quantity: str | None = None
+    schema: dict[str, Any],
+    quantity: str | None = None,
+    constraint_type: str | None = None,
 ) -> dict[str, Any]:
     """A Constraint Schema in any old form, in the canonical form (v0.4 sections 2, 10;
     v0.6 section 2.1 for `applies_to`, which is `None` unless given or migrated).
@@ -172,7 +178,8 @@ def canonical_schema(
     string and a threshold without `quantity` gets the one given. A quantity is never
     guessed: a threshold without one and no `quantity` argument is an error. A schema
     that holds both a threshold and an ordering and no `applies_to` gets
-    `"ordering.after"` (v0.5 section 10); one without either is left as it is.
+    `"ordering.after"` when its `constraint_type` is C4 (v0.5 section 10); any other
+    schema is left as it is.
     """
     out = dict(schema)
     if "kind" in out:
@@ -201,19 +208,28 @@ def canonical_schema(
             k: thr[k] for k in ("quantity", "value", "unit", "comparator", "applies_to")
         }
     thr = out["threshold"]
-    if thr is not None and out["ordering"] is not None and thr["applies_to"] is None:
+    if (
+        constraint_type == APPLIES_TO_TYPE
+        and thr is not None
+        and out["ordering"] is not None
+        and thr["applies_to"] is None
+    ):
         thr["applies_to"] = "ordering.after"
     if isinstance(out["exception"], str):
         out["exception"] = {"exempt": out["exception"]}
     return out
 
 
-def fixture_schema(schema: dict[str, Any]) -> dict[str, Any]:
+def fixture_schema(
+    schema: dict[str, Any], constraint_type: str | None = None
+) -> dict[str, Any]:
     """The canonical form of an old fixture's schema (the quantity is `QUANTITY`).
 
     A schema without a `subject` gets the one of `SUBJECTS` (v0.6 section 10).
     """
-    out = canonical_schema(schema, QUANTITY.get(schema["constraint_id"]))
+    out = canonical_schema(
+        schema, QUANTITY.get(schema["constraint_id"]), constraint_type
+    )
     out.setdefault("subject", SUBJECTS[schema["constraint_id"]])
     return out
 
@@ -337,11 +353,14 @@ FORM_MIGRATIONS: tuple[dict[str, Any], ...] = (
 )
 
 
-def detect_old_forms(schema: dict[str, Any]) -> set[str]:
+def detect_old_forms(
+    schema: dict[str, Any], constraint_type: str | None = None
+) -> set[str]:
     """The ids of `FORM_MIGRATIONS` whose old form a Constraint Schema still holds."""
     found: set[str] = set()
     if (
-        schema.get("threshold") is not None
+        constraint_type == APPLIES_TO_TYPE
+        and schema.get("threshold") is not None
         and (schema.get("ordering") or schema.get("order")) is not None
         and schema["threshold"].get("applies_to") is None
     ):
@@ -377,7 +396,7 @@ class V2Type:
 
     def __init__(self, old: ConstraintType) -> None:
         self.old = old
-        self.schemas = tuple(fixture_schema(s) for s in old.schemas)
+        self.schemas = tuple(fixture_schema(s, old.label) for s in old.schemas)
         by_cid = {s["constraint_id"]: s for s in self.schemas}
         self.old_to_path: dict[str, GraphPath] = {
             p: old_property_path(by_cid[p.split(".")[0]], p.split(".")[1])

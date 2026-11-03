@@ -200,10 +200,10 @@ def _before_migration(sc: dict[str, Any]) -> dict[str, Any]:
 
 def test_an_old_c4_schema_gets_applies_to_ordering_after() -> None:
     (old,) = _old_schemas("c4")
-    assert "threshold_applies_to_missing" in detect_old_forms(old)
-    new = fixture_schema(old)
+    assert "threshold_applies_to_missing" in detect_old_forms(old, "C4")
+    new = fixture_schema(old, "C4")
     assert new["threshold"]["applies_to"] == "ordering.after"
-    assert "threshold_applies_to_missing" not in detect_old_forms(new)
+    assert "threshold_applies_to_missing" not in detect_old_forms(new, "C4")
 
 
 def test_applies_to_is_the_same_in_the_schema_and_in_the_path_definition() -> None:
@@ -243,8 +243,9 @@ def test_the_migration_changes_neither_path_id_nor_history_hash() -> None:
 @pytest.mark.parametrize("cid", ["c1", "c2", "c3", "c5"])
 def test_a_schema_without_both_threshold_and_ordering_stays_null(cid: str) -> None:
     for old in _old_schemas(cid):
-        assert "threshold_applies_to_missing" not in detect_old_forms(old)
-        thr = fixture_schema(old)["threshold"]
+        label = cid.upper()
+        assert "threshold_applies_to_missing" not in detect_old_forms(old, label)
+        thr = fixture_schema(old, label)["threshold"]
         assert thr is None or thr["applies_to"] is None
 
 
@@ -256,8 +257,17 @@ def test_c6_keeps_null() -> None:
 def test_a_c4_shape_without_an_ordering_stays_null() -> None:
     (old,) = _old_schemas("c4")
     old["order"] = None
-    assert "threshold_applies_to_missing" not in detect_old_forms(old)
-    assert fixture_schema(old)["threshold"]["applies_to"] is None
+    assert "threshold_applies_to_missing" not in detect_old_forms(old, "C4")
+    assert fixture_schema(old, "C4")["threshold"]["applies_to"] is None
+
+
+@pytest.mark.parametrize("label", ["C1", "C2", "C3", "C5", "C6"])
+def test_a_non_c4_type_with_threshold_and_ordering_stays_null(label: str) -> None:
+    (old,) = _old_schemas("c4")  # a schema that holds both threshold and ordering
+    assert old["threshold"] is not None and old["order"] is not None
+    assert "threshold_applies_to_missing" not in detect_old_forms(old, label)
+    assert fixture_schema(old, label)["threshold"]["applies_to"] is None
+    assert fixture_schema(old)["threshold"]["applies_to"] is None  # no type given
 
 
 def test_applies_to_is_set_exactly_on_the_c4_fixtures() -> None:
@@ -530,7 +540,7 @@ def test_every_old_form_in_the_old_fixtures_is_a_row_of_the_map() -> None:
     for f in OLD_FILES:
         schemas = _schemas(_load(f))
         for sc in schemas:
-            forms = detect_old_forms(sc)
+            forms = detect_old_forms(sc, _load(f)["constraint_type"])
             assert forms <= set(rows), forms - set(rows)
             seen |= forms
     # a row claiming the old fixtures hold the form really finds it there
@@ -581,14 +591,14 @@ def test_every_old_form_is_canonical_after_migration() -> None:
     handled = set(cases)
     for form_id, change in cases.items():
         old = {**base, **change}
-        assert form_id in detect_old_forms(old)
-        assert "subject_missing" in detect_old_forms(old)
+        assert form_id in detect_old_forms(old, "C4")
+        assert "subject_missing" in detect_old_forms(old, "C4")
         # the subject is never guessed from the schema: the builder adds it
-        new = {**canonical_schema(old, quantity="q"), "subject": "s"}
+        new = {**canonical_schema(old, "q", "C4"), "subject": "s"}
         _check_canonical(new)
-        assert detect_old_forms(new) == set()
+        assert detect_old_forms(new, "C4") == set()
     # the canonical form is a fixed point
-    again = canonical_schema(new, quantity="q")
+    again = canonical_schema(new, "q", "C4")
     assert again == new
     # forms that are not a schema value are checked elsewhere in this file
     elsewhere = {
