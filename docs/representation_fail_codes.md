@@ -4,7 +4,7 @@ Fixed by CLE v0.4 ("FAIL の理由コード: A の名前を、docs の一覧に�
 (`tests/test_representation_docs.py` compares it with the strings in `checks.py`); the descriptions are one line each.
 UNVERIFIABLE reason codes are those of CLE v0.3 section 3 (plus `MORPHISM_UNRESOLVED`, see
 `representation_ambiguities.md` #10). Warnings (not statuses) use `MAP_EXTRA_ENTRY` (R8, v0.4 D-14).
-R9 (`check_obligation_transport`, not part of `verify_history`) also gives the UNVERIFIABLE codes `DECLARED_LOST_CONTRADICTED_BY_EVIDENCE`, `OBLIGATION_CARRY_MISSING`, `EVIDENCE_REF_MISSING` and the existing `VOCABULARY_UNRESOLVED`, and the warning `APPLICABILITY_UNDETERMINED`.
+R9 (`check_obligation_transport`, not part of `verify_history`) also gives the UNVERIFIABLE codes `DECLARED_LOST_CONTRADICTED_BY_EVIDENCE`, `OBLIGATION_CARRY_MISSING`, `EVIDENCE_REF_MISSING`, `DECLARATION_CONTRADICTORY` and the existing `VOCABULARY_UNRESOLVED`, and the warnings `APPLICABILITY_UNDETERMINED` and `OBLIGATION_RESTORED`.
 
 | code | meaning |
 |---|---|
@@ -39,3 +39,18 @@ R9 (`check_obligation_transport`, not part of `verify_history`) also gives the U
 | `VERIFIED_ON_REFUTED` | R5: a VERIFIED morphism cites evidence whose validity is REFUTED. |
 | `VERIFIED_WITHOUT_EVIDENCE` | R5: a VERIFIED morphism has no evidence, or none that is sealed and checked, or has evidence with a broken seal (v0.4 D-13, D-19). |
 | `VERSION_CYCLE` | R6: the chain of versions (`prev_history_hash`) returns to a version already on it (v0.4 D-01). |
+
+## R9: known limits
+
+* **The vocabulary check compares references, not content.** R9 accepts the vocabulary
+  it is given when its `Ref` has the same `kind` and `value` as the history's
+  `vocabulary_ref` and both carry `SEAL_OK`. It uses no hash of the content, so a
+  vocabulary whose content was revised under the same `kind` and `value` cannot be
+  told apart: give a revised vocabulary a new id. A reference fixed by the content
+  (the HEXT v2 `state_hash`) is future work.
+* **No cryptographic verification.** R9 only reads that the seal status is `SEAL_OK`;
+  it does not verify the seal. A PASS from R9 does not mean the vocabulary is intact.
+* **Independent of R3.** R9 judges from its own inputs and does not depend on R3's
+  result for the history (a history for which R3 FAILs is still judged). If the
+  vocabulary cannot be confirmed, the result is UNVERIFIABLE
+  (`VOCABULARY_UNRESOLVED`), never PASS.
