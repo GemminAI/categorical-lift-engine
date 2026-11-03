@@ -163,14 +163,16 @@ def canonical_schema(
     schema: dict[str, Any], quantity: str | None = None
 ) -> dict[str, Any]:
     """A Constraint Schema in any old form, in the canonical form (v0.4 sections 2, 10;
-    v0.6 section 2.1 for `applies_to`, which is `None` unless given).
+    v0.6 section 2.1 for `applies_to`, which is `None` unless given or migrated).
 
     One rule per row of the section 10 table that concerns a schema: `kind` is
     `constraint_kind`, the kind names `order` and `exception_rule` are `ordering` and
     `exception`, the field `order` is `ordering`, `cmp` is `comparator`, `"must not"`
     is `must_not`, an `exception` string is `{exempt}`, a numeric `value` is a decimal
     string and a threshold without `quantity` gets the one given. A quantity is never
-    guessed: a threshold without one and no `quantity` argument is an error.
+    guessed: a threshold without one and no `quantity` argument is an error. A schema
+    that holds both a threshold and an ordering and no `applies_to` gets
+    `"ordering.after"` (v0.5 section 10); one without either is left as it is.
     """
     out = dict(schema)
     if "kind" in out:
@@ -198,6 +200,9 @@ def canonical_schema(
         out["threshold"] = {
             k: thr[k] for k in ("quantity", "value", "unit", "comparator", "applies_to")
         }
+    thr = out["threshold"]
+    if thr is not None and out["ordering"] is not None and thr["applies_to"] is None:
+        thr["applies_to"] = "ordering.after"
     if isinstance(out["exception"], str):
         out["exception"] = {"exempt": out["exception"]}
     return out
@@ -309,6 +314,13 @@ FORM_MIGRATIONS: tuple[dict[str, Any], ...] = (
         "source": "v0.4 section 10",
     },
     {
+        "id": "threshold_applies_to_missing",
+        "old": "no link from threshold quantity to ordering event (v0.4 and before)",
+        "canonical": '`threshold.applies_to` is `"ordering.after"`',
+        "in_old_fixtures": True,
+        "source": "v0.5 section 10",
+    },
+    {
         "id": "subject_missing",
         "old": "no `subject` in the constraint (v0.5 and before)",
         "canonical": "`subject` is added",
@@ -328,6 +340,12 @@ FORM_MIGRATIONS: tuple[dict[str, Any], ...] = (
 def detect_old_forms(schema: dict[str, Any]) -> set[str]:
     """The ids of `FORM_MIGRATIONS` whose old form a Constraint Schema still holds."""
     found: set[str] = set()
+    if (
+        schema.get("threshold") is not None
+        and (schema.get("ordering") or schema.get("order")) is not None
+        and schema["threshold"].get("applies_to") is None
+    ):
+        found.add("threshold_applies_to_missing")
     if "subject" not in schema:
         found.add("subject_missing")
     if "kind" in schema:

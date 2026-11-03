@@ -30,17 +30,23 @@ from ctp001_schema_graph import (
     TEMPLATES,
     aggregate,
     path_id,
+    paths_of,
 )
+from ctp001_types import TYPES, examples_of
 from ctp001_v2_builder import (
     CHANGED,
     FORM_MIGRATIONS,
     GOLDEN_V2_DIR,
     QUANTITY,
     TEXT_FIXES,
+    V2_TYPES,
+    V2Type,
     build_all,
+    build_example,
     canonical_schema,
     detect_old_forms,
     distinct_paths,
+    fixture_schema,
     migration_map,
     migration_md,
     old_properties,
@@ -178,12 +184,96 @@ def test_schema_is_in_the_canonical_form(path: Path) -> None:
         assert detect_old_forms(sc) == set()
 
 
-def test_the_c4_quantity_and_the_ordering_after_name_the_same_event() -> None:
-    """Section 4: C4's threshold quantity points at the `after` event (weak check:
-    they share a content word; the pointing itself is not a field of the schema)."""
-    sc = _schemas(_load(GOLDEN_V2_DIR / "c4_G0.json"))[0]
-    quantity = set(sc["threshold"]["quantity"].split())
-    assert quantity & set(sc["ordering"]["after"].split())
+def _old_schemas(cid: str) -> list[dict[str, Any]]:
+    """The old-form schemas of a constraint type of the old builder (untouched)."""
+    (t,) = [t for t in TYPES if t.cid == cid]
+    return [dict(sc) for sc in t.schemas]
+
+
+def _before_migration(sc: dict[str, Any]) -> dict[str, Any]:
+    """The schema as v0.4 wrote it: no `applies_to` link from threshold to ordering."""
+    out = dict(sc)
+    if out["threshold"] is not None:
+        out["threshold"] = {**out["threshold"], "applies_to": None}
+    return out
+
+
+def test_an_old_c4_schema_gets_applies_to_ordering_after() -> None:
+    (old,) = _old_schemas("c4")
+    assert "threshold_applies_to_missing" in detect_old_forms(old)
+    new = fixture_schema(old)
+    assert new["threshold"]["applies_to"] == "ordering.after"
+    assert "threshold_applies_to_missing" not in detect_old_forms(new)
+
+
+def test_applies_to_is_the_same_in_the_schema_and_in_the_path_definition() -> None:
+    for path in FILES:
+        doc = _load(path)
+        for sc in _schemas(doc):
+            if sc["threshold"] is None:
+                continue
+            (defn,) = [
+                d
+                for d in doc["path_definitions"].values()
+                if d["template_id"] == "T.threshold"
+                and d["constraint_id"] == sc["constraint_id"]
+            ]
+            assert defn["constraint_value"] == sc["threshold"]
+            assert (
+                defn["constraint_value"]["applies_to"] == sc["threshold"]["applies_to"]
+            )
+
+
+def test_the_migration_changes_neither_path_id_nor_history_hash() -> None:
+    for t in V2_TYPES:
+        before = tuple(_before_migration(sc) for sc in t.schemas)
+        assert {p.path_id for sc in before for p in paths_of(sc)} == {
+            p.path_id for p in t.paths
+        }
+        pre = V2Type(t.old)
+        pre.schemas = before
+        pre.paths = tuple(
+            sorted((p for sc in before for p in paths_of(sc)), key=lambda g: g.path_id)
+        )
+        for ex in examples_of(t.old.cid):
+            doc = _load(GOLDEN_V2_DIR / f"{t.old.cid}_{ex.name}.json")
+            assert build_example(pre, ex)["history"] == doc["history"]
+
+
+@pytest.mark.parametrize("cid", ["c1", "c2", "c3", "c5"])
+def test_a_schema_without_both_threshold_and_ordering_stays_null(cid: str) -> None:
+    for old in _old_schemas(cid):
+        assert "threshold_applies_to_missing" not in detect_old_forms(old)
+        thr = fixture_schema(old)["threshold"]
+        assert thr is None or thr["applies_to"] is None
+
+
+def test_c6_keeps_null() -> None:
+    for sc in _schemas(_load(GOLDEN_V2_DIR / "c6_G0.json")):
+        assert sc["threshold"] is None or sc["threshold"]["applies_to"] is None
+
+
+def test_a_c4_shape_without_an_ordering_stays_null() -> None:
+    (old,) = _old_schemas("c4")
+    old["order"] = None
+    assert "threshold_applies_to_missing" not in detect_old_forms(old)
+    assert fixture_schema(old)["threshold"]["applies_to"] is None
+
+
+def test_applies_to_is_set_exactly_on_the_c4_fixtures() -> None:
+    linked = sorted(
+        path.name
+        for path in FILES
+        for sc in _schemas(_load(path))
+        if sc["threshold"] is not None and sc["threshold"]["applies_to"] is not None
+    )
+    c4 = sorted(path.name for path in FILES if _load(path)["constraint_type"] == "C4")
+    assert len(c4) == 14
+    assert linked == c4
+    for path in FILES:
+        for sc in _schemas(_load(path)):
+            if sc["threshold"] is not None and sc["threshold"]["applies_to"]:
+                assert sc["threshold"]["applies_to"] == "ordering.after"
 
 
 @pytest.mark.parametrize("path", FILES, ids=lambda p: p.stem)
@@ -478,6 +568,15 @@ def test_every_old_form_is_canonical_after_migration() -> None:
         "modality_must_not": {"modality": "must not"},
         "kind_key": {},
         "subject_missing": {},
+        "threshold_applies_to_missing": {
+            "threshold": {
+                "quantity": "q",
+                "value": "5",
+                "unit": "u",
+                "comparator": ">",
+            },
+            "order": {"action": "a", "after": "b"},
+        },
     }
     handled = set(cases)
     for form_id, change in cases.items():

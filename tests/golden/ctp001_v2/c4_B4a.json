@@ -221,7 +221,7 @@
     "scope": null,
     "subject": "production deployment",
     "threshold": {
-      "applies_to": null,
+      "applies_to": "ordering.after",
       "comparator": ">=",
       "quantity": "approving reviewers",
       "unit": "reviewers",
@@ -659,7 +659,7 @@
     "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920": {
       "constraint_id": "c4",
       "constraint_value": {
-        "applies_to": null,
+        "applies_to": "ordering.after",
         "comparator": ">=",
         "quantity": "approving reviewers",
         "unit": "reviewers",
