@@ -944,6 +944,7 @@ def _r9_results(
 
 def check_obligation_transport(
     history: RepresentationHistory,
+    vocabulary: PropertyVocabulary | None,
     stages: Sequence[str],
     obligations: Collection[str],
     applicability: Mapping[str, str],
@@ -963,11 +964,13 @@ def check_obligation_transport(
     that was P, or None, in ``detail``). L->P adds the warning
     ``OBLIGATION_RESTORED`` and no finding; L->U and U->U give none.
 
-    The vocabulary is the one the history records: its ``vocabulary_ref`` must be
-    ``SEAL_OK`` and its property names are those of the history's identity
-    morphisms (R3 requires an identity to preserve the whole vocabulary). With no
-    such vocabulary, or an obligation it does not name, the result is
-    ``VOCABULARY_UNRESOLVED``. Properties of ``not_applicable`` constraints are
+    The vocabulary content is an input. It is used only once it is shown to be the
+    one the history's ``vocabulary_ref`` points at, as R3 reads it (v0.4 D-06): the
+    refs have the same kind and value (an id; no content-hash convention exists)
+    and both carry ``SEAL_OK``. With no vocabulary, another ref, a seal that is not
+    ``SEAL_OK`` or an obligation the vocabulary does not name, the result is
+    ``VOCABULARY_UNRESOLVED`` (also when ``O`` is empty). Properties of
+    ``not_applicable`` constraints are
     skipped; a finding on an ``undetermined`` constraint carries the warning
     ``APPLICABILITY_UNDETERMINED``. A constraint id is the part of the property
     name before the first dot.
@@ -995,6 +998,8 @@ def check_obligation_transport(
         )
         if not ok
     ]
+    if vocabulary_defects(vocabulary, hid):
+        flawed.append("vocabulary")
     if flawed:
         return _defect_results("R9", [_loc("field", hid, name) for name in flawed])
     assert evidence is not None
@@ -1009,12 +1014,15 @@ def check_obligation_transport(
             for (stage, prop), (status, ref) in evidence.items()
         ),
         "mode": mode,
+        "vocabulary": None if vocabulary is None else vocabulary.to_dict(),
     }
-    known: set[str] = set()
-    for m in idx.morphisms.values():
-        if idx.is_identity(m):
-            known.update((*m.preserved, *m.lost))
-    if history.vocabulary_ref.seal_status != "SEAL_OK" or not known:
+    mine = history.vocabulary_ref
+    if (
+        vocabulary is None
+        or (mine.kind, mine.value) != (vocabulary.ref.kind, vocabulary.ref.value)
+        or mine.seal_status != "SEAL_OK"
+        or vocabulary.ref.seal_status != "SEAL_OK"
+    ):
         findings: list[_R9Finding] = [
             (
                 "UNVERIFIABLE",
@@ -1024,6 +1032,7 @@ def check_obligation_transport(
             )
         ]
         return _r9_results(inputs, findings, [])
+    known = {*vocabulary.properties, *vocabulary.information}
     findings = []
     warnings: list[CheckWarning] = []
     for prop in sorted(set(obligations)):

@@ -251,6 +251,7 @@ def test_expectations_equal_the_design_table(cid: str, name: str) -> None:
 def _r9(doc: dict[str, Any], mode: str) -> list[CheckResult]:
     return check_obligation_transport(
         RepresentationHistory.from_dict(doc["history"]),
+        PropertyVocabulary.from_dict(doc["vocabulary"]),
         doc["chain"],
         doc["obligations"],
         doc["applicability"],

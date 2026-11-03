@@ -2,21 +2,26 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Any, Literal
 
 import pytest
 
 from cle.representation import (
     CheckResult,
+    PropertyVocabulary,
     Ref,
     RepresentationHistory,
     RepresentationMorphism,
     RepresentationState,
     check_obligation_transport,
+    check_r3,
     verify_history,
 )
 
+GOLDEN = Path(__file__).parent / "golden" / "ctp001"
 P = "c1.condition"
 STAGES = ["f1", "f2", "f3"]
 RANK = {"PASS": 0, "UNVERIFIABLE": 1, "FAIL": 2}
@@ -28,12 +33,10 @@ def history(
     declared: Mapping[str, str | None],
     *,
     both: tuple[str, ...] = (),
-    identity: bool = True,
     seal: Literal["SEAL_OK", "SEAL_FAIL"] | None = "SEAL_OK",
 ) -> RepresentationHistory:
     """Three stages. ``declared[stage]``: "preserved", "lost" or None (silent);
-    ``both`` lists the stages that list the property in both ``preserved`` and ``lost``.
-    The identity on K names the vocabulary (``P`` and ``c1.modality``)."""
+    ``both`` lists the stages that put the property in ``preserved`` and ``lost``."""
     states = tuple(RepresentationState(s, "h", "k", s) for s in "KXYZ")
     ends = {"f1": ("K", "X"), "f2": ("X", "Y"), "f3": ("Y", "Z")}
     morphisms = [
@@ -47,15 +50,19 @@ def history(
         )
         for stage in STAGES
     ]
-    if identity:
-        morphisms.append(
-            RepresentationMorphism(
-                "iK", "K", "K", "identity", preserved=(P, "c1.modality")
-            )
-        )
     return RepresentationHistory(
         "h", "t", Ref("hext", "v", seal_status=seal), states, tuple(morphisms), ()
     ).seal()
+
+
+def vocab(
+    *props: str,
+    value: str = "v",
+    seal: Literal["SEAL_OK", "SEAL_FAIL"] | None = "SEAL_OK",
+) -> PropertyVocabulary:
+    return PropertyVocabulary(
+        "v", "1", "t", props, (), Ref("hext", value, seal_status=seal)
+    )
 
 
 def evidence(**by_stage: str) -> dict[str, list[dict[str, str]]]:
@@ -80,10 +87,12 @@ def run(
     applicability: Mapping[str, str] | None = None,
     *,
     h: RepresentationHistory | None = None,
+    voc: PropertyVocabulary | str | None = "default",
     **kw: Any,
 ) -> list[CheckResult]:
     return check_obligation_transport(
         h or history(declared),
+        vocab(P, "c1.modality") if voc == "default" else voc,  # type: ignore[arg-type]
         kw.pop("stages", STAGES),
         kw.pop("obligations", [P]),
         applicability or {"c1": "applicable"},
@@ -279,6 +288,7 @@ def test_the_note_goes_only_with_findings_on_the_undetermined_constraint() -> No
     h = history(LOST)
     results = check_obligation_transport(
         h,
+        vocab(P),
         STAGES,
         [P, "c2.scope"],
         {"c1": "undetermined", "c2": "applicable"},
@@ -298,10 +308,10 @@ def test_a_stage_that_is_not_in_the_history_has_no_declaration() -> None:
     assert places(results) == ["nope"]
 
 
-# --- the history's vocabulary -------------------------------------------------
+# --- the vocabulary given in --------------------------------------------------
 
 
-def test_an_obligation_the_history_vocabulary_does_not_name_is_unresolved() -> None:
+def test_an_obligation_the_vocabulary_does_not_name_is_unresolved() -> None:
     results = run(FINE, obligations=["c1.unknown"])
     assert [(r.status, r.reason_code) for r in results] == [
         ("UNVERIFIABLE", "VOCABULARY_UNRESOLVED")
@@ -310,22 +320,51 @@ def test_an_obligation_the_history_vocabulary_does_not_name_is_unresolved() -> N
 
 
 @pytest.mark.parametrize(
-    "h",
+    ("voc", "h"),
     [
-        history(FINE, identity=False),
-        history(FINE, seal=None),
-        history(FINE, seal="SEAL_FAIL"),
+        (None, None),
+        (vocab(P, value="other"), None),
+        (vocab(P, seal=None), None),
+        (vocab(P, seal="SEAL_FAIL"), None),
+        (None, history(FINE, seal=None)),
+        (vocab(P), history(FINE, seal="SEAL_FAIL")),
     ],
-    ids=["no-identity", "seal-missing", "seal-failed"],
+    ids=[
+        "none",
+        "ref-mismatch",
+        "vocab-seal-missing",
+        "vocab-seal-failed",
+        "history-seal-missing",
+        "history-seal-failed",
+    ],
 )
-def test_no_usable_history_vocabulary_is_unresolved_never_skipped(
-    h: RepresentationHistory,
+def test_an_unconfirmed_vocabulary_is_unresolved_never_skipped(
+    voc: PropertyVocabulary | None, h: RepresentationHistory | None
 ) -> None:
     for obligations in ([P], []):
-        results = run(FINE, h=h, obligations=obligations)
+        results = run(FINE, h=h, voc=voc, obligations=obligations)
         assert [(r.status, r.reason_code) for r in results] == [
             ("UNVERIFIABLE", "VOCABULARY_UNRESOLVED")
         ]
+
+
+def test_a_different_ref_kind_is_a_mismatch() -> None:
+    kind = PropertyVocabulary("v", "1", "t", (P,), (), Ref("history", "v", "SEAL_OK"))
+    assert codes(run(FINE, voc=kind)) == ["VOCABULARY_UNRESOLVED"]
+
+
+def test_r9_judges_with_the_given_vocabulary_when_r3_fails() -> None:
+    doc = json.loads((GOLDEN / "c1_D0.json").read_text(encoding="utf-8"))
+    h = RepresentationHistory.from_dict(doc["history"])
+    voc = PropertyVocabulary.from_dict(doc["vocabulary"])
+    assert any(r.status == "FAIL" for r in check_r3(h, voc))
+    results = check_obligation_transport(
+        h, voc, doc["chain"], doc["obligations"], doc["applicability"]
+    )
+    assert [(r.status, r.reason_code) for r in results] == [
+        ("FAIL", "OBLIGATION_DECLARED_LOST")
+    ]
+    assert places(results) == ["f1"] * len(results[0].locations)
 
 
 # --- defects, scope, determinism ----------------------------------------------
@@ -348,6 +387,7 @@ def test_no_usable_history_vocabulary_is_unresolved_never_skipped(
         ({"ev": {"f1": [{"property": 1, "status": "lost"}]}}, "carry_evidence"),
         ({"ev": {"f1": [{"property": P, "status": "maybe"}]}}, "carry_evidence"),
         ({"mode": "M3"}, "mode"),
+        ({"vocabulary": "x"}, "vocabulary"),
     ],
 )
 def test_defective_inputs_are_results_not_exceptions(
@@ -355,6 +395,7 @@ def test_defective_inputs_are_results_not_exceptions(
 ) -> None:
     results = check_obligation_transport(
         history(FINE),
+        kw.get("vocabulary", vocab(P)),
         kw.get("stages", STAGES),
         kw.get("obligations", [P]),
         kw.get("applicability", {"c1": "applicable"}),
@@ -368,7 +409,7 @@ def test_defective_inputs_are_results_not_exceptions(
 
 
 def test_a_defective_history_is_a_result() -> None:
-    results = check_obligation_transport("nope", STAGES, [P], {})  # type: ignore[arg-type]
+    results = check_obligation_transport("nope", vocab(P), STAGES, [P], {})  # type: ignore[arg-type]
     assert [(r.status, r.reason_code) for r in results] == [
         ("FAIL", "INPUT_TYPE_INVALID")
     ]
@@ -377,7 +418,7 @@ def test_a_defective_history_is_a_result() -> None:
 def test_r9_is_not_in_verify_history_and_the_history_is_untouched() -> None:
     h = history(FINE)
     before = h.to_dict()
-    check_obligation_transport(h, STAGES, [P], {"c1": "applicable"})
+    check_obligation_transport(h, vocab(P), STAGES, [P], {"c1": "applicable"})
     assert h.to_dict() == before
     assert all(r.rule != "R9" for r in verify_history(h))
 
