@@ -335,6 +335,7 @@
       "modality": "may",
       "ordering": null,
       "scope": null,
+      "subject": "refunds",
       "threshold": {
         "comparator": ">",
         "quantity": "refund amount",
@@ -350,6 +351,7 @@
       "modality": "may",
       "ordering": null,
       "scope": "EU-region storage",
+      "subject": "customer records",
       "threshold": null
     }
   ],

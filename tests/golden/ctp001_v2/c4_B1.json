@@ -219,6 +219,7 @@
       "after": "reviewers approve"
     },
     "scope": null,
+    "subject": "production deployment",
     "threshold": {
       "comparator": ">=",
       "quantity": "approving reviewers",

@@ -231,6 +231,7 @@
     "modality": "may",
     "ordering": null,
     "scope": null,
+    "subject": "refunds",
     "threshold": {
       "comparator": ">",
       "quantity": "refund amount",

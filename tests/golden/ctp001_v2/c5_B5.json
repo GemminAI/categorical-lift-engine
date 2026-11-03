@@ -251,6 +251,7 @@
     "modality": "must",
     "ordering": null,
     "scope": null,
+    "subject": "passwords",
     "threshold": {
       "comparator": ">=",
       "quantity": "time since last rotation",

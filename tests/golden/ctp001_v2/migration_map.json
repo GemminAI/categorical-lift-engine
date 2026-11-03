@@ -85,6 +85,13 @@
       "source": "section 10"
     },
     {
+      "canonical": "`subject` is added",
+      "id": "subject_missing",
+      "in_old_fixtures": true,
+      "old": "no `subject` in the constraint (v0.5 and before)",
+      "source": "v0.6 section 10"
+    },
+    {
       "canonical": "`constraint_kind`",
       "id": "kind_key",
       "in_old_fixtures": true,

@@ -128,6 +128,7 @@ def test_only_d0_fails_r3_in_every_type() -> None:
 SCHEMA_FIELDS = {
     "constraint_id",
     "constraint_kind",
+    "subject",
     "condition",
     "scope",
     "modality",
@@ -146,9 +147,10 @@ DECIMAL = re.compile(r"(0|[1-9][0-9]*)(\.[0-9]+)?")
 
 
 def _check_canonical(sc: dict[str, Any]) -> None:
-    """Constraint Schema 仕様 v0.4 section 2: the fields and their types."""
+    """Constraint Schema 仕様 v0.4/v0.6 section 2: the fields and their types."""
     assert set(sc) == SCHEMA_FIELDS
     assert isinstance(sc["constraint_id"], str)
+    assert isinstance(sc["subject"], str) and sc["subject"]
     assert sc["constraint_kind"] in KINDS
     for f in ("condition", "scope"):
         assert sc[f] is None or isinstance(sc[f], str)
@@ -474,12 +476,15 @@ def test_every_old_form_is_canonical_after_migration() -> None:
         },
         "modality_must_not": {"modality": "must not"},
         "kind_key": {},
+        "subject_missing": {},
     }
     handled = set(cases)
     for form_id, change in cases.items():
         old = {**base, **change}
         assert form_id in detect_old_forms(old)
-        new = canonical_schema(old, quantity="q")
+        assert "subject_missing" in detect_old_forms(old)
+        # the subject is never guessed from the schema: the builder adds it
+        new = {**canonical_schema(old, quantity="q"), "subject": "s"}
         _check_canonical(new)
         assert detect_old_forms(new) == set()
     # the canonical form is a fixed point

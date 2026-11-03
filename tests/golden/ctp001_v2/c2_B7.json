@@ -126,6 +126,7 @@
     "modality": "may",
     "ordering": null,
     "scope": "EU-region storage",
+    "subject": "customer records",
     "threshold": null
   },
   "constraint_type": "C2",

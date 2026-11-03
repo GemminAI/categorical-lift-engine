@@ -144,6 +144,17 @@ CHANGED: dict[tuple[str, str, str], tuple[tuple[str, ...], str]] = {
 }
 
 
+# v0.6 section 2: the subject of each constraint (a required field, not a component, so
+# `schema_graph_version` and every `path_id` stay as they were). C6 holds C1 and C2.
+SUBJECTS = {
+    "c1": "refunds",
+    "c2": "customer records",
+    "c3": "records",
+    "c4": "production deployment",
+    "c5": "passwords",
+}
+
+
 # v0.4 section 10, for the schema's own fields: old kind names to canonical ones
 KIND_RENAMES = {"order": "ordering", "exception_rule": "exception"}
 
@@ -191,8 +202,13 @@ def canonical_schema(
 
 
 def fixture_schema(schema: dict[str, Any]) -> dict[str, Any]:
-    """The canonical form of an old fixture's schema (the quantity is `QUANTITY`)."""
-    return canonical_schema(schema, QUANTITY.get(schema["constraint_id"]))
+    """The canonical form of an old fixture's schema (the quantity is `QUANTITY`).
+
+    A schema without a `subject` gets the one of `SUBJECTS` (v0.6 section 10).
+    """
+    out = canonical_schema(schema, QUANTITY.get(schema["constraint_id"]))
+    out.setdefault("subject", SUBJECTS[schema["constraint_id"]])
+    return out
 
 
 def old_property_path(schema: dict[str, Any], field: str) -> GraphPath:
@@ -291,6 +307,13 @@ FORM_MIGRATIONS: tuple[dict[str, Any], ...] = (
         "source": "section 10",
     },
     {
+        "id": "subject_missing",
+        "old": "no `subject` in the constraint (v0.5 and before)",
+        "canonical": "`subject` is added",
+        "in_old_fixtures": True,
+        "source": "v0.6 section 10",
+    },
+    {
         "id": "kind_key",
         "old": "schema key `kind` (old fixtures)",
         "canonical": "`constraint_kind`",
@@ -303,6 +326,8 @@ FORM_MIGRATIONS: tuple[dict[str, Any], ...] = (
 def detect_old_forms(schema: dict[str, Any]) -> set[str]:
     """The ids of `FORM_MIGRATIONS` whose old form a Constraint Schema still holds."""
     found: set[str] = set()
+    if "subject" not in schema:
+        found.add("subject_missing")
     if "kind" in schema:
         found.add("kind_key")
     kind = schema.get("kind", schema.get("constraint_kind"))

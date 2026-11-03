@@ -180,6 +180,7 @@
     "modality": "must_not",
     "ordering": null,
     "scope": null,
+    "subject": "records",
     "threshold": {
       "comparator": "<",
       "quantity": "record age",

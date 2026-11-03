@@ -29,6 +29,7 @@ Path, identified by `path_id`; `path_label` is for display only).
 | `T.ordering` components spelled differently in v0.3 and v0.3.1 | `action`, `after`, `after_edge` | no | section 10 |
 | `T.exception` components `exempt` only (v0.3) | `exempt`, `except_edge` | no | section 10 |
 | old property names (`c1.condition`, ...) | `path_id` (identity), `path_label` (display); table below | yes | section 10 |
+| no `subject` in the constraint (v0.5 and before) | `subject` is added | yes | v0.6 section 10 |
 | schema key `kind` (old fixtures) | `constraint_kind` | yes | section 2 (not a row of section 10) |
 
 ## Templates and their required components
