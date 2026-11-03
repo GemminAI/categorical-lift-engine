@@ -182,6 +182,7 @@
     "scope": null,
     "subject": "records",
     "threshold": {
+      "applies_to": null,
       "comparator": "<",
       "quantity": "record age",
       "unit": "days",
@@ -621,6 +622,7 @@
     "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69": {
       "constraint_id": "c3",
       "constraint_value": {
+        "applies_to": null,
         "comparator": "<",
         "quantity": "record age",
         "unit": "days",

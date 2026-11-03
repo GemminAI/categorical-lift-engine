@@ -253,6 +253,7 @@
     "scope": null,
     "subject": "passwords",
     "threshold": {
+      "applies_to": null,
       "comparator": ">=",
       "quantity": "time since last rotation",
       "unit": "days",
@@ -719,6 +720,7 @@
     "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445": {
       "constraint_id": "c5",
       "constraint_value": {
+        "applies_to": null,
         "comparator": ">=",
         "quantity": "time since last rotation",
         "unit": "days",

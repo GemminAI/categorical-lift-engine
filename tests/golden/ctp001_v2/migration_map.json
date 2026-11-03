@@ -5,84 +5,84 @@
       "id": "threshold_cmp",
       "in_old_fixtures": false,
       "old": "`cmp` (v0.3 section 3)",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "field `ordering`, template `T.ordering`",
       "id": "ordering_field",
       "in_old_fixtures": true,
       "old": "field `order` (v0.1 section 1)",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "kind `ordering`",
       "id": "kind_order",
       "in_old_fixtures": false,
       "old": "kind `order` (v0.1)",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "`path_label` `c4.ordering`",
       "id": "label_c4_order",
       "in_old_fixtures": true,
       "old": "`path_label` `c4.order` (old property name)",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "kind `exception`",
       "id": "kind_exception_rule",
       "in_old_fixtures": false,
       "old": "kind `exception_rule` (v0.1)",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "`{exempt}`",
       "id": "exception_string",
       "in_old_fixtures": true,
       "old": "field `exception` is a string",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "a decimal string",
       "id": "value_numeric",
       "in_old_fixtures": true,
       "old": "`threshold.value` is a number",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "`quantity` is added",
       "id": "threshold_no_quantity",
       "in_old_fixtures": true,
       "old": "`threshold` without `quantity`",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "`must_not`",
       "id": "modality_must_not",
       "in_old_fixtures": true,
       "old": "`modality` `\"must not\"`",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "`action`, `after`, `after_edge`",
       "id": "ordering_components",
       "in_old_fixtures": false,
       "old": "`T.ordering` components spelled differently in v0.3 and v0.3.1",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "`exempt`, `except_edge`",
       "id": "exception_components",
       "in_old_fixtures": false,
       "old": "`T.exception` components `exempt` only (v0.3)",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "`path_id` (identity), `path_label` (display); table below",
       "id": "property_names",
       "in_old_fixtures": true,
       "old": "old property names (`c1.condition`, ...)",
-      "source": "section 10"
+      "source": "v0.4 section 10"
     },
     {
       "canonical": "`subject` is added",
@@ -96,7 +96,7 @@
       "id": "kind_key",
       "in_old_fixtures": true,
       "old": "schema key `kind` (old fixtures)",
-      "source": "section 2 (not a row of section 10)"
+      "source": "v0.4 section 2 (not a row of section 10)"
     }
   ],
   "granularity_changed_templates": [
@@ -372,5 +372,5 @@
     }
   ],
   "schema_graph_version": "1",
-  "spec": "Constraint Schema 仕様 v0.4 section 10"
+  "spec": "Constraint Schema 仕様 v0.6 section 10"
 }

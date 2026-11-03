@@ -157,7 +157,8 @@ def _check_canonical(sc: dict[str, Any]) -> None:
     assert sc["modality"] in {None, "may", "must", "must_not"}
     thr = sc["threshold"]
     if thr is not None:
-        assert set(thr) == {"quantity", "value", "unit", "comparator"}
+        assert set(thr) == {"quantity", "value", "unit", "comparator", "applies_to"}
+        assert thr["applies_to"] is None or isinstance(thr["applies_to"], str)
         assert isinstance(thr["quantity"], str) and thr["quantity"]
         assert isinstance(thr["value"], str) and DECIMAL.fullmatch(thr["value"])
         assert isinstance(thr["unit"], str) and thr["unit"]
@@ -518,6 +519,7 @@ def test_a_missing_quantity_is_never_guessed() -> None:
         "value": "1",
         "unit": "u",
         "comparator": "<",
+        "applies_to": None,
     }
 
 

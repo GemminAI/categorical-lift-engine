@@ -1,6 +1,8 @@
-# Migration: old forms to the canonical form (Constraint Schema v0.4)
+# Migration: old forms to the canonical form (Constraint Schema v0.6)
 
-Section 10 of `Constraint Schema 仕様 v0.4`. The same tables in a machine-readable
+Section 10 of `Constraint Schema 仕様 v0.6`, which keeps the rows of v0.4 and v0.5
+section 10 and adds its own; the Source column says which version each row is from.
+The same tables in a machine-readable
 form are in `migration_map.json`; both are written by `tests/ctp001_v2_builder.py` and
 `tests/test_ctp001_v2_fixtures.py` checks that they are what the builder writes, that
 every old form the 84 old fixtures hold is a row below, and that nothing is missing in
@@ -17,20 +19,20 @@ Path, identified by `path_id`; `path_label` is for display only).
 
 | Old form | Canonical form | In the old fixtures | Source |
 |---|---|---|---|
-| `cmp` (v0.3 section 3) | `comparator` | no | section 10 |
-| field `order` (v0.1 section 1) | field `ordering`, template `T.ordering` | yes | section 10 |
-| kind `order` (v0.1) | kind `ordering` | no | section 10 |
-| `path_label` `c4.order` (old property name) | `path_label` `c4.ordering` | yes | section 10 |
-| kind `exception_rule` (v0.1) | kind `exception` | no | section 10 |
-| field `exception` is a string | `{exempt}` | yes | section 10 |
-| `threshold.value` is a number | a decimal string | yes | section 10 |
-| `threshold` without `quantity` | `quantity` is added | yes | section 10 |
-| `modality` `"must not"` | `must_not` | yes | section 10 |
-| `T.ordering` components spelled differently in v0.3 and v0.3.1 | `action`, `after`, `after_edge` | no | section 10 |
-| `T.exception` components `exempt` only (v0.3) | `exempt`, `except_edge` | no | section 10 |
-| old property names (`c1.condition`, ...) | `path_id` (identity), `path_label` (display); table below | yes | section 10 |
+| `cmp` (v0.3 section 3) | `comparator` | no | v0.4 section 10 |
+| field `order` (v0.1 section 1) | field `ordering`, template `T.ordering` | yes | v0.4 section 10 |
+| kind `order` (v0.1) | kind `ordering` | no | v0.4 section 10 |
+| `path_label` `c4.order` (old property name) | `path_label` `c4.ordering` | yes | v0.4 section 10 |
+| kind `exception_rule` (v0.1) | kind `exception` | no | v0.4 section 10 |
+| field `exception` is a string | `{exempt}` | yes | v0.4 section 10 |
+| `threshold.value` is a number | a decimal string | yes | v0.4 section 10 |
+| `threshold` without `quantity` | `quantity` is added | yes | v0.4 section 10 |
+| `modality` `"must not"` | `must_not` | yes | v0.4 section 10 |
+| `T.ordering` components spelled differently in v0.3 and v0.3.1 | `action`, `after`, `after_edge` | no | v0.4 section 10 |
+| `T.exception` components `exempt` only (v0.3) | `exempt`, `except_edge` | no | v0.4 section 10 |
+| old property names (`c1.condition`, ...) | `path_id` (identity), `path_label` (display); table below | yes | v0.4 section 10 |
 | no `subject` in the constraint (v0.5 and before) | `subject` is added | yes | v0.6 section 10 |
-| schema key `kind` (old fixtures) | `constraint_kind` | yes | section 2 (not a row of section 10) |
+| schema key `kind` (old fixtures) | `constraint_kind` | yes | v0.4 section 2 (not a row of section 10) |
 
 ## Templates and their required components
 

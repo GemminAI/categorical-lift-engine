@@ -162,7 +162,8 @@ KIND_RENAMES = {"order": "ordering", "exception_rule": "exception"}
 def canonical_schema(
     schema: dict[str, Any], quantity: str | None = None
 ) -> dict[str, Any]:
-    """A Constraint Schema in any old form, in the canonical form (v0.4 sections 2, 10).
+    """A Constraint Schema in any old form, in the canonical form (v0.4 sections 2, 10;
+    v0.6 section 2.1 for `applies_to`, which is `None` unless given).
 
     One rule per row of the section 10 table that concerns a schema: `kind` is
     `constraint_kind`, the kind names `order` and `exception_rule` are `ordering` and
@@ -193,8 +194,9 @@ def canonical_schema(
                 raise ValueError("a threshold without a quantity needs one given")
             thr["quantity"] = quantity
         thr["value"] = str(thr["value"])
+        thr.setdefault("applies_to", None)
         out["threshold"] = {
-            k: thr[k] for k in ("quantity", "value", "unit", "comparator")
+            k: thr[k] for k in ("quantity", "value", "unit", "comparator", "applies_to")
         }
     if isinstance(out["exception"], str):
         out["exception"] = {"exempt": out["exception"]}
@@ -227,84 +229,84 @@ FORM_MIGRATIONS: tuple[dict[str, Any], ...] = (
         "old": "`cmp` (v0.3 section 3)",
         "canonical": "`comparator`",
         "in_old_fixtures": False,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "ordering_field",
         "old": "field `order` (v0.1 section 1)",
         "canonical": "field `ordering`, template `T.ordering`",
         "in_old_fixtures": True,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "kind_order",
         "old": "kind `order` (v0.1)",
         "canonical": "kind `ordering`",
         "in_old_fixtures": False,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "label_c4_order",
         "old": "`path_label` `c4.order` (old property name)",
         "canonical": "`path_label` `c4.ordering`",
         "in_old_fixtures": True,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "kind_exception_rule",
         "old": "kind `exception_rule` (v0.1)",
         "canonical": "kind `exception`",
         "in_old_fixtures": False,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "exception_string",
         "old": "field `exception` is a string",
         "canonical": "`{exempt}`",
         "in_old_fixtures": True,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "value_numeric",
         "old": "`threshold.value` is a number",
         "canonical": "a decimal string",
         "in_old_fixtures": True,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "threshold_no_quantity",
         "old": "`threshold` without `quantity`",
         "canonical": "`quantity` is added",
         "in_old_fixtures": True,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "modality_must_not",
         "old": '`modality` `"must not"`',
         "canonical": "`must_not`",
         "in_old_fixtures": True,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "ordering_components",
         "old": "`T.ordering` components spelled differently in v0.3 and v0.3.1",
         "canonical": "`action`, `after`, `after_edge`",
         "in_old_fixtures": False,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "exception_components",
         "old": "`T.exception` components `exempt` only (v0.3)",
         "canonical": "`exempt`, `except_edge`",
         "in_old_fixtures": False,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "property_names",
         "old": "old property names (`c1.condition`, ...)",
         "canonical": "`path_id` (identity), `path_label` (display); table below",
         "in_old_fixtures": True,
-        "source": "section 10",
+        "source": "v0.4 section 10",
     },
     {
         "id": "subject_missing",
@@ -318,7 +320,7 @@ FORM_MIGRATIONS: tuple[dict[str, Any], ...] = (
         "old": "schema key `kind` (old fixtures)",
         "canonical": "`constraint_kind`",
         "in_old_fixtures": True,
-        "source": "section 2 (not a row of section 10)",
+        "source": "v0.4 section 2 (not a row of section 10)",
     },
 )
 
@@ -711,7 +713,7 @@ def migration_map() -> dict[str, Any]:
     ]
     return {
         "schema_graph_version": SCHEMA_GRAPH_VERSION,
-        "spec": "Constraint Schema 仕様 v0.4 section 10",
+        "spec": "Constraint Schema 仕様 v0.6 section 10",
         "form_migrations": [dict(f) for f in FORM_MIGRATIONS],
         "granularity_changed_templates": [
             t.template_id for t in TEMPLATES if t.granularity == "changed"
@@ -743,9 +745,11 @@ def migration_md() -> str:
         f"| {f['source']} |"
         for f in m["form_migrations"]
     )
-    return f"""# Migration: old forms to the canonical form (Constraint Schema v0.4)
+    return f"""# Migration: old forms to the canonical form (Constraint Schema v0.6)
 
-Section 10 of `Constraint Schema 仕様 v0.4`. The same tables in a machine-readable
+Section 10 of `Constraint Schema 仕様 v0.6`, which keeps the rows of v0.4 and v0.5
+section 10 and adds its own; the Source column says which version each row is from.
+The same tables in a machine-readable
 form are in `migration_map.json`; both are written by `tests/ctp001_v2_builder.py` and
 `tests/test_ctp001_v2_fixtures.py` checks that they are what the builder writes, that
 every old form the 84 old fixtures hold is a row below, and that nothing is missing in
