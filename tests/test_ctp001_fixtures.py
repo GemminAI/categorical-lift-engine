@@ -256,7 +256,6 @@ def _r9(doc: dict[str, Any], mode: str) -> list[CheckResult]:
         doc["applicability"],
         doc["carry_evidence"],
         mode,
-        PropertyVocabulary.from_dict(doc["vocabulary"]),
     )
 
 

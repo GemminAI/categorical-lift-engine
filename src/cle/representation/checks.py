@@ -860,7 +860,8 @@ def check_r8(
 
 _R9_MODES = ("M1", "M2")
 _R9_APPLICABILITY = ("applicable", "undetermined", "not_applicable")
-_SEVERITY: dict[Status, int] = {"PASS": 0, "UNVERIFIABLE": 1, "FAIL": 2}
+_R9_STATE: dict[Status, str] = {"PASS": "P", "UNVERIFIABLE": "U", "FAIL": "L"}
+_R9Finding = tuple[Status, str, Location, tuple[tuple[str, str | None], ...]]
 
 # (declared, evidence) -> (status, reason code); None = no declaration / no evidence.
 _R9_TABLE: dict[tuple[str | None, str | None], tuple[Status, str | None]] = {
@@ -909,6 +910,38 @@ def _r9_evidence(
     return out
 
 
+def _r9_results(
+    inputs: Mapping[str, Any],
+    findings: Sequence[_R9Finding],
+    warnings: Sequence[CheckWarning],
+) -> list[CheckResult]:
+    """Like `_results`, but findings that differ in ``detail`` stay apart."""
+    digest = sha256_hex(dict(inputs))
+    extra = tuple(dict.fromkeys(warnings))
+    groups: dict[tuple[Status, str, tuple[tuple[str, str | None], ...]], list[Location]]
+    groups = {}
+    for status, code, location, detail in findings:
+        locations = groups.setdefault((status, code, detail), [])
+        if location not in locations:
+            locations.append(location)
+    if not groups:
+        return [CheckResult("R9", "PASS", None, (), digest, CHECKER, extra)]
+    ordered = sorted(groups.items(), key=lambda kv: (kv[0][0] != "FAIL", kv[0][1:]))
+    return [
+        CheckResult(
+            "R9",
+            status,
+            code,
+            tuple(locations),
+            digest,
+            CHECKER,
+            extra,
+            dict(detail) if detail else None,
+        )
+        for (status, code, detail), locations in ordered
+    ]
+
+
 def check_obligation_transport(
     history: RepresentationHistory,
     stages: Sequence[str],
@@ -916,21 +949,28 @@ def check_obligation_transport(
     applicability: Mapping[str, str],
     carry_evidence: Mapping[str, Sequence[Mapping[str, Any]]] | None = None,
     mode: str = "M1",
-    vocabulary: PropertyVocabulary | None = None,
 ) -> list[CheckResult]:
-    """R9: does each obligation (a property name) survive every stage of the chain?
+    """R9: is each obligation (a property name) carried through every stage?
 
-    The declaration of a stage is read from the stage morphism's ``preserved`` /
-    ``lost`` in the history (a property in both counts as lost). Carry Evidence is
-    outside the history and is read only in mode M2; M1 judges the declarations
-    alone. The (declaration x evidence) table is v0.3 section 3. A finding is made
-    only at a stage where a property goes from fine to worse than before (the first
-    stage is compared with a fine start), so a loss that is merely carried on is not
-    reported again, and a later return to ``preserved`` removes no earlier finding.
-    Properties of ``not_applicable`` constraints are skipped; a finding on a
-    ``undetermined`` constraint carries the warning ``APPLICABILITY_UNDETERMINED``
-    without changing the status. A constraint id is the part of the property name
-    before the first dot.
+    Declaration = the stage morphism's ``preserved`` / ``lost`` (a self-report);
+    evidence = the Carry Evidence outside the history, read only in mode M2. A
+    declaration or evidence that cannot be used counts as absent and is a finding
+    of its own: ``DECLARATION_CONTRADICTORY`` (a property in both lists) and
+    ``EVIDENCE_REF_MISSING``. The v0.3 section 3 table then gives each property
+    at each stage one state: P (carried, a PASS cell), L (lost, FAIL) or U
+    (unknown, UNVERIFIABLE); before the first stage it is P. Findings are made at
+    changes of state: P->L FAIL, P->U UNVERIFIABLE, U->L FAIL (with the last stage
+    that was P, or None, in ``detail``). L->P adds the warning
+    ``OBLIGATION_RESTORED`` and no finding; L->U and U->U give none.
+
+    The vocabulary is the one the history records: its ``vocabulary_ref`` must be
+    ``SEAL_OK`` and its property names are those of the history's identity
+    morphisms (R3 requires an identity to preserve the whole vocabulary). With no
+    such vocabulary, or an obligation it does not name, the result is
+    ``VOCABULARY_UNRESOLVED``. Properties of ``not_applicable`` constraints are
+    skipped; a finding on an ``undetermined`` constraint carries the warning
+    ``APPLICABILITY_UNDETERMINED``. A constraint id is the part of the property
+    name before the first dot.
     """
     defects = history_defects(history)
     if defects:
@@ -955,63 +995,10 @@ def check_obligation_transport(
         )
         if not ok
     ]
-    if vocabulary_defects(vocabulary, hid):
-        flawed.append("vocabulary")
     if flawed:
         return _defect_results("R9", [_loc("field", hid, name) for name in flawed])
     assert evidence is not None
     idx = _Index(history)
-    known = (
-        None
-        if vocabulary is None
-        else {*vocabulary.properties, *vocabulary.information}
-    )
-    findings: list[Finding] = []
-    warnings: list[CheckWarning] = []
-    for prop in sorted(set(obligations)):
-        state = applicability.get(prop.split(".", 1)[0], "applicable")
-        if state == "not_applicable":
-            continue
-        if known is not None and prop not in known:
-            findings.append(
-                (
-                    "UNVERIFIABLE",
-                    "VOCABULARY_UNRESOLVED",
-                    _loc("field", hid, "obligations"),
-                )
-            )
-            continue
-        before = 0
-        for stage in stages:
-            morphism = idx.morphisms.get(stage)
-            declared = (
-                None
-                if morphism is None
-                else "lost"
-                if prop in morphism.lost
-                else "preserved"
-                if prop in morphism.preserved
-                else None
-            )
-            seen = evidence.get((stage, prop)) if mode == "M2" else None
-            if seen is not None and seen[1] is None:
-                # no usable reference: the evidence counts as absent (declaration
-                # only), and the missing reference is a finding of its own
-                findings.append(
-                    (
-                        "UNVERIFIABLE",
-                        "EVIDENCE_REF_MISSING",
-                        _loc("morphism", stage, prop),
-                    )
-                )
-                seen = None
-            status, code = _R9_TABLE[(declared, None if seen is None else seen[0])]
-            if _SEVERITY[status] > before:
-                where = _loc("morphism", stage, prop)
-                findings.append((status, str(code), where))
-                if state == "undetermined":
-                    warnings.append(CheckWarning("APPLICABILITY_UNDETERMINED", where))
-            before = _SEVERITY[status]
     inputs = {
         "history": history.to_dict(),
         "stages": list(stages),
@@ -1022,9 +1009,73 @@ def check_obligation_transport(
             for (stage, prop), (status, ref) in evidence.items()
         ),
         "mode": mode,
-        "vocabulary": None if vocabulary is None else vocabulary.to_dict(),
     }
-    return _results("R9", inputs, findings, tuple(dict.fromkeys(warnings)))
+    known: set[str] = set()
+    for m in idx.morphisms.values():
+        if idx.is_identity(m):
+            known.update((*m.preserved, *m.lost))
+    if history.vocabulary_ref.seal_status != "SEAL_OK" or not known:
+        findings: list[_R9Finding] = [
+            (
+                "UNVERIFIABLE",
+                "VOCABULARY_UNRESOLVED",
+                _loc("field", hid, "vocabulary_ref"),
+                (),
+            )
+        ]
+        return _r9_results(inputs, findings, [])
+    findings = []
+    warnings: list[CheckWarning] = []
+    for prop in sorted(set(obligations)):
+        state = applicability.get(prop.split(".", 1)[0], "applicable")
+        if state == "not_applicable":
+            continue
+
+        def add(
+            status: Status,
+            code: str,
+            where: Location,
+            detail: tuple[tuple[str, str | None], ...] = (),
+            prop_state: str = state,
+        ) -> None:
+            findings.append((status, code, where, detail))
+            if prop_state == "undetermined":
+                warnings.append(CheckWarning("APPLICABILITY_UNDETERMINED", where))
+
+        if prop not in known:
+            add(
+                "UNVERIFIABLE",
+                "VOCABULARY_UNRESOLVED",
+                _loc("field", hid, "obligations"),
+            )
+            continue
+        now, last_carried = "P", None
+        for stage in stages:
+            morphism = idx.morphisms.get(stage)
+            where = _loc("morphism", stage, prop)
+            declared = None
+            if morphism is not None:
+                is_lost, is_kept = prop in morphism.lost, prop in morphism.preserved
+                if is_lost and is_kept:
+                    add("UNVERIFIABLE", "DECLARATION_CONTRADICTORY", where)
+                else:
+                    declared = "lost" if is_lost else "preserved" if is_kept else None
+            seen = evidence.get((stage, prop)) if mode == "M2" else None
+            if seen is not None and seen[1] is None:
+                add("UNVERIFIABLE", "EVIDENCE_REF_MISSING", where)
+                seen = None
+            status, code = _R9_TABLE[(declared, None if seen is None else seen[0])]
+            new = _R9_STATE[status]
+            if now == "P" and new != "P":
+                add(status, str(code), where)
+            elif now == "U" and new == "L":
+                add(status, str(code), where, (("last_known_preserved", last_carried),))
+            elif now == "L" and new == "P":
+                warnings.append(CheckWarning("OBLIGATION_RESTORED", where))
+            if new == "P":
+                last_carried = stage
+            now = new
+    return _r9_results(inputs, findings, warnings)
 
 
 def verify_history(

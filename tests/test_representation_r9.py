@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, Literal
 
 import pytest
 
 from cle.representation import (
     CheckResult,
-    PropertyVocabulary,
     Ref,
     RepresentationHistory,
     RepresentationMorphism,
@@ -21,25 +20,41 @@ from cle.representation import (
 P = "c1.condition"
 STAGES = ["f1", "f2", "f3"]
 RANK = {"PASS": 0, "UNVERIFIABLE": 1, "FAIL": 2}
+FINE = {"f1": "preserved", "f2": "preserved", "f3": "preserved"}
+LOST = {"f1": "lost", "f2": "lost", "f3": "lost"}
 
 
-def history(declared: Mapping[str, str | None]) -> RepresentationHistory:
-    """Three stages; ``declared[stage]`` is "preserved", "lost" or None (silent)."""
+def history(
+    declared: Mapping[str, str | None],
+    *,
+    both: tuple[str, ...] = (),
+    identity: bool = True,
+    seal: Literal["SEAL_OK", "SEAL_FAIL"] | None = "SEAL_OK",
+) -> RepresentationHistory:
+    """Three stages. ``declared[stage]``: "preserved", "lost" or None (silent);
+    ``both`` lists the stages that list the property in both ``preserved`` and ``lost``.
+    The identity on K names the vocabulary (``P`` and ``c1.modality``)."""
     states = tuple(RepresentationState(s, "h", "k", s) for s in "KXYZ")
     ends = {"f1": ("K", "X"), "f2": ("X", "Y"), "f3": ("Y", "Z")}
-    morphisms = tuple(
+    morphisms = [
         RepresentationMorphism(
             stage,
             ends[stage][0],
             ends[stage][1],
             "generator",
-            preserved=(P,) if declared[stage] == "preserved" else (),
-            lost=(P,) if declared[stage] == "lost" else (),
+            preserved=(P,) if declared[stage] == "preserved" or stage in both else (),
+            lost=(P,) if declared[stage] == "lost" or stage in both else (),
         )
         for stage in STAGES
-    )
+    ]
+    if identity:
+        morphisms.append(
+            RepresentationMorphism(
+                "iK", "K", "K", "identity", preserved=(P, "c1.modality")
+            )
+        )
     return RepresentationHistory(
-        "h", "t", Ref("hext", "v", seal_status="SEAL_OK"), states, morphisms, ()
+        "h", "t", Ref("hext", "v", seal_status=seal), states, tuple(morphisms), ()
     ).seal()
 
 
@@ -62,17 +77,18 @@ def run(
     declared: Mapping[str, str | None],
     ev: Any = None,
     mode: str = "M1",
-    applicability: dict[str, str] | None = None,
+    applicability: Mapping[str, str] | None = None,
+    *,
+    h: RepresentationHistory | None = None,
     **kw: Any,
 ) -> list[CheckResult]:
     return check_obligation_transport(
-        history(declared),
+        h or history(declared),
         kw.pop("stages", STAGES),
         kw.pop("obligations", [P]),
         applicability or {"c1": "applicable"},
         ev,
         mode,
-        **kw,
     )
 
 
@@ -85,11 +101,14 @@ def codes(results: list[CheckResult]) -> list[str]:
 
 
 def places(results: list[CheckResult]) -> list[str]:
-    return [loc.id for r in results for loc in r.locations]
+    return sorted(loc.id for r in results for loc in r.locations)
+
+
+def warns(results: list[CheckResult]) -> list[tuple[str, str]]:
+    return [(w.reason_code, w.location.id) for r in results for w in r.warnings]
 
 
 # The nine cells of v0.3 section 3, one stage (f1) with the others fine.
-OK = {"f2": "preserved", "f3": "preserved"}
 CELLS = [
     ("lost", "lost", "FAIL", "OBLIGATION_LOST_BY_EVIDENCE"),
     ("preserved", "lost", "FAIL", "PRESERVED_CONTRADICTED_BY_EVIDENCE"),
@@ -107,131 +126,209 @@ CELLS = [
 def test_the_nine_cells_in_m2(
     decl: str | None, ev: str | None, status: str, code: str | None
 ) -> None:
-    ev_doc = (
-        evidence(f1=ev, f2="preserved", f3="preserved")
-        if ev
-        else evidence(f2="preserved", f3="preserved")
-    )
-    results = run({"f1": decl, "f2": "preserved", "f3": "preserved"}, ev_doc, "M2")
+    rest = {"f2": "preserved", "f3": "preserved"}
+    doc = evidence(f1=ev, **rest) if ev else evidence(**rest)
+    results = run({"f1": decl, **rest}, doc, "M2")
     assert worst(results) == status
     assert codes(results) == ([code] if code else [])
     assert places(results) == (["f1"] if code else [])
 
 
-@pytest.mark.parametrize(("decl", "ev", "status", "code"), CELLS)
-def test_m1_ignores_the_evidence(
-    decl: str | None, ev: str | None, status: str, code: str | None
-) -> None:
-    ev_doc = evidence(f1="lost", f2="lost", f3="lost")
-    m1 = run({"f1": decl, "f2": "preserved", "f3": "preserved"}, ev_doc, "M1")
-    no_evidence = {"lost": "FAIL", "preserved": "PASS", None: "UNVERIFIABLE"}
-    assert worst(m1) == no_evidence[decl]
-    if decl is None:
-        assert codes(m1) == ["OBLIGATION_CARRY_MISSING"]
+@pytest.mark.parametrize("decl", ["lost", "preserved", None])
+def test_m1_ignores_the_evidence(decl: str | None) -> None:
+    rest = {"f2": "preserved", "f3": "preserved"}
+    m1 = run({"f1": decl, **rest}, evidence(f1="lost", f2="lost", f3="lost"), "M1")
+    assert (
+        worst(m1) == {"lost": "FAIL", "preserved": "PASS", None: "UNVERIFIABLE"}[decl]
+    )
 
 
-def test_a_loss_carried_on_is_reported_once_at_the_first_stage() -> None:
+# --- the state changes of section 5 -------------------------------------------
+
+
+def test_p_to_l_is_a_fail_at_that_stage_and_a_loss_carried_on_is_silent() -> None:
     results = run({"f1": "preserved", "f2": "lost", "f3": "lost"})
+    assert [(r.status, r.reason_code) for r in results] == [
+        ("FAIL", "OBLIGATION_DECLARED_LOST")
+    ]
+    assert places(results) == ["f2"]
+    assert results[0].detail is None
+
+
+def test_p_to_u_is_unverifiable_at_that_stage_and_u_to_u_is_silent() -> None:
+    results = run({"f1": "preserved", "f2": None, "f3": None})
+    assert [(r.status, r.reason_code) for r in results] == [
+        ("UNVERIFIABLE", "OBLIGATION_CARRY_MISSING")
+    ]
     assert places(results) == ["f2"]
 
 
-def test_a_return_to_preserved_keeps_the_fail_and_a_new_drop_is_reported() -> None:
+def test_u_to_l_is_a_fail_with_the_last_known_preserved_stage() -> None:
+    results = run({"f1": "preserved", "f2": None, "f3": "lost"})
+    fail = [r for r in results if r.status == "FAIL"]
+    assert [r.reason_code for r in fail] == ["OBLIGATION_DECLARED_LOST"]
+    assert places(fail) == ["f3"]
+    assert fail[0].detail == {"last_known_preserved": "f1"}
+    assert worst(results) == "FAIL"
+    assert fail[0].to_dict()["detail"] == {"last_known_preserved": "f1"}
+
+
+def test_u_to_l_from_the_start_has_no_last_known_preserved() -> None:
+    results = run({"f1": None, "f2": "lost", "f3": "lost"})
+    fail = [r for r in results if r.status == "FAIL"]
+    assert fail[0].detail == {"last_known_preserved": None}
+    assert fail[0].to_dict()["detail"] == {"last_known_preserved": None}
+    assert places(fail) == ["f2"]
+
+
+def test_l_to_p_keeps_the_fail_and_warns_without_a_new_finding() -> None:
+    results = run({"f1": "lost", "f2": "preserved", "f3": "preserved"})
+    assert [(r.status, r.reason_code) for r in results] == [
+        ("FAIL", "OBLIGATION_DECLARED_LOST")
+    ]
+    assert places(results) == ["f1"]
+    assert warns(results) == [("OBLIGATION_RESTORED", "f2")]
+    assert "detail" not in results[0].to_dict()
+
+
+def test_a_drop_after_a_restoration_is_a_new_fail() -> None:
     results = run({"f1": "lost", "f2": "preserved", "f3": "lost"})
-    assert worst(results) == "FAIL"
-    assert sorted(places(results)) == ["f1", "f3"]
-    assert worst(run({"f1": "lost", "f2": "preserved", "f3": "preserved"})) == "FAIL"
+    assert places(results) == ["f1", "f3"]
 
 
-def test_unverifiable_then_fail_is_reported_again() -> None:
-    ev = evidence(f1="preserved", f2="lost", f3="lost")
-    results = run({"f1": "lost", "f2": "lost", "f3": "lost"}, ev, "M2")
-    assert worst(results) == "FAIL"
-    assert sorted(places(results)) == ["f1", "f2"]
+def test_l_to_u_gives_no_finding() -> None:
+    results = run({"f1": "lost", "f2": None, "f3": None})
+    assert [(r.status, r.reason_code) for r in results] == [
+        ("FAIL", "OBLIGATION_DECLARED_LOST")
+    ]
+    assert places(results) == ["f1"]
 
 
 def test_all_findings_are_given_and_the_value_is_the_worst() -> None:
     results = run(
-        {"f1": "lost", "f2": None, "f3": None},
-        obligations=[P, "c1.modality"],
+        {"f1": "lost", "f2": None, "f3": None}, obligations=[P, "c1.modality"]
     )
     assert worst(results) == "FAIL"
     assert [r.status for r in results] == ["FAIL", "UNVERIFIABLE"]
 
 
-def test_missing_evidence_ref_counts_as_no_evidence_and_is_a_finding() -> None:
+# --- unusable declarations and evidence ---------------------------------------
+
+
+def test_a_contradictory_declaration_is_absent_and_a_finding() -> None:
+    results = run(FINE, h=history(FINE, both=("f2",)))
+    assert sorted((r.status, r.reason_code) for r in results) == [
+        ("UNVERIFIABLE", "DECLARATION_CONTRADICTORY"),
+        ("UNVERIFIABLE", "OBLIGATION_CARRY_MISSING"),
+    ]
+    assert places(results) == ["f2", "f2"]
+    assert worst(results) == "UNVERIFIABLE"  # not counted as lost
+
+
+def test_a_contradictory_declaration_with_evidence_uses_the_evidence() -> None:
+    h = history(FINE, both=("f1",))
+    kept = run(FINE, evidence(f1="preserved"), "M2", h=h)
+    assert codes(kept) == ["DECLARATION_CONTRADICTORY"]
+    dropped = run(FINE, evidence(f1="lost"), "M2", h=h)
+    assert codes(dropped) == [
+        "DECLARATION_CONTRADICTORY",
+        "OBLIGATION_LOST_BY_EVIDENCE",
+    ]
+    assert worst(dropped) == "FAIL"
+
+
+def test_missing_evidence_ref_makes_the_evidence_absent_and_is_a_finding() -> None:
     ev = evidence(f1="preserved")
     ev["f1"][0]["evidence_ref"] = ""
-    lost = run({"f1": "lost", "f2": "preserved", "f3": "preserved"}, ev, "M2")
+    lost = run({**FINE, "f1": "lost"}, ev, "M2")
     assert worst(lost) == "FAIL"
     assert codes(lost) == ["EVIDENCE_REF_MISSING", "OBLIGATION_DECLARED_LOST"]
-    assert sorted(r.status for r in lost) == ["FAIL", "UNVERIFIABLE"]
-    kept = run({"f1": "preserved", "f2": "preserved", "f3": "preserved"}, ev, "M2")
+    kept = run(FINE, ev, "M2")
     assert worst(kept) == "UNVERIFIABLE"
     assert codes(kept) == ["EVIDENCE_REF_MISSING"]
     assert places(kept) == ["f1"]
 
 
+def test_a_stage_listed_twice_does_not_repeat_a_location() -> None:
+    ev = evidence(f1="preserved")
+    ev["f1"][0]["evidence_ref"] = ""
+    results = run(FINE, ev, "M2", stages=["f1", "f1"])
+    assert places(results) == ["f1"]
+
+
+def test_evidence_that_is_not_basis_evidence_is_ignored() -> None:
+    ev = evidence(f1="lost")
+    ev["f1"][0]["basis"] = "declared"
+    assert worst(run(FINE, ev, "M2")) == "PASS"
+
+
+# --- applicability ------------------------------------------------------------
+
+
 def test_not_applicable_is_skipped_and_undetermined_is_annotated() -> None:
-    lost = {"f1": "lost", "f2": "lost", "f3": "lost"}
-    skipped = run(lost, applicability={"c1": "not_applicable"})
-    assert worst(skipped) == "PASS"
-    marked = run(lost, applicability={"c1": "undetermined"})
+    assert worst(run(LOST, applicability={"c1": "not_applicable"})) == "PASS"
+    marked = run(LOST, applicability={"c1": "undetermined"})
     assert worst(marked) == "FAIL"
-    assert [w.reason_code for r in marked for w in r.warnings] == [
-        "APPLICABILITY_UNDETERMINED"
-    ]
-    quiet = run(
-        {"f1": "preserved", "f2": "preserved", "f3": "preserved"},
-        applicability={"c1": "undetermined"},
-    )
+    assert warns(marked) == [("APPLICABILITY_UNDETERMINED", "f1")]
+    quiet = run(FINE, applicability={"c1": "undetermined"})
     assert worst(quiet) == "PASS"
     assert not any(r.warnings for r in quiet)
 
 
+def test_the_note_goes_only_with_findings_on_the_undetermined_constraint() -> None:
+    h = history(LOST)
+    results = check_obligation_transport(
+        h,
+        STAGES,
+        [P, "c2.scope"],
+        {"c1": "undetermined", "c2": "applicable"},
+    )
+    # c2.scope is not in the vocabulary: its finding is not annotated
+    assert "VOCABULARY_UNRESOLVED" in codes(results)
+    assert set(warns(results)) == {("APPLICABILITY_UNDETERMINED", "f1")}
+
+
 def test_a_constraint_missing_from_applicability_counts_as_applicable() -> None:
-    results = run({"f1": "lost", "f2": "lost", "f3": "lost"}, applicability={})
-    assert worst(results) == "FAIL"
+    assert worst(run(LOST, applicability={})) == "FAIL"
 
 
 def test_a_stage_that_is_not_in_the_history_has_no_declaration() -> None:
-    results = run(
-        {"f1": "preserved", "f2": "preserved", "f3": "preserved"}, stages=["f1", "nope"]
-    )
+    results = run(FINE, stages=["f1", "nope"])
     assert codes(results) == ["OBLIGATION_CARRY_MISSING"]
     assert places(results) == ["nope"]
 
 
-def test_a_property_both_preserved_and_lost_counts_as_lost() -> None:
-    h = history({"f1": "lost", "f2": "preserved", "f3": "preserved"})
-    both = RepresentationMorphism(
-        "f1", "K", "X", "generator", preserved=(P,), lost=(P,)
-    )
-    h = RepresentationHistory(
-        h.history_id,
-        h.task_ref,
-        h.vocabulary_ref,
-        h.states,
-        (both, *h.morphisms[1:]),
-        (),
-    )
-    results = check_obligation_transport(h, STAGES, [P], {"c1": "applicable"})
-    assert codes(results) == ["OBLIGATION_DECLARED_LOST"]
+# --- the history's vocabulary -------------------------------------------------
 
 
-def vocab(*props: str) -> PropertyVocabulary:
-    return PropertyVocabulary(
-        "v", "1", "t", props, (), Ref("hext", "v", seal_status="SEAL_OK")
-    )
+def test_an_obligation_the_history_vocabulary_does_not_name_is_unresolved() -> None:
+    results = run(FINE, obligations=["c1.unknown"])
+    assert [(r.status, r.reason_code) for r in results] == [
+        ("UNVERIFIABLE", "VOCABULARY_UNRESOLVED")
+    ]
+    assert worst(run(FINE)) == "PASS"
 
 
-def test_vocabulary_unresolved() -> None:
-    fine = {"f1": "preserved", "f2": "preserved", "f3": "preserved"}
-    results = run(fine, vocabulary=vocab("c1.modality"))
-    assert codes(results) == ["VOCABULARY_UNRESOLVED"]
-    assert worst(run(fine, vocabulary=vocab(P))) == "PASS"
+@pytest.mark.parametrize(
+    "h",
+    [
+        history(FINE, identity=False),
+        history(FINE, seal=None),
+        history(FINE, seal="SEAL_FAIL"),
+    ],
+    ids=["no-identity", "seal-missing", "seal-failed"],
+)
+def test_no_usable_history_vocabulary_is_unresolved_never_skipped(
+    h: RepresentationHistory,
+) -> None:
+    for obligations in ([P], []):
+        results = run(FINE, h=h, obligations=obligations)
+        assert [(r.status, r.reason_code) for r in results] == [
+            ("UNVERIFIABLE", "VOCABULARY_UNRESOLVED")
+        ]
 
 
-FINE = {"f1": "preserved", "f2": "preserved", "f3": "preserved"}
+# --- defects, scope, determinism ----------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -251,24 +348,18 @@ FINE = {"f1": "preserved", "f2": "preserved", "f3": "preserved"}
         ({"ev": {"f1": [{"property": 1, "status": "lost"}]}}, "carry_evidence"),
         ({"ev": {"f1": [{"property": P, "status": "maybe"}]}}, "carry_evidence"),
         ({"mode": "M3"}, "mode"),
-        ({"vocabulary": "x"}, "vocabulary"),
     ],
 )
 def test_defective_inputs_are_results_not_exceptions(
     kw: dict[str, Any], field: str
 ) -> None:
-    ev = kw.pop("ev", None)
-    mode = kw.pop("mode", "M1")
-    applicability = kw.pop("applicability", None)
-    h = history(FINE)
     results = check_obligation_transport(
-        h,
+        history(FINE),
         kw.get("stages", STAGES),
         kw.get("obligations", [P]),
-        applicability if applicability is not None else {"c1": "applicable"},
-        ev,
-        mode,
-        kw.get("vocabulary"),
+        kw.get("applicability", {"c1": "applicable"}),
+        kw.get("ev"),
+        kw.get("mode", "M1"),
     )
     assert [(r.status, r.reason_code) for r in results] == [
         ("FAIL", "INPUT_TYPE_INVALID")
@@ -283,12 +374,6 @@ def test_a_defective_history_is_a_result() -> None:
     ]
 
 
-def test_evidence_that_is_not_basis_evidence_is_ignored() -> None:
-    ev = evidence(f1="lost")
-    ev["f1"][0]["basis"] = "declared"
-    assert worst(run(FINE, ev, "M2")) == "PASS"
-
-
 def test_r9_is_not_in_verify_history_and_the_history_is_untouched() -> None:
     h = history(FINE)
     before = h.to_dict()
@@ -298,6 +383,6 @@ def test_r9_is_not_in_verify_history_and_the_history_is_untouched() -> None:
 
 
 def test_the_result_is_deterministic() -> None:
-    a = run({"f1": "lost", "f2": "lost", "f3": "lost"}, evidence(f1="lost"), "M2")
-    b = run({"f1": "lost", "f2": "lost", "f3": "lost"}, evidence(f1="lost"), "M2")
+    a = run(LOST, evidence(f1="lost"), "M2")
+    b = run(LOST, evidence(f1="lost"), "M2")
     assert [r.to_dict() for r in a] == [r.to_dict() for r in b]

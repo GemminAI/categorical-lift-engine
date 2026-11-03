@@ -174,33 +174,40 @@ def carry_evidence(t: ConstraintType, ex: Example) -> dict[str, list[dict[str, s
 
 def derive_r9(t: ConstraintType, ex: Example, *, with_evidence: bool) -> dict[str, Any]:
     """The v0.3 section 3 table applied to the fixture's declared/evidence statuses."""
-    findings: list[tuple[str, str, str]] = []  # (stage, status, code)
+    findings: list[tuple[str, str, str, str]] = []  # (stage, status, code, property)
     for p in _obligations(t, ex):
         for i, stage in enumerate(STAGES):
             declared_lost = p not in _declared(ex)[i]
             if not with_evidence:
                 if declared_lost:
-                    findings.append((stage, "FAIL", "OBLIGATION_DECLARED_LOST"))
+                    findings.append((stage, "FAIL", "OBLIGATION_DECLARED_LOST", p))
                 continue
             evidence_lost = p not in ex.present[i]
             if declared_lost and evidence_lost:
-                findings.append((stage, "FAIL", "OBLIGATION_LOST_BY_EVIDENCE"))
+                findings.append((stage, "FAIL", "OBLIGATION_LOST_BY_EVIDENCE", p))
             elif evidence_lost:
-                findings.append((stage, "FAIL", "PRESERVED_CONTRADICTED_BY_EVIDENCE"))
+                findings.append(
+                    (stage, "FAIL", "PRESERVED_CONTRADICTED_BY_EVIDENCE", p)
+                )
             elif declared_lost:
                 findings.append(
-                    (stage, "UNVERIFIABLE", "DECLARED_LOST_CONTRADICTED_BY_EVIDENCE")
+                    (
+                        stage,
+                        "UNVERIFIABLE",
+                        "DECLARED_LOST_CONTRADICTED_BY_EVIDENCE",
+                        p,
+                    )
                 )
-    value = _worst([status for _, status, _ in findings])
-    first = min((STAGES.index(s) for s, _, _ in findings), default=None)
-    undetermined = "undetermined" in _applicability(t, ex).values()
+    value = _worst([status for _, status, _, _ in findings])
+    first = min((STAGES.index(s) for s, _, _, _ in findings), default=None)
+    app = _applicability(t, ex)
+    # the note goes only with findings on an `undetermined` constraint
+    undetermined = any(app[p.split(".")[0]] == "undetermined" for *_, p in findings)
     return {
         "value": value,
-        "reason_codes": sorted({code for _, _, code in findings}),
+        "reason_codes": sorted({code for _, _, code, _ in findings}),
         "locations": [] if first is None else [STAGES[first]],
-        "annotations": (
-            ["APPLICABILITY_UNDETERMINED"] if value != "PASS" and undetermined else []
-        ),
+        "annotations": ["APPLICABILITY_UNDETERMINED"] if undetermined else [],
     }
 
 

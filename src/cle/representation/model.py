@@ -473,6 +473,9 @@ class CheckResult:
     inputs_sha256: str
     checker: CheckerInfo
     warnings: tuple[CheckWarning, ...] = ()
+    detail: Mapping[str, str | None] | None = (
+        None  # R9 only; absent from to_dict if None
+    )
 
     def __post_init__(self) -> None:
         _require(self.rule, get_args(RuleId), "CheckResult.rule")
@@ -486,7 +489,7 @@ class CheckResult:
             )
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        out: dict[str, Any] = {
             "rule": self.rule,
             "status": self.status,
             "reason_code": self.reason_code,
@@ -495,6 +498,9 @@ class CheckResult:
             "checker": self.checker.to_dict(),
             "warnings": [w.to_dict() for w in self.warnings],
         }
+        if self.detail is not None:
+            out["detail"] = dict(self.detail)
+        return out
 
 
 def aggregate(results: Sequence[CheckResult]) -> Status:
