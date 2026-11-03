@@ -9,6 +9,7 @@ from __future__ import annotations
 from cle.representation.canonical import canonical_json, sha256_hex
 from cle.representation.checks import (
     CHECKER,
+    check_obligation_transport,
     check_r1,
     check_r2,
     check_r3,
@@ -58,6 +59,7 @@ __all__ = [
     "Span",
     "aggregate",
     "canonical_json",
+    "check_obligation_transport",
     "check_r1",
     "check_r2",
     "check_r3",

@@ -23,6 +23,7 @@ from cle.representation import (
     CheckResult,
     PropertyVocabulary,
     RepresentationHistory,
+    check_obligation_transport,
     check_r1,
     check_r2,
     check_r3,
@@ -247,10 +248,40 @@ def test_expectations_equal_the_design_table(cid: str, name: str) -> None:
         assert expected["r9"]["m1"]["annotations"] == ["APPLICABILITY_UNDETERMINED"]
 
 
-@pytest.mark.skip(reason="R9 と Verifier は Stage C")
+def _r9(doc: dict[str, Any], mode: str) -> list[CheckResult]:
+    return check_obligation_transport(
+        RepresentationHistory.from_dict(doc["history"]),
+        doc["chain"],
+        doc["obligations"],
+        doc["applicability"],
+        doc["carry_evidence"],
+        mode,
+        PropertyVocabulary.from_dict(doc["vocabulary"]),
+    )
+
+
+@pytest.mark.parametrize("mode", ["m1", "m2"])
 @pytest.mark.parametrize("path", FILES, ids=lambda p: p.stem)
-def test_r9_compliance_and_two_axis_content(path: Path) -> None:
-    raise AssertionError("checked once R9 and the Constraint Verifier exist")
+def test_r9_matches_expected(path: Path, mode: str) -> None:
+    doc = _load(path)
+    results = _r9(doc, mode.upper())
+    expected = doc["expected"]["r9"][mode]
+    assert _worst(results) == expected["value"]
+    assert sorted({r.reason_code for r in results if r.reason_code}) == sorted(
+        expected["reason_codes"]
+    )
+    stages = {loc.id for r in results for loc in r.locations}
+    assert [s for s in STAGES if s in stages] == expected["locations"]
+    assert stages <= set(STAGES)
+    assert sorted({w.reason_code for r in results for w in r.warnings}) == sorted(
+        expected["annotations"]
+    )
+
+
+@pytest.mark.skip(reason="the Constraint Verifier and the two-axis step are Stage C")
+@pytest.mark.parametrize("path", FILES, ids=lambda p: p.stem)
+def test_compliance_and_two_axis_content(path: Path) -> None:
+    raise AssertionError("checked once the Constraint Verifier exists")
 
 
 # --- determinism across processes ---------------------------------------------

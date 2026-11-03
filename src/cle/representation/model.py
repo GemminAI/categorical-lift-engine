@@ -29,7 +29,7 @@ Verification = Literal["UNVERIFIED", "VERIFIED", "REFUTED"]
 Claim = Literal["invertible", "not_invertible", "unknown"]
 Basis = Literal["declared", "recomputed"]
 Status = Literal["PASS", "FAIL", "UNVERIFIABLE"]
-RuleId = Literal["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"]
+RuleId = Literal["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9"]
 LocationKind = Literal["state", "morphism", "composition", "field"]
 
 

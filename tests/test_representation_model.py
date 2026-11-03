@@ -177,7 +177,7 @@ def test_pass_carries_no_code_and_rule_status_are_checked() -> None:
     with pytest.raises(RepresentationError):
         _result("MAYBE", None, ())
     with pytest.raises(RepresentationError):
-        CheckResult("R9", "PASS", None, (), "0", CHK)  # type: ignore[arg-type]
+        CheckResult("R10", "PASS", None, (), "0", CHK)  # type: ignore[arg-type]
 
 
 def test_check_result_to_dict() -> None:

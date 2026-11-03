@@ -13,9 +13,9 @@ choice is listed in ``docs/representation_ambiguities.md``.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import replace
-from typing import Any
+from typing import Any, cast
 
 from cle.representation.canonical import sha256_hex
 from cle.representation.model import (
@@ -854,6 +854,179 @@ def check_r8(
 # --------------------------------------------------------------------------
 
 
+# --------------------------------------------------------------------------
+# R9  obligation transport (EXP-RAG-CTP001 v0.3 sections 3 and 5)
+# --------------------------------------------------------------------------
+
+_R9_MODES = ("M1", "M2")
+_R9_APPLICABILITY = ("applicable", "undetermined", "not_applicable")
+_SEVERITY: dict[Status, int] = {"PASS": 0, "UNVERIFIABLE": 1, "FAIL": 2}
+
+# (declared, evidence) -> (status, reason code); None = no declaration / no evidence.
+_R9_TABLE: dict[tuple[str | None, str | None], tuple[Status, str | None]] = {
+    ("lost", "lost"): ("FAIL", "OBLIGATION_LOST_BY_EVIDENCE"),
+    ("preserved", "lost"): ("FAIL", "PRESERVED_CONTRADICTED_BY_EVIDENCE"),
+    ("lost", "preserved"): ("UNVERIFIABLE", "DECLARED_LOST_CONTRADICTED_BY_EVIDENCE"),
+    ("preserved", "preserved"): ("PASS", None),
+    ("lost", None): ("FAIL", "OBLIGATION_DECLARED_LOST"),
+    ("preserved", None): ("PASS", None),
+    (None, "lost"): ("FAIL", "OBLIGATION_LOST_BY_EVIDENCE"),
+    (None, "preserved"): ("PASS", None),
+    (None, None): ("UNVERIFIABLE", "OBLIGATION_CARRY_MISSING"),
+}
+
+
+def _strings(value: Any, kinds: tuple[type, ...]) -> bool:
+    if not isinstance(value, kinds):
+        return False
+    return all(isinstance(x, str) for x in cast(Collection[Any], value))
+
+
+def _r9_evidence(
+    evidence: Any,
+) -> dict[tuple[str, str], tuple[str, str | None]] | None:
+    """Carry Evidence as (stage, property) -> (status, ref); None if malformed."""
+    if evidence is None:
+        return {}
+    if not isinstance(evidence, Mapping):
+        return None
+    out: dict[tuple[str, str], tuple[str, str | None]] = {}
+    for stage, entries in evidence.items():
+        if not isinstance(stage, str) or not isinstance(entries, (list, tuple)):
+            return None
+        for entry in entries:
+            if not isinstance(entry, Mapping):
+                return None
+            prop, status = entry.get("property"), entry.get("status")
+            if not isinstance(prop, str) or status not in ("preserved", "lost"):
+                return None
+            ref = entry.get("evidence_ref")
+            if entry.get("basis") == "evidence":
+                out.setdefault(
+                    (stage, prop),
+                    (status, ref if isinstance(ref, str) and ref else None),
+                )
+    return out
+
+
+def check_obligation_transport(
+    history: RepresentationHistory,
+    stages: Sequence[str],
+    obligations: Collection[str],
+    applicability: Mapping[str, str],
+    carry_evidence: Mapping[str, Sequence[Mapping[str, Any]]] | None = None,
+    mode: str = "M1",
+    vocabulary: PropertyVocabulary | None = None,
+) -> list[CheckResult]:
+    """R9: does each obligation (a property name) survive every stage of the chain?
+
+    The declaration of a stage is read from the stage morphism's ``preserved`` /
+    ``lost`` in the history (a property in both counts as lost). Carry Evidence is
+    outside the history and is read only in mode M2; M1 judges the declarations
+    alone. The (declaration x evidence) table is v0.3 section 3. A finding is made
+    only at a stage where a property goes from fine to worse than before (the first
+    stage is compared with a fine start), so a loss that is merely carried on is not
+    reported again, and a later return to ``preserved`` removes no earlier finding.
+    Properties of ``not_applicable`` constraints are skipped; a finding on a
+    ``undetermined`` constraint carries the warning ``APPLICABILITY_UNDETERMINED``
+    without changing the status. A constraint id is the part of the property name
+    before the first dot.
+    """
+    defects = history_defects(history)
+    if defects:
+        return _defect_results("R9", defects)
+    hid = str(history.history_id)
+    evidence = _r9_evidence(carry_evidence)
+    flawed = [
+        name
+        for name, ok in (
+            ("stages", _strings(stages, (list, tuple))),
+            ("obligations", _strings(obligations, (list, tuple, set, frozenset))),
+            (
+                "applicability",
+                isinstance(applicability, Mapping)
+                and all(
+                    isinstance(k, str) and v in _R9_APPLICABILITY
+                    for k, v in applicability.items()
+                ),
+            ),
+            ("carry_evidence", evidence is not None),
+            ("mode", mode in _R9_MODES),
+        )
+        if not ok
+    ]
+    if vocabulary_defects(vocabulary, hid):
+        flawed.append("vocabulary")
+    if flawed:
+        return _defect_results("R9", [_loc("field", hid, name) for name in flawed])
+    assert evidence is not None
+    idx = _Index(history)
+    known = (
+        None
+        if vocabulary is None
+        else {*vocabulary.properties, *vocabulary.information}
+    )
+    findings: list[Finding] = []
+    warnings: list[CheckWarning] = []
+    for prop in sorted(set(obligations)):
+        state = applicability.get(prop.split(".", 1)[0], "applicable")
+        if state == "not_applicable":
+            continue
+        if known is not None and prop not in known:
+            findings.append(
+                (
+                    "UNVERIFIABLE",
+                    "VOCABULARY_UNRESOLVED",
+                    _loc("field", hid, "obligations"),
+                )
+            )
+            continue
+        before = 0
+        for stage in stages:
+            morphism = idx.morphisms.get(stage)
+            declared = (
+                None
+                if morphism is None
+                else "lost"
+                if prop in morphism.lost
+                else "preserved"
+                if prop in morphism.preserved
+                else None
+            )
+            seen = evidence.get((stage, prop)) if mode == "M2" else None
+            if seen is not None and seen[1] is None:
+                # no usable reference: the evidence counts as absent (declaration
+                # only), and the missing reference is a finding of its own
+                findings.append(
+                    (
+                        "UNVERIFIABLE",
+                        "EVIDENCE_REF_MISSING",
+                        _loc("morphism", stage, prop),
+                    )
+                )
+                seen = None
+            status, code = _R9_TABLE[(declared, None if seen is None else seen[0])]
+            if _SEVERITY[status] > before:
+                where = _loc("morphism", stage, prop)
+                findings.append((status, str(code), where))
+                if state == "undetermined":
+                    warnings.append(CheckWarning("APPLICABILITY_UNDETERMINED", where))
+            before = _SEVERITY[status]
+    inputs = {
+        "history": history.to_dict(),
+        "stages": list(stages),
+        "obligations": sorted(set(obligations)),
+        "applicability": dict(applicability),
+        "carry_evidence": sorted(
+            [stage, prop, status, ref]
+            for (stage, prop), (status, ref) in evidence.items()
+        ),
+        "mode": mode,
+        "vocabulary": None if vocabulary is None else vocabulary.to_dict(),
+    }
+    return _results("R9", inputs, findings, tuple(dict.fromkeys(warnings)))
+
+
 def verify_history(
     history: RepresentationHistory,
     *,
@@ -861,7 +1034,8 @@ def verify_history(
     eligibility: Mapping[str, bool] | None = None,
     previous: RepresentationHistory | None = None,
 ) -> list[CheckResult]:
-    """R1-R7 over one history (R8 needs two histories: call `check_r8`)."""
+    """R1-R7 over one history (R8 needs two histories: call `check_r8`; R9 has its
+    own inputs: call `check_obligation_transport`)."""
     return [
         *check_r1(history),
         *check_r2(history),

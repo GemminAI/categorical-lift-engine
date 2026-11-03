@@ -4,6 +4,7 @@ Fixed by CLE v0.4 ("FAIL の理由コード: A の名前を、docs の一覧に�
 (`tests/test_representation_docs.py` compares it with the strings in `checks.py`); the descriptions are one line each.
 UNVERIFIABLE reason codes are those of CLE v0.3 section 3 (plus `MORPHISM_UNRESOLVED`, see
 `representation_ambiguities.md` #10). Warnings (not statuses) use `MAP_EXTRA_ENTRY` (R8, v0.4 D-14).
+R9 (`check_obligation_transport`, not part of `verify_history`) also gives the UNVERIFIABLE codes `DECLARED_LOST_CONTRADICTED_BY_EVIDENCE`, `OBLIGATION_CARRY_MISSING`, `EVIDENCE_REF_MISSING` and the existing `VOCABULARY_UNRESOLVED`, and the warning `APPLICABILITY_UNDETERMINED`.
 
 | code | meaning |
 |---|---|
@@ -27,6 +28,9 @@ UNVERIFIABLE reason codes are those of CLE v0.3 section 3 (plus `MORPHISM_UNRESO
 | `INVERSE_NOT_IDENTITY` | R4: a composition of a morphism with its claimed inverse is not an identity. |
 | `INVERTIBLE_WITH_LOSS` | R4: a morphism claimed invertible has a non-empty `lost`. |
 | `LOST_NOT_PROPAGATED` | R3: `lost` of a composite lacks what was lost along the way. |
+| `OBLIGATION_DECLARED_LOST` | R9 (M1, or M2 with no evidence): a stage declares an obligation property `lost`; location = the stage where it first drops (EXP-RAG-CTP001 v0.3 section 3). |
+| `OBLIGATION_LOST_BY_EVIDENCE` | R9 (M2): the evidence says the property is lost (declared `lost`, or no declaration). |
+| `PRESERVED_CONTRADICTED_BY_EVIDENCE` | R9 (M2): a stage declares the property `preserved` but the evidence says `lost`. |
 | `PRESERVED_NOT_CARRIED` | R3: a composite claims a property preserved that the steps do not carry through. |
 | `RULE_SEAL_FAILED` | R5: the rule reference of a VERIFIED morphism has `SEAL_FAIL`. |
 | `SPAN_ON_INELIGIBLE` | R7: a state has a span in a session reported ineligible. |
