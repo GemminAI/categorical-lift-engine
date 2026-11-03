@@ -1,0 +1,36 @@
+{
+  "spec": "Constraint Schema 仕様 v0.4 section 6.1",
+  "rule": "L if any component is L, else U if any is U, else P",
+  "threshold_components": ["quantity", "value", "unit", "comparator"],
+  "vectors": [
+    {"id": "V1", "template_id": "T.threshold", "components": {"quantity": "P", "value": "P", "unit": "P", "comparator": "P"}, "path_state": "P"},
+    {"id": "V2", "template_id": "T.threshold", "components": {"quantity": "P", "value": "P", "unit": "P", "comparator": "L"}, "path_state": "L"},
+    {"id": "V3", "template_id": "T.threshold", "components": {"quantity": "P", "value": "P", "unit": "P", "comparator": "U"}, "path_state": "U"},
+    {"id": "V4", "template_id": "T.threshold", "components": {"quantity": "P", "value": "L", "unit": "U", "comparator": "P"}, "path_state": "L", "note": "L over U"},
+    {"id": "V5", "template_id": "T.threshold", "components": {"quantity": "U", "value": "U", "unit": "U", "comparator": "U"}, "path_state": "U"},
+    {"id": "V6", "template_id": "T.threshold", "components": {"quantity": "L", "value": "L", "unit": "L", "comparator": "L"}, "path_state": "L"},
+    {"id": "V7", "template_id": "T.threshold", "components": {"quantity": "U", "value": "P", "unit": "P", "comparator": "L"}, "path_state": "L", "note": "L over U"},
+    {"id": "V8", "template_id": "T.threshold", "components": {"quantity": "P", "value": "P", "unit": "U", "comparator": "U"}, "path_state": "U"}
+  ],
+  "single_component_templates": {
+    "templates": ["T.condition", "T.scope", "T.modality"],
+    "cases": [
+      {"component": "P", "path_state": "P"},
+      {"component": "L", "path_state": "L"},
+      {"component": "U", "path_state": "U"}
+    ]
+  },
+  "multi_component_templates": [
+    {"template_id": "T.ordering", "components": {"action": "P", "after": "P", "after_edge": "P"}, "path_state": "P"},
+    {"template_id": "T.ordering", "components": {"action": "P", "after": "P", "after_edge": "L"}, "path_state": "L"},
+    {"template_id": "T.ordering", "components": {"action": "P", "after": "P", "after_edge": "U"}, "path_state": "U"},
+    {"template_id": "T.ordering", "components": {"action": "U", "after": "L", "after_edge": "P"}, "path_state": "L", "note": "L over U"},
+    {"template_id": "T.ordering", "components": {"action": "U", "after": "U", "after_edge": "U"}, "path_state": "U"},
+    {"template_id": "T.ordering", "components": {"action": "L", "after": "L", "after_edge": "L"}, "path_state": "L"},
+    {"template_id": "T.ordering", "components": {"action": "P", "after": "U", "after_edge": "L"}, "path_state": "L", "note": "L over U"},
+    {"template_id": "T.exception", "components": {"exempt": "P", "except_edge": "P"}, "path_state": "P"},
+    {"template_id": "T.exception", "components": {"exempt": "P", "except_edge": "L"}, "path_state": "L", "note": "Edge Preservation: the leaf survives, the edge is gone"},
+    {"template_id": "T.exception", "components": {"exempt": "P", "except_edge": "U"}, "path_state": "U"},
+    {"template_id": "T.exception", "components": {"exempt": "U", "except_edge": "L"}, "path_state": "L", "note": "L over U"}
+  ]
+}

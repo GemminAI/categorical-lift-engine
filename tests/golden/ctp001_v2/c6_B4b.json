@@ -330,10 +330,10 @@
     {
       "condition": "manager approval",
       "constraint_id": "c1",
+      "constraint_kind": "conditional_permission",
       "exception": null,
-      "kind": "conditional_permission",
       "modality": "may",
-      "order": null,
+      "ordering": null,
       "scope": null,
       "threshold": {
         "comparator": ">",
@@ -345,10 +345,10 @@
     {
       "condition": null,
       "constraint_id": "c2",
+      "constraint_kind": "scope_restriction",
       "exception": null,
-      "kind": "scope_restriction",
       "modality": "may",
-      "order": null,
+      "ordering": null,
       "scope": "EU-region storage",
       "threshold": null
     }

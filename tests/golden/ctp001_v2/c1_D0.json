@@ -226,10 +226,10 @@
   "constraint_schema": {
     "condition": "manager approval",
     "constraint_id": "c1",
+    "constraint_kind": "conditional_permission",
     "exception": null,
-    "kind": "conditional_permission",
     "modality": "may",
-    "order": null,
+    "ordering": null,
     "scope": null,
     "threshold": {
       "comparator": ">",

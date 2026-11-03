@@ -1,14 +1,35 @@
-# Migration: old properties to Schema Graph paths
+# Migration: old forms to the canonical form (Constraint Schema v0.4)
 
-`Constraint Schema 仕様 v0.3` section 6, step 5 (frozen by v0.3.1). The same table in a
-machine-readable form is `migration_map.json`; both are written by
-`tests/ctp001_v2_builder.py` and `tests/test_ctp001_v2_fixtures.py` checks that they are
-what the builder writes and that nothing is missing in either direction.
+Section 10 of `Constraint Schema 仕様 v0.4`. The same tables in a machine-readable
+form are in `migration_map.json`; both are written by `tests/ctp001_v2_builder.py` and
+`tests/test_ctp001_v2_fixtures.py` checks that they are what the builder writes, that
+every old form the 84 old fixtures hold is a row below, and that nothing is missing in
+either direction.
 
 Old fixtures: `tests/golden/ctp001/` (the obligation is a property
 `<constraint_id>.<field>`). New fixtures: this directory (the obligation is a Graph
 Path, identified by `path_id`; `path_label` is for display only).
 `schema_graph_version` is `"1"`.
+
+## Old names and types to the canonical form
+
+"In the old fixtures" says whether the 84 old fixtures still hold the old form.
+
+| Old form | Canonical form | In the old fixtures | Source |
+|---|---|---|---|
+| `cmp` (v0.3 section 3) | `comparator` | no | section 10 |
+| field `order` (v0.1 section 1) | field `ordering`, template `T.ordering` | yes | section 10 |
+| kind `order` (v0.1) | kind `ordering` | no | section 10 |
+| `path_label` `c4.order` (old property name) | `path_label` `c4.ordering` | yes | section 10 |
+| kind `exception_rule` (v0.1) | kind `exception` | no | section 10 |
+| field `exception` is a string | `{exempt}` | yes | section 10 |
+| `threshold.value` is a number | a decimal string | yes | section 10 |
+| `threshold` without `quantity` | `quantity` is added | yes | section 10 |
+| `modality` `"must not"` | `must_not` | yes | section 10 |
+| `T.ordering` components spelled differently in v0.3 and v0.3.1 | `action`, `after`, `after_edge` | no | section 10 |
+| `T.exception` components `exempt` only (v0.3) | `exempt`, `except_edge` | no | section 10 |
+| old property names (`c1.condition`, ...) | `path_id` (identity), `path_label` (display); table below | yes | section 10 |
+| schema key `kind` (old fixtures) | `constraint_kind` | yes | section 2 (not a row of section 10) |
 
 ## Templates and their required components
 
@@ -18,14 +39,16 @@ Path, identified by `path_id`; `path_label` is for display only).
 | `T.scope` | `scope` | same |
 | `T.modality` | `modality` | same |
 | `T.threshold` | `quantity`, `value`, `unit`, `comparator` | changed |
-| `T.exception` | `exempt` | same |
+| `T.exception` | `exempt`, `except_edge` | same |
 | `T.ordering` | `action`, `after`, `after_edge` | changed |
 
 "same": the old property and the new path are the same unit, so the result of R9 on
-the old property and on the path must agree (step 6). "changed": the old property is
-one unit, the path is a structure of several components (`T.threshold`: quantity,
-value, unit, comparator; `T.ordering`: action, after and the direction of the AFTER
-edge), so an example may differ (step 6, not done here).
+the old property and on the path must agree (step 6, not done here). "changed": the
+old property is one unit, the path is a structure of several components
+(`T.threshold`: quantity, value, unit, comparator; `T.ordering`: action, after and the
+direction of the AFTER edge), so an example may differ (step 6, not done here).
+`T.exception` gains `except_edge` in v0.4; its unit is still one property, so it stays
+"same".
 
 ## Old property to new path
 

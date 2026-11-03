@@ -1,21 +1,22 @@
 """Builder for `tests/golden/ctp001_v2/`: the 84 fixtures on the Schema Graph.
 
-Steps 2-5 of `Constraint Schema 仕様 v0.3` section 6. The texts, the declared and
-evidence statuses and the applicability of the 84 examples are those of
+Steps 2-5 of `Constraint Schema 仕様 v0.4` (the canonical form). The texts, the
+declared and evidence statuses and the applicability of the 84 examples are those of
 `tests/ctp001_types.py` (the old fixtures, untouched); what changes is the unit:
 
-* the Constraint Schema is written in the v0.2 notation (section 2);
+* the Constraint Schema is written in the canonical notation (v0.4 section 2);
 * the obligation is a Graph Path (`ctp001_schema_graph.py`), not a field, so the
   vocabulary, the obligations, the declarations (`preserved`/`lost`) and the Carry
   Evidence are keyed by `path_id`;
-* each Carry Evidence entry holds `components` (v0.3 section 5); the state of the
-  path is aggregated from them by the v0.3.1 section 1 rule, nothing else.
+* each Carry Evidence entry holds `components`; the state of the path is aggregated
+  from them by the v0.4 section 6 rule, nothing else.
 
 A component's state is decided from the break type of the example and the component
 it breaks, written out in `CHANGED` below: a property that is lost at a stage loses
-all components of its path (`ABSENT_IN_OUTPUT`) unless `CHANGED` names the
-component(s) that changed. The expected values are derived from that and the v0.3
-section 3 table, never from the output of R9.
+all components of its path (`ABSENT_IN_OUTPUT`; for `T.exception` that is `exempt`
+and `except_edge`, v0.4 section 7.4) unless `CHANGED` names the component(s) that
+changed. The expected values are derived from that and the old R9 table, never from
+the output of R9.
 """
 
 from __future__ import annotations
@@ -59,7 +60,7 @@ from ctp001_types import TYPES, examples_of
 
 GOLDEN_V2_DIR = Path(__file__).parent / "golden" / "ctp001_v2"
 
-# Step 2: v0.1 section 1.1 asks for the quantity a threshold compares; the fixtures'
+# v0.4 section 2.1 asks for the quantity a threshold compares; the old fixtures'
 # schemas had none. One quantity per constraint that has a threshold.
 QUANTITY = {
     "c1": "refund amount",
@@ -86,35 +87,187 @@ CHANGED: dict[tuple[str, str, str], tuple[tuple[str, ...], str]] = {
 }
 
 
-def v02_schema(schema: dict[str, Any]) -> dict[str, Any]:
-    """The Constraint Schema in the v0.2 notation (and v0.1 section 1's value forms).
+# v0.4 section 10, for the schema's own fields: old kind names to canonical ones
+KIND_RENAMES = {"order": "ordering", "exception_rule": "exception"}
 
-    `threshold` gains `quantity`, its `value` is a decimal string (v0.1 section 1.1,
-    so that JCS holds no number); `modality` is `must_not`; `exception` is
-    `{exempt}` (v0.1 section 1). The kind names `ordering` and `exception` are
-    already the fixtures' names.
+
+def canonical_schema(
+    schema: dict[str, Any], quantity: str | None = None
+) -> dict[str, Any]:
+    """A Constraint Schema in any old form, in the canonical form (v0.4 sections 2, 10).
+
+    One rule per row of the section 10 table that concerns a schema: `kind` is
+    `constraint_kind`, the kind names `order` and `exception_rule` are `ordering` and
+    `exception`, the field `order` is `ordering`, `cmp` is `comparator`, `"must not"`
+    is `must_not`, an `exception` string is `{exempt}`, a numeric `value` is a decimal
+    string and a threshold without `quantity` gets the one given. A quantity is never
+    guessed: a threshold without one and no `quantity` argument is an error.
     """
     out = dict(schema)
+    if "kind" in out:
+        out["constraint_kind"] = KIND_RENAMES.get(out["kind"], out["kind"])
+        del out["kind"]
+    else:
+        out["constraint_kind"] = KIND_RENAMES.get(
+            out["constraint_kind"], out["constraint_kind"]
+        )
+    if "order" in out:
+        out["ordering"] = out.pop("order")
     if out["modality"] == "must not":
         out["modality"] = "must_not"
-    if out["threshold"] is not None:
-        thr = out["threshold"]
+    thr = out["threshold"]
+    if thr is not None:
+        thr = dict(thr)
+        if "cmp" in thr:
+            thr["comparator"] = thr.pop("cmp")
+        if "quantity" not in thr:
+            if quantity is None:
+                raise ValueError("a threshold without a quantity needs one given")
+            thr["quantity"] = quantity
+        thr["value"] = str(thr["value"])
         out["threshold"] = {
-            "quantity": QUANTITY[out["constraint_id"]],
-            "value": str(thr["value"]),
-            "unit": thr["unit"],
-            "comparator": thr["comparator"],
+            k: thr[k] for k in ("quantity", "value", "unit", "comparator")
         }
-    if out["exception"] is not None:
+    if isinstance(out["exception"], str):
         out["exception"] = {"exempt": out["exception"]}
     return out
 
 
+def fixture_schema(schema: dict[str, Any]) -> dict[str, Any]:
+    """The canonical form of an old fixture's schema (the quantity is `QUANTITY`)."""
+    return canonical_schema(schema, QUANTITY.get(schema["constraint_id"]))
+
+
 def old_property_path(schema: dict[str, Any], field: str) -> GraphPath:
     """The one path an old `<constraint_id>.<field>` property becomes."""
-    template = TEMPLATE_BY_FIELD[field]
+    template = TEMPLATE_BY_FIELD[KIND_RENAMES.get(field, field)]  # old `c4.order`
     (path,) = [p for p in paths_of(schema) if p.template_id == template.template_id]
     return path
+
+
+# v0.4 section 10: every old name or type and the canonical form it becomes.
+# `in_old_fixtures` says whether the 84 old fixtures (or the 191ba3f ones, for the last
+# two) still hold the old form; `source` is the section of the spec that says it.
+FORM_MIGRATIONS: tuple[dict[str, Any], ...] = (
+    {
+        "id": "threshold_cmp",
+        "old": "`cmp` (v0.3 section 3)",
+        "canonical": "`comparator`",
+        "in_old_fixtures": False,
+        "source": "section 10",
+    },
+    {
+        "id": "ordering_field",
+        "old": "field `order` (v0.1 section 1)",
+        "canonical": "field `ordering`, template `T.ordering`",
+        "in_old_fixtures": True,
+        "source": "section 10",
+    },
+    {
+        "id": "kind_order",
+        "old": "kind `order` (v0.1)",
+        "canonical": "kind `ordering`",
+        "in_old_fixtures": False,
+        "source": "section 10",
+    },
+    {
+        "id": "label_c4_order",
+        "old": "`path_label` `c4.order` (old property name)",
+        "canonical": "`path_label` `c4.ordering`",
+        "in_old_fixtures": True,
+        "source": "section 10",
+    },
+    {
+        "id": "kind_exception_rule",
+        "old": "kind `exception_rule` (v0.1)",
+        "canonical": "kind `exception`",
+        "in_old_fixtures": False,
+        "source": "section 10",
+    },
+    {
+        "id": "exception_string",
+        "old": "field `exception` is a string",
+        "canonical": "`{exempt}`",
+        "in_old_fixtures": True,
+        "source": "section 10",
+    },
+    {
+        "id": "value_numeric",
+        "old": "`threshold.value` is a number",
+        "canonical": "a decimal string",
+        "in_old_fixtures": True,
+        "source": "section 10",
+    },
+    {
+        "id": "threshold_no_quantity",
+        "old": "`threshold` without `quantity`",
+        "canonical": "`quantity` is added",
+        "in_old_fixtures": True,
+        "source": "section 10",
+    },
+    {
+        "id": "modality_must_not",
+        "old": '`modality` `"must not"`',
+        "canonical": "`must_not`",
+        "in_old_fixtures": True,
+        "source": "section 10",
+    },
+    {
+        "id": "ordering_components",
+        "old": "`T.ordering` components spelled differently in v0.3 and v0.3.1",
+        "canonical": "`action`, `after`, `after_edge`",
+        "in_old_fixtures": False,
+        "source": "section 10",
+    },
+    {
+        "id": "exception_components",
+        "old": "`T.exception` components `exempt` only (v0.3)",
+        "canonical": "`exempt`, `except_edge`",
+        "in_old_fixtures": False,
+        "source": "section 10",
+    },
+    {
+        "id": "property_names",
+        "old": "old property names (`c1.condition`, ...)",
+        "canonical": "`path_id` (identity), `path_label` (display); table below",
+        "in_old_fixtures": True,
+        "source": "section 10",
+    },
+    {
+        "id": "kind_key",
+        "old": "schema key `kind` (old fixtures)",
+        "canonical": "`constraint_kind`",
+        "in_old_fixtures": True,
+        "source": "section 2 (not a row of section 10)",
+    },
+)
+
+
+def detect_old_forms(schema: dict[str, Any]) -> set[str]:
+    """The ids of `FORM_MIGRATIONS` whose old form a Constraint Schema still holds."""
+    found: set[str] = set()
+    if "kind" in schema:
+        found.add("kind_key")
+    kind = schema.get("kind", schema.get("constraint_kind"))
+    if kind == "order":
+        found.add("kind_order")
+    if kind == "exception_rule":
+        found.add("kind_exception_rule")
+    if "order" in schema:
+        found.add("ordering_field")
+    if schema.get("modality") == "must not":
+        found.add("modality_must_not")
+    if isinstance(schema.get("exception"), str):
+        found.add("exception_string")
+    thr = schema.get("threshold")
+    if thr is not None:
+        if "cmp" in thr:
+            found.add("threshold_cmp")
+        if "quantity" not in thr:
+            found.add("threshold_no_quantity")
+        if not isinstance(thr["value"], str):
+            found.add("value_numeric")
+    return found
 
 
 class V2Type:
@@ -122,7 +275,7 @@ class V2Type:
 
     def __init__(self, old: ConstraintType) -> None:
         self.old = old
-        self.schemas = tuple(v02_schema(s) for s in old.schemas)
+        self.schemas = tuple(fixture_schema(s) for s in old.schemas)
         by_cid = {s["constraint_id"]: s for s in self.schemas}
         self.old_to_path: dict[str, GraphPath] = {
             p: old_property_path(by_cid[p.split(".")[0]], p.split(".")[1])
@@ -148,6 +301,11 @@ def _id(path: GraphPath) -> str:
 
 
 # ---------------------------------------------------------------- component states
+
+
+def path_state_of(components: list[dict[str, Any]]) -> str:
+    """The state of a path from its components (v0.4 section 6)."""
+    return aggregate(c["status"] for c in components)
 
 
 def component_states(
@@ -183,7 +341,7 @@ def carry_evidence(t: V2Type, ex: Example) -> dict[str, list[dict[str, Any]]]:
                 p for p, gp in t.old_to_path.items() if gp.path_id == path.path_id
             ]
             comps = component_states(t, ex, i, prop)
-            state = aggregate(c["status"] for c in comps)
+            state = path_state_of(comps)
             entries.append(
                 {
                     "property": path.path_id,
@@ -319,7 +477,7 @@ def derive_r9(
     *,
     with_evidence: bool,
 ) -> dict[str, Any]:
-    """The v0.3 section 3 table at the path level (same rule as the old builder)."""
+    """The old R9 table at the path level (same rule as the old builder)."""
     findings: list[tuple[str, str, str, str]] = []  # (stage, status, code, path_id)
     for p in obligations:
         for i, stage in enumerate(STAGES):
@@ -470,6 +628,8 @@ def migration_map() -> dict[str, Any]:
     ]
     return {
         "schema_graph_version": SCHEMA_GRAPH_VERSION,
+        "spec": "Constraint Schema 仕様 v0.4 section 10",
+        "form_migrations": [dict(f) for f in FORM_MIGRATIONS],
         "granularity_changed_templates": [
             t.template_id for t in TEMPLATES if t.granularity == "changed"
         ],
@@ -495,17 +655,31 @@ def migration_md() -> str:
         f"| {t.granularity} |"
         for t in TEMPLATES
     )
-    return f"""# Migration: old properties to Schema Graph paths
+    forms = "\n".join(
+        f"| {f['old']} | {f['canonical']} | {'yes' if f['in_old_fixtures'] else 'no'} "
+        f"| {f['source']} |"
+        for f in m["form_migrations"]
+    )
+    return f"""# Migration: old forms to the canonical form (Constraint Schema v0.4)
 
-`Constraint Schema 仕様 v0.3` section 6, step 5 (frozen by v0.3.1). The same table in a
-machine-readable form is `migration_map.json`; both are written by
-`tests/ctp001_v2_builder.py` and `tests/test_ctp001_v2_fixtures.py` checks that they are
-what the builder writes and that nothing is missing in either direction.
+Section 10 of `Constraint Schema 仕様 v0.4`. The same tables in a machine-readable
+form are in `migration_map.json`; both are written by `tests/ctp001_v2_builder.py` and
+`tests/test_ctp001_v2_fixtures.py` checks that they are what the builder writes, that
+every old form the 84 old fixtures hold is a row below, and that nothing is missing in
+either direction.
 
 Old fixtures: `tests/golden/ctp001/` (the obligation is a property
 `<constraint_id>.<field>`). New fixtures: this directory (the obligation is a Graph
 Path, identified by `path_id`; `path_label` is for display only).
 `schema_graph_version` is `"{m["schema_graph_version"]}"`.
+
+## Old names and types to the canonical form
+
+"In the old fixtures" says whether the 84 old fixtures still hold the old form.
+
+| Old form | Canonical form | In the old fixtures | Source |
+|---|---|---|---|
+{forms}
 
 ## Templates and their required components
 
@@ -514,10 +688,12 @@ Path, identified by `path_id`; `path_label` is for display only).
 {comps}
 
 "same": the old property and the new path are the same unit, so the result of R9 on
-the old property and on the path must agree (step 6). "changed": the old property is
-one unit, the path is a structure of several components (`T.threshold`: quantity,
-value, unit, comparator; `T.ordering`: action, after and the direction of the AFTER
-edge), so an example may differ (step 6, not done here).
+the old property and on the path must agree (step 6, not done here). "changed": the
+old property is one unit, the path is a structure of several components
+(`T.threshold`: quantity, value, unit, comparator; `T.ordering`: action, after and the
+direction of the AFTER edge), so an example may differ (step 6, not done here).
+`T.exception` gains `except_edge` in v0.4; its unit is still one property, so it stays
+"same".
 
 ## Old property to new path
 

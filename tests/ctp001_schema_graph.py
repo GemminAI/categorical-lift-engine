@@ -1,21 +1,23 @@
-"""Canonical Schema Graph of EXP-RAG-CTP001 (`Constraint Schema 仕様 v0.3` section 3).
+"""Canonical Schema Graph of EXP-RAG-CTP001 (`Constraint Schema 仕様 v0.4` section 4).
 
 The six path templates, the names of the components each one requires, and the
-`path_id` of a Graph Path. This is data and two small pure functions; it knows no
-fixture. `schema_graph_version` "1" is the version frozen by v0.3.1 section 4.
+`path_id` of a Graph Path. This is data and a few small pure functions; it knows no
+fixture. `schema_graph_version` "1" is the version frozen by v0.4 section 11.
 
-* A path is identified by `path_id` (v0.3 section 4, 1):
+* A path is identified by `path_id` (v0.4 section 5):
   `"path:" + sha256(JCS({constraint_id, template_id, schema_graph_version}))`. The
   label (`c5.threshold`) is for display and is never an input of the id.
 * A component is one required part of the template. The set of components is fixed by
-  the template and is never reduced to fit a stage's output (v0.3.1 section 1).
+  the template and is never reduced to fit a stage's output (v0.4 section 4).
 * The state of a path is aggregated from its components, L over U over P
-  (v0.3.1 section 1); no judgement is involved.
+  (v0.4 section 6); no judgement is involved. The relation edges (`comparator`,
+  `except_edge`, `after_edge`) are components, so a surviving leaf never makes a path
+  P without them (Edge Preservation, v0.4 section 6, 2).
 """
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
@@ -29,9 +31,9 @@ STATES = ("P", "L", "U")
 class Template:
     template_id: str
     schema_field: str  # the field of the Constraint Schema that instantiates it
-    edges: tuple[str, ...]  # the relations of v0.3 section 3, for the record
+    edges: tuple[str, ...]  # the relations of v0.4 section 4, for the record
     components: tuple[str, ...]  # required parts, in a fixed order
-    # against the old property of the same field (v0.3 section 6, 6): is the
+    # against the old property of the same field (v0.4 section 10): is the
     # unit of the obligation the same, or does it change
     granularity: str
 
@@ -49,19 +51,27 @@ TEMPLATES: tuple[Template, ...] = (
     Template(
         "T.threshold",
         "threshold",
-        ("HAS_THRESHOLD", "ON_QUANTITY", "VALUE", "UNIT", "CMP"),
+        ("HAS_THRESHOLD", "ON_QUANTITY", "VALUE", "UNIT", "COMPARATOR"),
         ("quantity", "value", "unit", "comparator"),
         "changed",
     ),
-    Template("T.exception", "exception", ("EXCEPT",), ("exempt",), "same"),
+    Template(
+        "T.exception",
+        "exception",
+        ("EXCEPT",),
+        ("exempt", "except_edge"),
+        "same",
+    ),
     Template(
         "T.ordering",
-        "order",
+        "ordering",
         ("AFTER",),
         ("action", "after", "after_edge"),
         "changed",
     ),
 )
+# the components that are relations rather than leaves (v0.4 section 6, 2)
+EDGE_COMPONENTS = frozenset({"comparator", "except_edge", "after_edge"})
 TEMPLATE_BY_ID: dict[str, Template] = {t.template_id: t for t in TEMPLATES}
 TEMPLATE_BY_FIELD: dict[str, Template] = {t.schema_field: t for t in TEMPLATES}
 
@@ -71,7 +81,7 @@ def path_id(
     template_id: str,
     schema_graph_version: str = SCHEMA_GRAPH_VERSION,
 ) -> str:
-    """v0.3 section 4, 1. The material is three strings; the keys are sorted by JCS."""
+    """v0.4 section 5. The material is three strings; the keys are sorted by JCS."""
     return "path:" + sha256_hex(
         {
             "constraint_id": constraint_id,
@@ -82,7 +92,7 @@ def path_id(
 
 
 def path_label(constraint_id: str, template_id: str) -> str:
-    """Display only (v0.3.1 section 3): `c5.threshold`."""
+    """Display only (v0.4 section 5): `c5.threshold`."""
     return f"{constraint_id}.{template_id.removeprefix('T.')}"
 
 
@@ -100,7 +110,7 @@ class GraphPath:
         return TEMPLATE_BY_ID[self.template_id].components
 
     def definition(self) -> dict[str, Any]:
-        """The R9 vocabulary entry (v0.3 section 4, 5; v0.3.1 section 3)."""
+        """The R9 vocabulary entry (v0.4 section 5)."""
         return {
             "path_label": self.label,
             "constraint_id": self.constraint_id,
@@ -128,7 +138,7 @@ def paths_of(schema: dict[str, Any]) -> tuple[GraphPath, ...]:
 
 
 def aggregate(states: Iterable[str]) -> str:
-    """v0.3.1 section 1: L if any component is L, else U if any is U, else P."""
+    """v0.4 section 6: L if any component is L, else U if any is U, else P."""
     seen = set(states)
     if not seen <= set(STATES):
         raise ValueError(f"unknown component state(s): {sorted(seen - set(STATES))}")
@@ -137,3 +147,17 @@ def aggregate(states: Iterable[str]) -> str:
     if "L" in seen:
         return "L"
     return "U" if "U" in seen else "P"
+
+
+def aggregate_path(template_id: str, states: Mapping[str, str]) -> str:
+    """The state of a path of `template_id` from its components, by name.
+
+    The names must be exactly the template's components: none is dropped to fit an
+    output and none is invented (v0.4 section 4).
+    """
+    expected = TEMPLATE_BY_ID[template_id].components
+    if set(states) != set(expected):
+        raise ValueError(
+            f"{template_id} has components {list(expected)}, got {sorted(states)}"
+        )
+    return aggregate(states[name] for name in expected)

@@ -1,4 +1,5 @@
-"""EXP-RAG-CTP001 on the Schema Graph: `tests/golden/ctp001_v2/` (v0.3 section 6, 1-5).
+"""EXP-RAG-CTP001 on the canonical Schema (`Constraint Schema 仕様 v0.4`):
+`tests/golden/ctp001_v2/`.
 
 The 84 new fixtures, the old-property-to-path map and its gaps check. R1/R2 must PASS
 and R3 must FAIL only on D0. What R9, compliance and the two-axis class give on the
@@ -8,6 +9,7 @@ new fixtures is step 6 and is not checked here.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -31,8 +33,12 @@ from ctp001_schema_graph import (
 )
 from ctp001_v2_builder import (
     CHANGED,
+    FORM_MIGRATIONS,
     GOLDEN_V2_DIR,
+    QUANTITY,
     build_all,
+    canonical_schema,
+    detect_old_forms,
     distinct_paths,
     migration_map,
     migration_md,
@@ -118,26 +124,62 @@ def test_only_d0_fails_r3_in_every_type() -> None:
 # --- the shape of a new fixture ------------------------------------------------
 
 
+SCHEMA_FIELDS = {
+    "constraint_id",
+    "constraint_kind",
+    "condition",
+    "scope",
+    "modality",
+    "threshold",
+    "exception",
+    "ordering",
+}
+KINDS = {
+    "conditional_permission",
+    "scope_restriction",
+    "prohibition",
+    "ordering",
+    "exception",
+}
+DECIMAL = re.compile(r"(0|[1-9][0-9]*)(\.[0-9]+)?")
+
+
+def _check_canonical(sc: dict[str, Any]) -> None:
+    """Constraint Schema 仕様 v0.4 section 2: the fields and their types."""
+    assert set(sc) == SCHEMA_FIELDS
+    assert isinstance(sc["constraint_id"], str)
+    assert sc["constraint_kind"] in KINDS
+    for f in ("condition", "scope"):
+        assert sc[f] is None or isinstance(sc[f], str)
+    assert sc["modality"] in {None, "may", "must", "must_not"}
+    thr = sc["threshold"]
+    if thr is not None:
+        assert set(thr) == {"quantity", "value", "unit", "comparator"}
+        assert isinstance(thr["quantity"], str) and thr["quantity"]
+        assert isinstance(thr["value"], str) and DECIMAL.fullmatch(thr["value"])
+        assert isinstance(thr["unit"], str) and thr["unit"]
+        assert thr["comparator"] in {">", ">=", "<", "<=", "=="}
+    if sc["exception"] is not None:
+        assert set(sc["exception"]) == {"exempt"}
+        assert isinstance(sc["exception"]["exempt"], str)
+    if sc["ordering"] is not None:
+        assert set(sc["ordering"]) == {"action", "after"}
+        assert all(isinstance(v, str) and v for v in sc["ordering"].values())
+
+
 @pytest.mark.parametrize("path", FILES, ids=lambda p: p.stem)
-def test_schema_is_in_the_v02_notation(path: Path) -> None:
+def test_schema_is_in_the_canonical_form(path: Path) -> None:
     for sc in _schemas(_load(path)):
-        assert sc["kind"] in {
-            "conditional_permission",
-            "scope_restriction",
-            "prohibition",
-            "ordering",
-            "exception",
-        }
-        assert sc["modality"] in {None, "may", "must", "must_not"}
-        thr = sc["threshold"]
-        if thr is not None:
-            assert set(thr) == {"quantity", "value", "unit", "comparator"}
-            assert isinstance(thr["value"], str)
-            assert thr["quantity"]
-        if sc["exception"] is not None:
-            assert set(sc["exception"]) == {"exempt"}
-        if sc["order"] is not None:
-            assert set(sc["order"]) == {"action", "after"}
+        _check_canonical(sc)
+        assert detect_old_forms(sc) == set()
+
+
+def test_the_c4_quantity_and_the_ordering_after_name_the_same_event() -> None:
+    """Section 4: C4's threshold quantity points at the `after` event (weak check:
+    they share a content word; the pointing itself is not a field of the schema)."""
+    sc = _schemas(_load(GOLDEN_V2_DIR / "c4_G0.json"))[0]
+    quantity = set(sc["threshold"]["quantity"].split())
+    assert quantity & set(sc["ordering"]["after"].split())
 
 
 @pytest.mark.parametrize("path", FILES, ids=lambda p: p.stem)
@@ -147,7 +189,7 @@ def test_vocabulary_and_definitions_are_paths(path: Path) -> None:
     defs = doc["path_definitions"]
     assert doc["schema_graph_version"] == SCHEMA_GRAPH_VERSION
     assert vocab == sorted(defs)
-    fields = ("condition", "scope", "modality", "threshold", "exception", "order")
+    fields = ("condition", "scope", "modality", "threshold", "exception", "ordering")
     expected_count = sum(1 for sc in _schemas(doc) for f in fields if sc[f] is not None)
     assert len(vocab) == expected_count
     for pid, d in defs.items():
@@ -324,3 +366,181 @@ def test_path_counts_per_template() -> None:
 @pytest.mark.parametrize("path", FILES, ids=lambda p: p.stem)
 def test_r9_compliance_and_two_axis_content(path: Path) -> None:
     raise AssertionError("checked in step 6 (old vs new R9)")
+
+
+# --- step 3: T.exception states from the text (section 7.4) -----------------------
+
+EXEMPT = "service accounts"
+# section 8.4, exception expressions v1
+EXCEPT_EXPR = re.compile(
+    r"\b(except|except for|excluding|other than|with the exception of|exempt|"
+    r"excepted|does not apply to)\b",
+    re.IGNORECASE,
+)
+STAGE_TEXT = {"f1": "f1_context", "f2": "f2_decision", "f3": "f3_action"}
+# (example, stage) whose carried state (from the old fixtures) disagrees with what
+# section 7.4 gives from the stage's own text. Not resolved either way: choosing one
+# would move the carried statuses or the old R9 expectation (step 6).
+UNRESOLVED = {("c5_B3", "f2")}
+
+
+def _exception_states(text: str) -> dict[str, str]:
+    """Section 7.4 read off the stage's own text, independent of the builder.
+
+    The exempt is the schema's `service accounts`; an exception expression counts only
+    in the same clause as it (a clause is a sentence, `;` or `|` separated).
+    """
+    clauses = re.split(r"[.;|]", text)
+    exempt = any(EXEMPT in c.lower() for c in clauses)
+    related = any(EXEMPT in c.lower() and EXCEPT_EXPR.search(c) for c in clauses)
+    if not exempt:
+        return {"exempt": "L", "except_edge": "L"}  # row 2
+    return {"exempt": "P", "except_edge": "P" if related else "L"}  # rows 1 and 3
+
+
+@pytest.mark.parametrize(
+    "path", sorted(GOLDEN_V2_DIR.glob("c5_*.json")), ids=lambda p: p.stem
+)
+def test_exception_components_follow_section_7_4(path: Path) -> None:
+    doc = _load(path)
+    (pid,) = [
+        p
+        for p, d in doc["path_definitions"].items()
+        if d["template_id"] == "T.exception"
+    ]
+    for stage, key in STAGE_TEXT.items():
+        entry = next(e for e in doc["carry_evidence"][stage] if e["property"] == pid)
+        got = {c["name"]: c["status"] for c in entry["components"]}
+        assert list(got) == ["exempt", "except_edge"]
+        from_text = _exception_states(doc["texts"][key])
+        if (path.stem, stage) in UNRESOLVED:
+            assert got != from_text  # carried P/P, the text has no `service accounts`
+            continue
+        assert got == from_text, (path.stem, stage)
+        # every example is decided: none is U (row 4 has no example among the 84)
+        assert "U" not in got.values()
+        assert entry["path_state"] == ("P" if set(got.values()) == {"P"} else "L")
+
+
+def test_every_c5_exception_break_is_the_exempt_going_missing() -> None:
+    """Rows 3 and 4 (exempt present, relation missing or unidentifiable) have no
+    example among the 84: the only break of the exception is the exempt being absent,
+    so `exempt` and `except_edge` always break together."""
+    for path in sorted(GOLDEN_V2_DIR.glob("c5_*.json")):
+        doc = _load(path)
+        for entries in doc["carry_evidence"].values():
+            for e in entries:
+                if e["path_label"] == "c5.exception":
+                    assert len({c["status"] for c in e["components"]}) == 1
+
+
+# --- step 4: the section 10 forms ------------------------------------------------
+
+
+def test_every_old_form_in_the_old_fixtures_is_a_row_of_the_map() -> None:
+    rows = {
+        f["id"]: f
+        for f in _load(GOLDEN_V2_DIR / "migration_map.json")["form_migrations"]
+    }
+    assert set(rows) == {f["id"] for f in FORM_MIGRATIONS}
+    seen: set[str] = set()
+    for f in OLD_FILES:
+        schemas = _schemas(_load(f))
+        for sc in schemas:
+            forms = detect_old_forms(sc)
+            assert forms <= set(rows), forms - set(rows)
+            seen |= forms
+    # a row claiming the old fixtures hold the form really finds it there
+    # (property names and the label are checked through the property map instead)
+    structural = {"property_names", "label_c4_order"}
+    claimed = {i for i, r in rows.items() if r["in_old_fixtures"]} - structural
+    assert claimed == seen
+    assert "label_c4_order" in rows and any(
+        p.endswith(".order") for p in old_properties()
+    )
+
+
+def test_every_old_form_is_canonical_after_migration() -> None:
+    """Each old form, alone, becomes the canonical one; the result is section 2."""
+    base: dict[str, Any] = {
+        "constraint_id": "cx",
+        "kind": "prohibition",
+        "condition": None,
+        "scope": None,
+        "modality": None,
+        "threshold": None,
+        "exception": None,
+        "order": None,
+    }
+    cases: dict[str, dict[str, Any]] = {
+        "threshold_cmp": {"threshold": {"value": "5", "unit": "u", "cmp": ">"}},
+        "ordering_field": {"order": {"action": "a", "after": "b"}},
+        "kind_order": {"kind": "order", "order": {"action": "a", "after": "b"}},
+        "kind_exception_rule": {"kind": "exception_rule"},
+        "exception_string": {"exception": "robots"},
+        "value_numeric": {"threshold": {"value": 5, "unit": "u", "comparator": "<="}},
+        "threshold_no_quantity": {
+            "threshold": {"value": "5", "unit": "u", "comparator": "=="}
+        },
+        "modality_must_not": {"modality": "must not"},
+        "kind_key": {},
+    }
+    handled = set(cases)
+    for form_id, change in cases.items():
+        old = {**base, **change}
+        assert form_id in detect_old_forms(old)
+        new = canonical_schema(old, quantity="q")
+        _check_canonical(new)
+        assert detect_old_forms(new) == set()
+    # the canonical form is a fixed point
+    again = canonical_schema(new, quantity="q")
+    assert again == new
+    # forms that are not a schema value are checked elsewhere in this file
+    elsewhere = {
+        "ordering_components",
+        "exception_components",
+        "property_names",
+        "label_c4_order",
+    }
+    assert handled | elsewhere == {f["id"] for f in FORM_MIGRATIONS}
+
+
+def test_a_missing_quantity_is_never_guessed() -> None:
+    old = {
+        "constraint_id": "cx",
+        "kind": "prohibition",
+        "condition": None,
+        "scope": None,
+        "modality": "must not",
+        "threshold": {"value": 1, "unit": "u", "comparator": "<"},
+        "exception": None,
+        "order": None,
+    }
+    with pytest.raises(ValueError, match="quantity"):
+        canonical_schema(old)
+    assert canonical_schema(old, "q")["threshold"] == {
+        "quantity": "q",
+        "value": "1",
+        "unit": "u",
+        "comparator": "<",
+    }
+
+
+def test_the_new_fixtures_use_the_one_quantity_per_threshold_constraint() -> None:
+    for path in FILES:
+        for sc in _schemas(_load(path)):
+            if sc["threshold"] is not None:
+                assert sc["threshold"]["quantity"] == QUANTITY[sc["constraint_id"]]
+
+
+def test_exception_and_ordering_components_are_the_canonical_ones() -> None:
+    assert TEMPLATE_BY_ID["T.exception"].components == ("exempt", "except_edge")
+    assert TEMPLATE_BY_ID["T.ordering"].components == ("action", "after", "after_edge")
+    names = {
+        tuple(c["name"] for c in e["components"])
+        for path in FILES
+        for entries in _load(path)["carry_evidence"].values()
+        for e in entries
+    }
+    assert ("exempt", "except_edge") in names
+    assert ("exempt",) not in names

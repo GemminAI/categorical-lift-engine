@@ -211,10 +211,10 @@
   "constraint_schema": {
     "condition": null,
     "constraint_id": "c4",
+    "constraint_kind": "ordering",
     "exception": null,
-    "kind": "ordering",
     "modality": null,
-    "order": {
+    "ordering": {
       "action": "deploy to production",
       "after": "reviewers approve"
     },

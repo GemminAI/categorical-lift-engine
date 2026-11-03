@@ -121,10 +121,10 @@
   "constraint_schema": {
     "condition": null,
     "constraint_id": "c2",
+    "constraint_kind": "scope_restriction",
     "exception": null,
-    "kind": "scope_restriction",
     "modality": "may",
-    "order": null,
+    "ordering": null,
     "scope": "EU-region storage",
     "threshold": null
   },

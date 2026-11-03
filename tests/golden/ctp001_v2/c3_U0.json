@@ -175,10 +175,10 @@
   "constraint_schema": {
     "condition": null,
     "constraint_id": "c3",
+    "constraint_kind": "prohibition",
     "exception": null,
-    "kind": "prohibition",
     "modality": "must_not",
-    "order": null,
+    "ordering": null,
     "scope": null,
     "threshold": {
       "comparator": "<",

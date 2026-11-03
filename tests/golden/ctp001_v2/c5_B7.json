@@ -48,6 +48,12 @@
             "name": "exempt",
             "reason": "ABSENT_IN_OUTPUT",
             "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B7/f1/c5.exception#except_edge",
+            "name": "except_edge",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
           }
         ],
         "evidence_ref": "fixture:c5/B7/f1/c5.exception",
@@ -117,6 +123,12 @@
           {
             "evidence_ref": "fixture:c5/B7/f2/c5.exception#exempt",
             "name": "exempt",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B7/f2/c5.exception#except_edge",
+            "name": "except_edge",
             "reason": "ABSENT_IN_OUTPUT",
             "status": "L"
           }
@@ -190,6 +202,12 @@
             "name": "exempt",
             "reason": "ABSENT_IN_OUTPUT",
             "status": "L"
+          },
+          {
+            "evidence_ref": "fixture:c5/B7/f3/c5.exception#except_edge",
+            "name": "except_edge",
+            "reason": "ABSENT_IN_OUTPUT",
+            "status": "L"
           }
         ],
         "evidence_ref": "fixture:c5/B7/f3/c5.exception",
@@ -226,12 +244,12 @@
   "constraint_schema": {
     "condition": null,
     "constraint_id": "c5",
+    "constraint_kind": "exception",
     "exception": {
       "exempt": "service accounts"
     },
-    "kind": "exception",
     "modality": "must",
-    "order": null,
+    "ordering": null,
     "scope": null,
     "threshold": {
       "comparator": ">=",
