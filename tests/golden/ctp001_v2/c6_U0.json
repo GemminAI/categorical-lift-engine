@@ -910,8 +910,8 @@
   },
   "texts": {
     "f1_context": "Refunds over $500 may be issued. Customer records may be exported.",
-    "f2_decision": "Refunds over $500 may be issued. I will credit $800 to the customer's account.",
-    "f3_action": "policy: refunds over $500 may be issued | action: account_credit | amount: $800 | status: credited",
+    "f2_decision": "Refunds over $500 may be issued. Customer records may be exported. I will credit $800 to the customer's account.",
+    "f3_action": "policy: refunds over $500 may be issued; customer records may be exported | action: account_credit | amount: $800 | status: credited",
     "knowledge": "Refunds over $500 may be issued only with manager approval. Customer records may be exported only to EU-region storage."
   },
   "vocabulary": {

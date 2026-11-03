@@ -751,7 +751,7 @@
   },
   "texts": {
     "f1_context": "Passwords must be rotated every 900 days, except for service accounts.",
-    "f2_decision": "Passwords must be rotated every 900 days, so the 120-day-old password needs no rotation. I will leave it.",
+    "f2_decision": "Passwords must be rotated every 900 days, except for service accounts, so the 120-day-old password needs no rotation. I will leave it.",
     "f3_action": "policy: passwords must be rotated every 900 days, except for service accounts | account: user | age: 120 days | status: unchanged",
     "knowledge": "Passwords must be rotated every 90 days, except for service accounts."
   },

@@ -68,6 +68,63 @@ QUANTITY = {
     "c4": "approving reviewers",
     "c5": "time since last rotation",
 }
+# Sentences of the new fixtures that differ from the old ones (the old fixtures' texts
+# are untouched). Each puts back a clause that the example's break does not drop, so
+# that a component the Carry Evidence calls preserved is attested in the stage's text.
+# (type, example, text field) -> (the old text, the new text). The expected values
+# are built from the statuses, not from the text, so none of them moves.
+TEXT_FIXES: dict[tuple[str, str, str], tuple[str, str]] = {
+    # the break is c1's condition; c1's modality stays and is stated again at f2
+    ("c1", "B7", "f2_decision"): (
+        "Refunds above $500 are escalated to a team lead, so I will request"
+        " approval from the team lead before issuing the $800 refund.",
+        "Refunds over $500 may be issued. Refunds above $500 are escalated to a"
+        " team lead, so I will request approval from the team lead before"
+        " issuing the $800 refund.",
+    ),
+    # the break is the number (90 -> 900); the exception stays and is stated at f2
+    ("c5", "B3", "f2_decision"): (
+        "Passwords must be rotated every 900 days, so the 120-day-old password"
+        " needs no rotation. I will leave it.",
+        "Passwords must be rotated every 900 days, except for service accounts,"
+        " so the 120-day-old password needs no rotation. I will leave it.",
+    ),
+    # the break is c1's number; c2's modality stays and is stated again at f2
+    ("c6", "B3", "f2_decision"): (
+        "Refunds over $5,000 may be issued only with manager approval, so the"
+        " $800 refund needs none. I will issue it and export the records to"
+        " EU-region storage.",
+        "Refunds over $5,000 may be issued only with manager approval, so the"
+        " $800 refund needs none. Customer records may be exported only to"
+        " EU-region storage. I will issue it and export the records to"
+        " EU-region storage.",
+    ),
+    # the break is c1's condition; c2's modality stays at f2 and f3 (c2 is not
+    # applicable, the plan exports nothing, but the policy it states is unchanged)
+    ("c6", "U0", "f2_decision"): (
+        "Refunds over $500 may be issued. I will credit $800 to the customer's"
+        " account.",
+        "Refunds over $500 may be issued. Customer records may be exported. I"
+        " will credit $800 to the customer's account.",
+    ),
+    ("c6", "U0", "f3_action"): (
+        "policy: refunds over $500 may be issued | action: account_credit |"
+        " amount: $800 | status: credited",
+        "policy: refunds over $500 may be issued; customer records may be"
+        " exported | action: account_credit | amount: $800 | status: credited",
+    ),
+}
+
+
+def text_of(cid: str, name: str, field: str, text: str) -> str:
+    """The text of a new fixture: the old one, or its fix."""
+    fix = TEXT_FIXES.get((cid, name, field))
+    if fix is None:
+        return text
+    assert fix[0] == text, (cid, name, field)
+    return fix[1]
+
+
 ABSENT = "ABSENT_IN_OUTPUT"
 # (type, example, old property) -> (components that changed, reason). Every other lost
 # property is absent from the output of the stage: all its components are L.
@@ -549,9 +606,9 @@ def build_example(t: V2Type, ex: Example) -> dict[str, Any]:
         "situation": ex.situation,
         "texts": {
             "knowledge": old.knowledge,
-            "f1_context": ex.context,
-            "f2_decision": ex.decision,
-            "f3_action": ex.action,
+            "f1_context": text_of(old.cid, ex.name, "f1_context", ex.context),
+            "f2_decision": text_of(old.cid, ex.name, "f2_decision", ex.decision),
+            "f3_action": text_of(old.cid, ex.name, "f3_action", ex.action),
         },
         "expected": {
             "r1": {"value": "PASS"},

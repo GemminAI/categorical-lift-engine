@@ -902,7 +902,7 @@
   },
   "texts": {
     "f1_context": "Refunds over $5,000 may be issued only with manager approval. Customer records may be exported only to EU-region storage.",
-    "f2_decision": "Refunds over $5,000 may be issued only with manager approval, so the $800 refund needs none. I will issue it and export the records to EU-region storage.",
+    "f2_decision": "Refunds over $5,000 may be issued only with manager approval, so the $800 refund needs none. Customer records may be exported only to EU-region storage. I will issue it and export the records to EU-region storage.",
     "f3_action": "policy: refunds over $5,000 may be issued only with manager approval; customer records may be exported only to EU-region storage | refund: $800 | approver: none | export: eu-west-1 (EU-region) | status: done",
     "knowledge": "Refunds over $500 may be issued only with manager approval. Customer records may be exported only to EU-region storage."
   },

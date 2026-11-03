@@ -2,8 +2,8 @@
 `tests/golden/ctp001_v2/`.
 
 The 84 new fixtures, the old-property-to-path map and its gaps check. R1/R2 must PASS
-and R3 must FAIL only on D0. What R9, compliance and the two-axis class give on the
-new fixtures is step 6 and is not checked here.
+and R3 must FAIL only on D0. What R9 and the two-axis class give on the new fixtures is
+checked in `test_ctp001_v2_step6.py`.
 """
 
 from __future__ import annotations
@@ -36,6 +36,7 @@ from ctp001_v2_builder import (
     FORM_MIGRATIONS,
     GOLDEN_V2_DIR,
     QUANTITY,
+    TEXT_FIXES,
     build_all,
     canonical_schema,
     detect_old_forms,
@@ -254,7 +255,9 @@ def test_new_statuses_carry_the_old_ones(path: Path) -> None:
         label_to_id[old_to_path[p]] for p in old["obligations"]
     )
     assert doc["applicability"] == old["applicability"]
-    assert doc["texts"] == old["texts"]
+    # the sentences are the old ones except the listed fixes (TEXT_FIXES)
+    fixed = {f for (c, n, f) in TEXT_FIXES if f"{c}_{n}.json" == path.name}
+    assert {k for k in doc["texts"] if doc["texts"][k] != old["texts"][k]} == fixed
     assert doc["expected"] == old["expected"]
 
 
@@ -362,12 +365,6 @@ def test_path_counts_per_template() -> None:
     }
 
 
-@pytest.mark.skip(reason="step 6: R9, compliance and two-axis on the new fixtures")
-@pytest.mark.parametrize("path", FILES, ids=lambda p: p.stem)
-def test_r9_compliance_and_two_axis_content(path: Path) -> None:
-    raise AssertionError("checked in step 6 (old vs new R9)")
-
-
 # --- step 3: T.exception states from the text (section 7.4) -----------------------
 
 EXEMPT = "service accounts"
@@ -378,10 +375,6 @@ EXCEPT_EXPR = re.compile(
     re.IGNORECASE,
 )
 STAGE_TEXT = {"f1": "f1_context", "f2": "f2_decision", "f3": "f3_action"}
-# (example, stage) whose carried state (from the old fixtures) disagrees with what
-# section 7.4 gives from the stage's own text. Not resolved either way: choosing one
-# would move the carried statuses or the old R9 expectation (step 6).
-UNRESOLVED = {("c5_B3", "f2")}
 
 
 def _exception_states(text: str) -> dict[str, str]:
@@ -413,9 +406,6 @@ def test_exception_components_follow_section_7_4(path: Path) -> None:
         got = {c["name"]: c["status"] for c in entry["components"]}
         assert list(got) == ["exempt", "except_edge"]
         from_text = _exception_states(doc["texts"][key])
-        if (path.stem, stage) in UNRESOLVED:
-            assert got != from_text  # carried P/P, the text has no `service accounts`
-            continue
         assert got == from_text, (path.stem, stage)
         # every example is decided: none is U (row 4 has no example among the 84)
         assert "U" not in got.values()
