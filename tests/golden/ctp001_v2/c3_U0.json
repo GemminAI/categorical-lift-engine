@@ -654,6 +654,16 @@
     "knowledge": "Do not delete records younger than 30 days."
   },
   "vocabulary": {
+    "constraints": [
+      [
+        "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",
+        "c3"
+      ],
+      [
+        "path:ebe4df78114b3ed6a65487ffb1dd3e3ae7f070b1cda8a55707bd169fc785df69",
+        "c3"
+      ]
+    ],
     "information": [],
     "properties": [
       "path:cbcaddbcc62856cdfd84bd4abde1ae3ff2d4c4db7c585d1f45b6d20b2430804c",

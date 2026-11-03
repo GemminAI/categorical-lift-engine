@@ -302,9 +302,15 @@ class PropertyVocabulary:
     properties: tuple[str, ...]
     information: tuple[str, ...]
     ref: Ref
+    # (property name, constraint id) entries: which constraint a property belongs to.
+    # Part of the vocabulary's content, so it is covered by the same reference and
+    # seal as the names. R9 reads a property's constraint from here and from nowhere
+    # else; the name of a property says nothing about it. A list of pairs, not a map,
+    # so that a repeated name stays visible instead of being overwritten.
+    constraints: tuple[tuple[str, str], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        out: dict[str, Any] = {
             "vocabulary_id": self.vocabulary_id,
             "version": self.version,
             "task_ref": self.task_ref,
@@ -312,6 +318,9 @@ class PropertyVocabulary:
             "information": sorted(self.information),
             "ref": self.ref.to_dict(),
         }
+        if self.constraints:  # absent when empty: a vocabulary without it is unchanged
+            out["constraints"] = [[p, c] for p, c in sorted(self.constraints)]
+        return out
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> PropertyVocabulary:
@@ -322,6 +331,7 @@ class PropertyVocabulary:
             properties=tuple(data["properties"]),
             information=tuple(data["information"]),
             ref=Ref.from_dict(data["ref"]),
+            constraints=tuple((p, c) for p, c in data.get("constraints", ())),
         )
 
 

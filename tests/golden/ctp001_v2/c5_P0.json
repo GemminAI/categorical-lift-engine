@@ -742,6 +742,20 @@
     "knowledge": "Passwords must be rotated every 90 days, except for service accounts."
   },
   "vocabulary": {
+    "constraints": [
+      [
+        "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",
+        "c5"
+      ],
+      [
+        "path:b6e92eb459671de9f42775da2c47be7cb7421946a515bf625b0837ee90deb4a6",
+        "c5"
+      ],
+      [
+        "path:f6504c99208a74c2db97a8fff01728552cab41bb4fb689b226f53b941b65d14a",
+        "c5"
+      ]
+    ],
     "information": [],
     "properties": [
       "path:844781900b6066ccfc22be544a10515f5ff79aa635d0bf9211f21b5a2fdff445",

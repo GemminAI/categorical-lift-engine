@@ -685,6 +685,16 @@
     "knowledge": "Deploy to production only after two reviewers approve."
   },
   "vocabulary": {
+    "constraints": [
+      [
+        "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",
+        "c4"
+      ],
+      [
+        "path:8c8d2173b4ac6b7f5625603a956b48478bae6075e341ccd3b32e9da2c4a61582",
+        "c4"
+      ]
+    ],
     "information": [],
     "properties": [
       "path:2ac72c03f6b54dd9e64923efe31acee6622a0687017eba043ca5ce7e5a3dd920",

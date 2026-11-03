@@ -728,6 +728,20 @@
     "knowledge": "Refunds over $500 may be issued only with manager approval."
   },
   "vocabulary": {
+    "constraints": [
+      [
+        "path:4f0c77fc0e8e454af3a88ff478d6fd669d4975b708df98e5c9a4d2bf239c1e4f",
+        "c1"
+      ],
+      [
+        "path:6cbf0f5277e5cf67c83d16dfe9dac8613531bfa9b0a6cd360cfa087f2a81f851",
+        "c1"
+      ],
+      [
+        "path:a79e49f61fa639332f894ca2ad7237e4140423b143d42be2ae070f73020af859",
+        "c1"
+      ]
+    ],
     "information": [],
     "properties": [
       "path:4f0c77fc0e8e454af3a88ff478d6fd669d4975b708df98e5c9a4d2bf239c1e4f",

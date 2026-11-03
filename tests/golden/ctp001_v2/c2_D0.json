@@ -591,6 +591,16 @@
     "knowledge": "Customer records may be exported only to EU-region storage."
   },
   "vocabulary": {
+    "constraints": [
+      [
+        "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",
+        "c2"
+      ],
+      [
+        "path:783c9a78e4258c9ef2d18c5efe2c22a392763b19a2224a563d0bf2b652f1216e",
+        "c2"
+      ]
+    ],
     "information": [],
     "properties": [
       "path:4abb0dbe9e1bf2d55d9832b5a617bb9b8d0ca32842c92e510a76e1350de4c69f",

@@ -942,6 +942,28 @@ def _r9_results(
     ]
 
 
+def _r9_unresolved(
+    prop: str, known: set[str], entries: Mapping[str, Sequence[str]]
+) -> str | None:
+    """Why the constraint of an obligation cannot be read from the vocabulary.
+
+    The constraint id comes from the vocabulary's entry for the property and from
+    nowhere else: not from the name, not from a label. None: it can be read.
+    """
+    if prop not in known:
+        return "PROPERTY_NOT_IN_VOCABULARY"
+    owners = entries.get(prop, ())
+    if not owners:
+        return "CONSTRAINT_ENTRY_MISSING"
+    if len(owners) > 1:
+        return (
+            "CONSTRAINT_ENTRY_CONFLICT"
+            if len(set(owners)) > 1
+            else "CONSTRAINT_ENTRY_DUPLICATE"
+        )
+    return None
+
+
 def check_obligation_transport(
     history: RepresentationHistory,
     vocabulary: PropertyVocabulary | None,
@@ -969,11 +991,14 @@ def check_obligation_transport(
     refs have the same kind and value (an id; no content-hash convention exists)
     and both carry ``SEAL_OK``. With no vocabulary, another ref, a seal that is not
     ``SEAL_OK`` or an obligation the vocabulary does not name, the result is
-    ``VOCABULARY_UNRESOLVED`` (also when ``O`` is empty). Properties of
-    ``not_applicable`` constraints are
-    skipped; a finding on an ``undetermined`` constraint carries the warning
-    ``APPLICABILITY_UNDETERMINED``. A constraint id is the part of the property
-    name before the first dot.
+    ``VOCABULARY_UNRESOLVED`` (also when ``O`` is empty). The constraint of an
+    obligation is read from the vocabulary's ``constraints`` entry for it, never from
+    its name; an obligation with no such entry, with two entries (the same or
+    different constraint) or not named by the vocabulary is
+    ``VOCABULARY_UNRESOLVED`` too, with the reason and the property in ``detail``.
+    ``applicability`` is keyed by constraint id. Properties of ``not_applicable``
+    constraints are skipped; a finding on an ``undetermined`` constraint carries the
+    warning ``APPLICABILITY_UNDETERMINED``.
     """
     defects = history_defects(history)
     if defects:
@@ -1035,8 +1060,22 @@ def check_obligation_transport(
     known = {*vocabulary.properties, *vocabulary.information}
     findings = []
     warnings: list[CheckWarning] = []
+    entries: dict[str, list[str]] = {}
+    for named, owner in vocabulary.constraints:
+        entries.setdefault(named, []).append(owner)
     for prop in sorted(set(obligations)):
-        state = applicability.get(prop.split(".", 1)[0], "applicable")
+        unresolved = _r9_unresolved(prop, known, entries)
+        if unresolved is not None:
+            findings.append(
+                (
+                    "UNVERIFIABLE",
+                    "VOCABULARY_UNRESOLVED",
+                    _loc("field", hid, "obligations"),
+                    (("reason", unresolved), ("property", prop)),
+                )
+            )
+            continue
+        state = applicability.get(entries[prop][0], "applicable")
         if state == "not_applicable":
             continue
 
@@ -1051,13 +1090,6 @@ def check_obligation_transport(
             if prop_state == "undetermined":
                 warnings.append(CheckWarning("APPLICABILITY_UNDETERMINED", where))
 
-        if prop not in known:
-            add(
-                "UNVERIFIABLE",
-                "VOCABULARY_UNRESOLVED",
-                _loc("field", hid, "obligations"),
-            )
-            continue
         now, last_carried = "P", None
         for stage in stages:
             morphism = idx.morphisms.get(stage)

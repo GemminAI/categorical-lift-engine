@@ -29,6 +29,7 @@ from cle.representation import (
     check_r3,
 )
 from ctp001_builder import GOLDEN_DIR, STAGES, build_all, dump
+from ctp001_legacy import legacy_vocabulary
 
 ROOT = Path(__file__).resolve().parent.parent
 TYPE_IDS = ["c1", "c2", "c3", "c4", "c5", "c6"]
@@ -251,7 +252,7 @@ def test_expectations_equal_the_design_table(cid: str, name: str) -> None:
 def _r9(doc: dict[str, Any], mode: str) -> list[CheckResult]:
     return check_obligation_transport(
         RepresentationHistory.from_dict(doc["history"]),
-        PropertyVocabulary.from_dict(doc["vocabulary"]),
+        legacy_vocabulary(doc),  # old names: through the migration adapter
         doc["chain"],
         doc["obligations"],
         doc["applicability"],

@@ -157,6 +157,11 @@ def vocabulary_defects(vocabulary: Any, where: str) -> list[Location]:
         and _strs(vocabulary.properties)
         and _strs(vocabulary.information)
         and _ref(vocabulary.ref)
+        and isinstance(vocabulary.constraints, tuple)
+        and all(
+            isinstance(e, tuple) and len(e) == 2 and _strs(e)
+            for e in vocabulary.constraints
+        )
     )
     return [] if ok else [Location("field", where, "vocabulary")]
 

@@ -17,6 +17,7 @@ from cle.representation import (
     RepresentationHistory,
     check_obligation_transport,
 )
+from ctp001_legacy import legacy_vocabulary
 
 R9_EVIDENCE_FIELDS = ("property", "status", "basis", "source", "evidence_ref")
 MODES = ("M1", "M2")
@@ -30,26 +31,19 @@ def r9_evidence(doc: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
     }
 
 
-def r9_applicability(doc: dict[str, Any]) -> dict[str, str]:
-    """The applicability R9 reads, keyed by what R9 reads it by.
-
-    R9 takes the constraint id of an obligation to be the part of its name before the
-    first dot. An old property (`c1.modality`) has one; a `path_id` has none, so its
-    whole name is the key and each path gets the applicability of its constraint.
-    """
-    paths = doc.get("path_definitions")
-    if paths is None:
-        return dict(doc["applicability"])
-    return {pid: doc["applicability"][d["constraint_id"]] for pid, d in paths.items()}
-
-
-def run_r9(doc: dict[str, Any], mode: str) -> list[CheckResult]:
+def run_r9(
+    doc: dict[str, Any], mode: str, *, legacy: bool = False
+) -> list[CheckResult]:
+    """R9 on a fixture. `legacy`: the properties are old names, so the vocabulary goes
+    through the migration adapter; otherwise its own `constraints` entries are used."""
     return check_obligation_transport(
         RepresentationHistory.from_dict(doc["history"]),
-        PropertyVocabulary.from_dict(doc["vocabulary"]),
+        legacy_vocabulary(doc)
+        if legacy
+        else PropertyVocabulary.from_dict(doc["vocabulary"]),
         doc["chain"],
         doc["obligations"],
-        r9_applicability(doc),
+        doc["applicability"],  # per constraint id, as R9 reads it
         r9_evidence(doc),
         mode,
     )

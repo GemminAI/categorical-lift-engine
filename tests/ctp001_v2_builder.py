@@ -441,6 +441,7 @@ def vocabulary(t: V2Type) -> PropertyVocabulary:
         t.as_type.props,
         (),
         _vocab_ref(t),
+        tuple((gp.path_id, gp.constraint_id) for gp in t.paths),
     )
 
 

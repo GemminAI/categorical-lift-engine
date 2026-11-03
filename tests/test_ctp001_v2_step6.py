@@ -23,7 +23,6 @@ from ctp001_v2_r9 import (
     MODES,
     R9_EVIDENCE_FIELDS,
     findings,
-    r9_applicability,
     r9_evidence,
     run_r9,
     summary,
@@ -86,13 +85,14 @@ def test_r9_cannot_tell_the_components_apart() -> None:
         assert findings(run_r9(doc, mode)) == findings(run_r9(other, mode))
 
 
-def test_the_applicability_is_keyed_by_path_for_r9() -> None:
+def test_the_constraint_of_a_path_comes_from_the_vocabulary() -> None:
     doc = _load(GOLDEN_V2_DIR / "c6_U0.json")
-    keyed = r9_applicability(doc)
-    assert set(keyed) == set(doc["path_definitions"])
-    assert {keyed[p] for p in keyed} == {"undetermined", "not_applicable"}
-    # the constraint-keyed map of the fixture does not reach R9 (a path id has no dot)
-    assert not set(doc["applicability"]) & set(doc["vocabulary"]["properties"])
+    entries = {p: c for p, c in doc["vocabulary"]["constraints"]}
+    assert entries == {
+        pid: d["constraint_id"] for pid, d in doc["path_definitions"].items()
+    }
+    assert not any("." in p for p in entries)  # a path id says nothing by its name
+    assert set(doc["applicability"]) == {"c1", "c2"}  # per constraint, not per path
 
 
 # --- 2. old against new ----------------------------------------------------------
@@ -111,7 +111,7 @@ def _renamed(
 ) -> dict[str, set[Any]]:
     """The old findings, keyed by the path that the old property became."""
     label_to_id = _by_label(new_doc)
-    raw = findings(run_r9(old_doc, mode))
+    raw = findings(run_r9(old_doc, mode, legacy=True))
     return {label_to_id[OLD_TO_PATH_LABEL[p]]: f for p, f in raw.items()}
 
 

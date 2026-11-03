@@ -40,7 +40,23 @@ R9 (`check_obligation_transport`, not part of `verify_history`) also gives the U
 | `VERIFIED_WITHOUT_EVIDENCE` | R5: a VERIFIED morphism has no evidence, or none that is sealed and checked, or has evidence with a broken seal (v0.4 D-13, D-19). |
 | `VERSION_CYCLE` | R6: the chain of versions (`prev_history_hash`) returns to a version already on it (v0.4 D-01). |
 
+## R9: where the constraint of a property comes from
+
+R9 takes the constraint of an obligation from the `constraints` entries of the
+vocabulary it is given (`(property, constraint id)` pairs, part of the vocabulary's
+content and so under the same reference and seal check as its names). It never reads
+a name (`c1.modality` and `path:...` are both opaque), a `path_label` or any other
+key. `applicability` is keyed by constraint id. An obligation whose entry cannot be
+read is `VOCABULARY_UNRESOLVED` (UNVERIFIABLE) with `detail.reason` and
+`detail.property`: `PROPERTY_NOT_IN_VOCABULARY`, `CONSTRAINT_ENTRY_MISSING`,
+`CONSTRAINT_ENTRY_DUPLICATE` (the same entry twice) or `CONSTRAINT_ENTRY_CONFLICT`
+(two constraint ids for one name). These are values of `detail`, not new reason codes.
+
 ## R9: known limits
+
+* **A vocabulary whose entries were rewritten cannot be told apart.** The check is on
+  the `kind` and `value` of the reference (below), so a vocabulary with the same
+  `kind` and `value` but other `constraints` entries is accepted as the same one.
 
 * **The vocabulary check compares references, not content.** R9 accepts the vocabulary
   it is given when its `Ref` has the same `kind` and `value` as the history's

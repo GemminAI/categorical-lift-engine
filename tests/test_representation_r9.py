@@ -20,6 +20,7 @@ from cle.representation import (
     check_r3,
     verify_history,
 )
+from ctp001_legacy import legacy_constraints, legacy_vocabulary
 
 GOLDEN = Path(__file__).parent / "golden" / "ctp001"
 P = "c1.condition"
@@ -61,7 +62,13 @@ def vocab(
     seal: Literal["SEAL_OK", "SEAL_FAIL"] | None = "SEAL_OK",
 ) -> PropertyVocabulary:
     return PropertyVocabulary(
-        "v", "1", "t", props, (), Ref("hext", value, seal_status=seal)
+        "v",
+        "1",
+        "t",
+        props,
+        (),
+        Ref("hext", value, seal_status=seal),
+        legacy_constraints(props),  # the old names, through the adapter
     )
 
 
@@ -356,7 +363,7 @@ def test_a_different_ref_kind_is_a_mismatch() -> None:
 def test_r9_judges_with_the_given_vocabulary_when_r3_fails() -> None:
     doc = json.loads((GOLDEN / "c1_D0.json").read_text(encoding="utf-8"))
     h = RepresentationHistory.from_dict(doc["history"])
-    voc = PropertyVocabulary.from_dict(doc["vocabulary"])
+    voc = legacy_vocabulary(doc)
     assert any(r.status == "FAIL" for r in check_r3(h, voc))
     results = check_obligation_transport(
         h, voc, doc["chain"], doc["obligations"], doc["applicability"]
