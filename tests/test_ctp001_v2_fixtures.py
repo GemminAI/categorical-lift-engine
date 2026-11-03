@@ -34,6 +34,7 @@ from ctp001_schema_graph import (
 )
 from ctp001_types import TYPES, examples_of
 from ctp001_v2_builder import (
+    APPLIES_TO_TYPE,
     CHANGED,
     FORM_MIGRATIONS,
     GOLDEN_V2_DIR,
@@ -551,6 +552,19 @@ def test_every_old_form_in_the_old_fixtures_is_a_row_of_the_map() -> None:
     assert "label_c4_order" in rows and any(
         p.endswith(".order") for p in old_properties()
     )
+
+
+def test_the_applies_to_row_names_the_type_the_rule_is_limited_to() -> None:
+    rows = {f["id"]: f for f in FORM_MIGRATIONS}
+    old = rows["threshold_applies_to_missing"]["old"]
+    assert old.startswith(f"constraint type {APPLIES_TO_TYPE}:")
+    written = _load(GOLDEN_V2_DIR / "migration_map.json")["form_migrations"]
+    assert [f for f in written if f["id"] == "threshold_applies_to_missing"] == [
+        rows["threshold_applies_to_missing"]
+    ]
+    assert f"constraint type {APPLIES_TO_TYPE}:" in (
+        GOLDEN_V2_DIR / "MIGRATION.md"
+    ).read_text(encoding="utf-8")
 
 
 def test_every_old_form_is_canonical_after_migration() -> None:

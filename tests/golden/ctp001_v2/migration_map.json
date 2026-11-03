@@ -88,7 +88,7 @@
       "canonical": "`threshold.applies_to` is `\"ordering.after\"`",
       "id": "threshold_applies_to_missing",
       "in_old_fixtures": true,
-      "old": "no link from threshold quantity to ordering event (v0.4 and before)",
+      "old": "constraint type C4: no link from threshold quantity to ordering event (v0.4 and before)",
       "source": "v0.5 section 10"
     },
     {

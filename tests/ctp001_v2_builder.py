@@ -331,7 +331,8 @@ FORM_MIGRATIONS: tuple[dict[str, Any], ...] = (
     },
     {
         "id": "threshold_applies_to_missing",
-        "old": "no link from threshold quantity to ordering event (v0.4 and before)",
+        "old": f"constraint type {APPLIES_TO_TYPE}: no link from threshold quantity"
+        " to ordering event (v0.4 and before)",
         "canonical": '`threshold.applies_to` is `"ordering.after"`',
         "in_old_fixtures": True,
         "source": "v0.5 section 10",
